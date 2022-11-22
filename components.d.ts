@@ -8,6 +8,7 @@ export {}
 declare module '@vue/runtime-core' {
   export interface GlobalComponents {
     ASkeleton: typeof import('@arco-design/web-vue')['Skeleton']
+    ASkeletonLine: typeof import('@arco-design/web-vue')['SkeletonLine']
     ASkeletonShape: typeof import('@arco-design/web-vue')['SkeletonShape']
     ASpace: typeof import('@arco-design/web-vue')['Space']
     RouterLink: typeof import('vue-router')['RouterLink']

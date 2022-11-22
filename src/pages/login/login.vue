@@ -1,25 +1,25 @@
 <script lang="ts" setup>
-import { getUuid } from '~/utils'
+import { useLoginQrCode, useloginIo } from '~/composables/useLogin'
 
-const loginQrCode = ref()
-const getLoginQrCode = async () => {
-	const res = await api.getLoginQRcode(getUuid().replace(/-/g, ''))
-	if (res.status === 200) {
-		loginQrCode.value = res.data.data
-	}
-}
-getLoginQrCode()
+onUnmounted(() => {
+	useloginIo.disconnect()
+})
 </script>
 
 <template>
 	<div class="bg flex center">
 		<div class="w-450px h-600px bg-white rounded-xl shadow-2xl">
-			<a-skeleton v-if="!loginQrCode" :animation="true">
+			<a-skeleton v-if="!useLoginQrCode" :animation="true" class="center flex-col">
 				<a-skeleton-shape shape="circle" size="large" />
+				<a-space direction="vertical" class="mt-40px m-auto w-80%" size="large">
+					<a-skeleton-line :rows="2" :line-height="50" />
+				</a-space>
 			</a-skeleton>
-			<img :src="`data:image/jpg;base64,${loginQrCode}`" class="w-300px h-300px mt-50px m-auto" v-else />
-			<h1 class="text-center mt-40px">请使用手机微信扫码登录</h1>
-			<h1 class="text-center mt-30px text-20px color-gray">备课系统需要配合手机微信使用</h1>
+			<div v-else>
+				<img :src="`data:image/jpg;base64,${useLoginQrCode}`" class="w-300px h-300px mt-50px m-auto" />
+				<h1 class="text-center mt-40px color-gray6">请使用手机微信扫码登录</h1>
+				<h1 class="text-center mt-30px text-20px color-gray">备课系统需要配合手机微信使用</h1>
+			</div>
 		</div>
 	</div>
 </template>
@@ -28,7 +28,6 @@ getLoginQrCode()
 .bg {
 	width: 100vw;
 	height: 100vh;
-	/* background-image: linear-gradient(120deg, #84fab0 0%, #8fd3f4 100%); */
 	background: url(//res.wx.qq.com/t/wx_fed/webwx/res/static/img/2zrdI1g.jpg) no-repeat 50%;
 	background-size: cover;
 }

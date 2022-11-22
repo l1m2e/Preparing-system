@@ -5,6 +5,7 @@ import Components from 'unplugin-vue-components/vite'
 import AutoImport from 'unplugin-auto-import/vite'
 import { ArcoResolver } from 'unplugin-vue-components/resolvers'
 import Unocss from 'unocss/vite'
+import requireTransform from 'vite-plugin-require-transform'
 
 export default defineConfig({
 	resolve: {
@@ -16,7 +17,7 @@ export default defineConfig({
 		Vue({
 			reactivityTransform: true
 		}),
-		// https://github.com/antfu/unplugin-auto-import
+		requireTransform({ fileRegex: /.ts$|.tsx$|.vue$/ }),
 		AutoImport({
 			imports: [
 				'vue',
@@ -33,8 +34,6 @@ export default defineConfig({
 			vueTemplate: true,
 			resolvers: [ArcoResolver()]
 		}),
-
-		// https://github.com/antfu/vite-plugin-components
 		Components({
 			dts: true,
 			resolvers: [
@@ -43,9 +42,6 @@ export default defineConfig({
 				})
 			]
 		}),
-
-		// https://github.com/antfu/unocss
-		// see unocss.config.ts for config
 		Unocss()
 	],
 	base: './'

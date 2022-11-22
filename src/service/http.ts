@@ -3,11 +3,11 @@ import axios from 'axios'
 import { baseUrl } from '~/config/baseUrl'
 import router from '~/router'
 
-axios.defaults.baseURL = baseUrl
+axios.defaults.baseURL = baseUrl.httpUrl
 axios.interceptors.request.use(
 	(config: AxiosRequestConfig) => {
 		if (config.headers) {
-			config.headers.Authorization = window.localStorage.getItem('token') || '' //添加token
+			config.headers.token = window.localStorage.getItem('token') || '' //添加token
 			config.timeout = 6000
 		}
 		return config
