@@ -1,6 +1,6 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
 import { close, start } from '~/utils/nporgress'
-const login = () => import('~/pages/login/login.vue')
+const layout = () => import('~/layout/layout.vue')
 const routes = [
 	{
 		path: '/',
@@ -9,7 +9,28 @@ const routes = [
 	{
 		path: '/login',
 		name: 'login',
-		component: login
+		component: () => import('~/pages/login/login.vue')
+	},
+	{
+		path: '/layout',
+		name: 'layout',
+		component: layout
+	},
+	{
+		path: '/course',
+		name: 'course',
+		component: layout,
+		children: [
+			{
+				path: 'list',
+				component: () => import('~/pages/course/course.vue')
+			}
+		]
+	},
+	{
+		path: '/scan-qr-login',
+		name: 'scan-qr-login',
+		component: () => import('~/pages/login/scan-qr-codes.vue')
 	}
 ]
 

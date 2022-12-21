@@ -1,15 +1,5 @@
 import { getUuid } from '~/utils'
-
-const UUIDCode = getUuid().replace(/-/g, '')
-export const useLoginQrCode = ref()
-export const getLoginQrCode = async () => {
-	const res = await api.getLoginQRcode(UUIDCode)
-	if (res.status === 200) {
-		useLoginQrCode.value = res.data.message
-	}
-}
-getLoginQrCode()
-
+import { io } from '~/service'
 export const useToken = useStorage('token', '')
 export const useUserInfo = useStorage('userInfo', {
 	userId: 0,
@@ -25,7 +15,19 @@ export const useUserInfo = useStorage('userInfo', {
 	}
 })
 
-export const useloginIo = api.onLoginIo(UUIDCode)
+export const useLoginQrCode = ref()
+export const useGetLoginQrCode = async () => {
+	useLoginQrCode.value = ''
+	const UUIDCode = getUuid().replace(/-/g, '')
+	const res = await api.getLoginQRcode(UUIDCode)
+	if (res.status === 200) {
+		useLoginQrCode.value = res.data.message
+		useloginIo.disconnect()
+		useloginIo = api.onLoginIo(UUIDCode)
+	}
+}
+
+export let useloginIo = io()
 //监听登录事件
 useloginIo.on('onAccredit', (res: any) => {
 	if (res.type === 'success') {

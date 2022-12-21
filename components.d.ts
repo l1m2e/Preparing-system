@@ -7,10 +7,24 @@ export {}
 
 declare module '@vue/runtime-core' {
   export interface GlobalComponents {
+    AButton: typeof import('@arco-design/web-vue')['Button']
+    ACard: typeof import('@arco-design/web-vue')['Card']
+    ADivider: typeof import('@arco-design/web-vue')['Divider']
+    AForm: typeof import('@arco-design/web-vue')['Form']
+    AFormItem: typeof import('@arco-design/web-vue')['FormItem']
+    AInput: typeof import('@arco-design/web-vue')['Input']
+    AInputPassword: typeof import('@arco-design/web-vue')['InputPassword']
+    ALayoutSider: typeof import('@arco-design/web-vue')['LayoutSider']
+    ALink: typeof import('@arco-design/web-vue')['Link']
+    AMenu: typeof import('@arco-design/web-vue')['Menu']
+    AMenuItem: typeof import('@arco-design/web-vue')['MenuItem']
     ASkeleton: typeof import('@arco-design/web-vue')['Skeleton']
     ASkeletonLine: typeof import('@arco-design/web-vue')['SkeletonLine']
     ASkeletonShape: typeof import('@arco-design/web-vue')['SkeletonShape']
     ASpace: typeof import('@arco-design/web-vue')['Space']
+    ASubMenu: typeof import('@arco-design/web-vue')['SubMenu']
+    ASwitch: typeof import('@arco-design/web-vue')['Switch']
+    ATag: typeof import('@arco-design/web-vue')['Tag']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
   }

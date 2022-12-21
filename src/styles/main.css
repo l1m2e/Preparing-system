@@ -10,6 +10,21 @@ body,
 html.dark {
 	background: #121212;
 }
+body {
+	background-color: #f2f3f5;
+}
+body[arco-theme='dark'] {
+	background: #29292c;
+	color: white;
+}
+body::-webkit-scrollbar {
+	width: 8px;
+	background: var(--color-neutral-3);
+}
+body::-webkit-scrollbar-thumb {
+	background: var(--color-neutral-5);
+	border-radius: 4px;
+}
 #nprogress .bar {
 	background: #6777ef !important;
 }
