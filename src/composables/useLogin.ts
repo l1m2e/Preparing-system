@@ -22,20 +22,27 @@ export const useGetLoginQrCode = async () => {
 	const res = await api.getLoginQRcode(UUIDCode)
 	if (res.status === 200) {
 		useLoginQrCode.value = res.data.message
-		useloginIo.disconnect()
-		useloginIo = api.onLoginIo(UUIDCode)
+		reconnection(UUIDCode)
 	}
 }
 
 export let useloginIo = io()
-//监听登录事件
-useloginIo.on('onAccredit', (res: any) => {
+
+// 重连ws
+const reconnection = (uuid: string) => {
+	useloginIo.disconnect()
+	useloginIo = api.onLoginIo(uuid)
+	//监听登录事件
+	useloginIo.on('onAccredit', onLogin)
+}
+
+const onLogin = (res: any) => {
 	if (res.type === 'success') {
 		useToken.value = res.message
 		useGetUserInfo() // 获取token成功则获取用户信息
 		useloginIo.disconnect() // 登录成功断开 ws
 	}
-})
+}
 
 export const useGetUserInfo = async () => {
 	const res = await api.getUserInfo()

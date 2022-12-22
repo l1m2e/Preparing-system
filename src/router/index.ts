@@ -23,7 +23,13 @@ const routes = [
 		children: [
 			{
 				path: 'list',
+				name: 'courseList',
 				component: () => import('~/pages/course/course.vue')
+			},
+			{
+				path: 'prepare',
+				name: 'coursePrepare',
+				component: () => import('~/pages/course/lesson-prepare.vue')
 			}
 		]
 	},
