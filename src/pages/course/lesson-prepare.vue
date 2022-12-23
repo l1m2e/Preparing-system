@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { setReactive } from '~/utils'
 import classRoomJpg from '~/assets/img/classroom.png'
+import weekCourse from './components/week-course.vue'
 const route = useRoute()
 const courseInfo = reactive({
 	className: '',
@@ -15,15 +16,14 @@ const courseInfo = reactive({
 	color: '',
 	classCount: ''
 })
-onMounted(() => {
-	setReactive(courseInfo, route.query)
-})
+setReactive(courseInfo, route.query)
+console.log('courseInfo', courseInfo)
 </script>
 
 <template>
 	<a-card :bordered="false">
 		<div class="flex">
-			<div class="w-250px h-150px relative mr-20px rounded-md overflow-hidden">
+			<div class="min-w-250px h-150px relative mr-20px rounded-md overflow-hidden">
 				<img class="w-100% h-100%" :src="classRoomJpg" alt="" />
 				<div class="absolute left-0 right-0 top-0 bottom-0 bg-[#00000042] center color-white text-19px">{{ courseInfo.courseName }}</div>
 			</div>
@@ -33,7 +33,6 @@ onMounted(() => {
 				</div>
 				<div class="icon-box mt-20px flex items-center text-16px">
 					<a-tag color="blue"><div class="i-ri-group-line"></div></a-tag>
-					<!-- <div class="ml-10px w-100px truncate">{{ courseInfo.className }}</div> -->
 					<a-select class="ml-10px max-w-120px" v-model="courseInfo.className" placeholder="班级选择">
 						<a-option>班级名称2</a-option>
 					</a-select>
@@ -47,7 +46,9 @@ onMounted(() => {
 					<div class="ml-10px w-120px truncate">{{ courseInfo.classRoom }}</div>
 				</div>
 			</div>
-			<div class="w-600px h-150px bg-red"></div>
+			<div class="w-100% h-200px">
+				<weekCourse :course-name="courseInfo.courseName" :class-name="courseInfo.className" :start-time="courseInfo.startTime"></weekCourse>
+			</div>
 		</div>
 
 		<!-- <div class="flex center justify-start h-40px">

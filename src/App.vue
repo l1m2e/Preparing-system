@@ -1,5 +1,5 @@
 <template>
-	<main font-sans>
+	<main>
 		<router-view />
 	</main>
 </template>

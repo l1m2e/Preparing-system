@@ -28,6 +28,7 @@ declare module '@vue/runtime-core' {
     ASubMenu: typeof import('@arco-design/web-vue')['SubMenu']
     ASwitch: typeof import('@arco-design/web-vue')['Switch']
     ATag: typeof import('@arco-design/web-vue')['Tag']
+    ATooltip: typeof import('@arco-design/web-vue')['Tooltip']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
   }
