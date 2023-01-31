@@ -10,7 +10,6 @@ const getCourseInfo = async () => {
 	if (res.status === 200) {
 		addColors(res.data, 'className') // 添加颜色
 		courseInfoList.value = formatData(res.data) // 格式化数据结构
-		// console.log('courseInfoList.value', courseInfoList.value)
 	} else {
 		Message.error('获取课程列表失败')
 	}

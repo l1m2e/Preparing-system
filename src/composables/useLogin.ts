@@ -15,6 +15,7 @@ export const useUserInfo = useStorage('userInfo', {
 	}
 })
 
+// 扫码登陆
 export const useLoginQrCode = ref()
 export const useGetLoginQrCode = async () => {
 	useLoginQrCode.value = ''

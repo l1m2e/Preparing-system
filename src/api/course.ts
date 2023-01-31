@@ -6,3 +6,5 @@ export const getSemesterCourse = (time: number) => axios.get('/teacherWeb/course
 export const getWeekCourse = (data: IWeekCourse) => axios.get('/teacherWeb/course/queryWeekCourse', { params: data })
 // 获取第几周的详细时间
 export const getWeekTime = (weekNum: number) => axios.get('/teacherWeb/course/timeCourse', { params: { weekNum } })
+// 根据课程名和班级名获取当前周的课程表 格式化
+export const weekCourseFormat = (data: IWeekCourse) => axios.get('/teacherWeb/course/weekCourseSimplify', { params: data })

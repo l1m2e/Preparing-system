@@ -16,3 +16,8 @@ export interface IAddIssueApi {
 	text: string
 	srcId: string
 }
+
+export interface Ilogin {
+	jobNum: string
+	password: string
+}

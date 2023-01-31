@@ -18,17 +18,17 @@ const routes = [
 	},
 	{
 		path: '/course',
-		name: 'course',
+		name: 'course-page',
 		component: layout,
 		children: [
 			{
 				path: 'list',
-				name: 'courseList',
+				name: 'course',
 				component: () => import('~/pages/course/course.vue')
 			},
 			{
 				path: 'prepare',
-				name: 'coursePrepare',
+				name: 'lesson-prepare',
 				component: () => import('~/pages/course/lesson-prepare.vue')
 			}
 		]

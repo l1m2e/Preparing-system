@@ -16,14 +16,13 @@ const courseInfo = reactive({
 	color: '',
 	classCount: ''
 })
-setReactive(courseInfo, route.query)
-console.log('courseInfo', courseInfo)
+setReactive(courseInfo, route.query) // 从route获取备课信息
 </script>
 
 <template>
 	<a-card :bordered="false">
 		<div class="flex">
-			<div class="min-w-250px h-150px relative mr-20px rounded-md overflow-hidden">
+			<div class="min-w-250px relative mr-20px rounded-md overflow-hidden">
 				<img class="w-100% h-100%" :src="classRoomJpg" alt="" />
 				<div class="absolute left-0 right-0 top-0 bottom-0 bg-[#00000042] center color-white text-19px">{{ courseInfo.courseName }}</div>
 			</div>
@@ -46,27 +45,10 @@ console.log('courseInfo', courseInfo)
 					<div class="ml-10px w-120px truncate">{{ courseInfo.classRoom }}</div>
 				</div>
 			</div>
-			<div class="w-100% h-200px">
+			<div class="w-100% h-310px">
 				<weekCourse :course-name="courseInfo.courseName" :class-name="courseInfo.className" :start-time="courseInfo.startTime"></weekCourse>
 			</div>
 		</div>
-
-		<!-- <div class="flex center justify-start h-40px">
-			<div class="text-12px min-w-260px">
-				<span>共计</span>
-				<a-tag class="mx-10px">{{ courseInfo.courseHourAll }}</a-tag>
-				<span>课时</span>
-				<span class="ml-20px">当前课时</span>
-				<a-tag class="mx-10px">{{ courseInfo.courseHour }}</a-tag>
-			</div>
-			<div class="w-100% center">
-				<a-progress
-					:steps="parseInt(courseInfo.courseHour)"
-					:animation="true"
-					size="mini"
-					:percent="parseFloat((parseInt(courseInfo.courseHour) / parseInt(courseInfo.courseHourAll)).toFixed(2))" />
-			</div>
-		</div> -->
 	</a-card>
 </template>
 

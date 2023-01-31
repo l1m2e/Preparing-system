@@ -1,16 +1,21 @@
 <script lang="ts" setup>
-// import loginbg from '~/assets/img/login-bg.svg'
-// import { loginApi, getAccessMenuApi, registerApi } from '~/api'
-// import { useMenuStore, useUserStore } from '~/store'
-// import { adminRoutes } from '~/router/modules/admin'
 import router from '~/router'
-
+import { useToken } from '~/composables'
 const flag = ref(true)
 //登陆表单
 const form = reactive({
-	uid: '',
+	jobNum: '',
 	password: ''
 })
+
+const login = async () => {
+	const res = await api.loggin(form)
+	if (res.status === 200) {
+		Message.success('登录成功')
+		useToken.value = res.data.message
+		router.push('/course/list')
+	}
+}
 
 const registerForm = reactive({
 	uid: '',
@@ -36,7 +41,7 @@ const scanQRcodesLogin = () => {
 				<h1 font-700 color="[var(--color-text-1)]" text-8 mt-10 text-center>登录</h1>
 				<a-form :model="form" layout="vertical" p-5>
 					<a-form-item field="name" label="工号">
-						<a-input v-model="form.uid" size="large" placeholder="请输入工号">
+						<a-input v-model="form.jobNum" size="large" placeholder="请输入工号">
 							<template #prefix>
 								<div i-carbon:user text-4 />
 							</template>
@@ -51,7 +56,7 @@ const scanQRcodesLogin = () => {
 					</a-form-item>
 					<a-form-item>
 						<div w="100%" h="100%" center>
-							<div class="button" @click="">登录</div>
+							<div class="button" @click="login">登录</div>
 						</div>
 					</a-form-item>
 				</a-form>
