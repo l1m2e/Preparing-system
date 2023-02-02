@@ -4,16 +4,22 @@ import { useToken } from '~/composables'
 const flag = ref(true)
 //登陆表单
 const form = reactive({
-	jobNum: '',
-	password: ''
+	jobNum: 'P1000100',
+	password: '123456'
 })
 
 const login = async () => {
-	const res = await api.loggin(form)
-	if (res.status === 200) {
-		Message.success('登录成功')
-		useToken.value = res.data.message
-		router.push('/course/list')
+	if (form.jobNum && form.password) {
+		const res = await api.loggin(form)
+		if (res.status === 200) {
+			Message.success('登录成功')
+			useToken.value = res.data.message
+			router.push('/course/list')
+		} else {
+			Message.error('账号或者密码错误')
+		}
+	} else {
+		Message.error('账号或者密码不能为空')
 	}
 }
 

@@ -1,23 +1,33 @@
 <script lang="ts" setup>
 import dayjs from 'dayjs'
 import { setReactive, changeTextToCN, getWeekList } from '~/utils'
+import { courseInfoStore } from '~/store/courseInfosStore'
 
-const props = defineProps<{
-	className: string
-	courseName: string
-	startTime: string
-}>()
-
-let selectionTime: string | number = parseFloat(props.startTime)
+let selectionTime: number | string = courseInfoStore.value.startTime
 const weekCourseList = ref()
 // 获取周课表
 const getWeekCourseList = async () => {
-	const res = await api.weekCourseFormat({ className: props.className, courseName: props.courseName, time: dayjs(selectionTime).format('YYYY-MM-DD') })
+	const res = await api.weekCourseFormat({
+		className: courseInfoStore.value.className,
+		courseName: courseInfoStore.value.courseName,
+		time: dayjs(selectionTime).format('YYYY-MM-DD')
+	})
 	if (res.status !== 200) return Message.error('获取课程列表失败')
 	weekCourseList.value = weekCourseListFormat(res.data.weekCourseSim)
 	weekInfo.weekNum = res.data.weekNum
-	console.log('res.data', res.data)
+	//给选中的课程标记颜色
+	weekCourseList.value.forEach((item: any) => {
+		item.courseInfo.forEach((course: any) => {
+			if (course.startTime) {
+				if (course.startTime === courseInfoStore.value.startTime) {
+					console.log(course.startTime, courseInfoStore.value.startTime)
+					course.selected = true
+				}
+			}
+		})
+	})
 }
+
 //课程表数据格式化函数
 const weekCourseListFormat = (data: Array<any>) => {
 	data.forEach((item: any) => {
@@ -43,7 +53,7 @@ const getWeekStartTime = async (first = false) => {
 	if (res.status !== 200) return Message.error('获取周时间失败')
 	setReactive(weekInfo, res.data)
 	if (first) {
-		selectionTime = parseFloat(props.startTime)
+		selectionTime = courseInfoStore.value.startTime
 	} else {
 		selectionTime = weekInfo.startDate
 	}
@@ -76,9 +86,28 @@ const getSelectedWeekList = (date: string) => {
 
 //监听班级改变重新拉取课程表
 watch(
-	() => props.className,
+	() => courseInfoStore.value.className,
 	() => getWeekCourseList()
 )
+
+//选中课时 修改store里面的数据
+const electedCourseHour = (info: any) => {
+	setReactive(courseInfoStore.value, info)
+	//排他算法 清除其他选中的颜色
+	weekCourseList.value.forEach((item: any) => {
+		item.courseInfo.forEach((course: any) => {
+			course.selected = false
+		})
+	})
+	info.selected = true
+	console.log(weekCourseList.value)
+}
+// 开启备课的时候重新查询周课表
+
+const onPreparesLessonInfoChange = () => {
+	getWeekCourseList()
+}
+defineExpose({ onPreparesLessonInfoChange })
 </script>
 
 <template>
@@ -106,8 +135,8 @@ watch(
 				<div class="w-100%">
 					<!-- 头部星期几 -->
 					<div class="center h-40px backdrop-blur-xl w-100% sticky top-0 text-center">
-						<div class="flex-1 mr-5px">#</div>
-						<div class="flex-1 mr-5px" v-for="item in weekDateArr">
+						<div class="flex-1 mr-5px max-w-100px">#</div>
+						<div class="flex-1 mr-5px max-w-100px" v-for="item in weekDateArr">
 							<p class="">{{ item.week }}</p>
 							<p class="mt-5px">{{ dayjs(item.date).format('MM/DD') }}</p>
 						</div>
@@ -115,7 +144,7 @@ watch(
 					<!-- 内容 -->
 					<div class="w-100%">
 						<div class="w-100% center h-50px mb-5px" v-for="(item, index) in weekCourseList">
-							<div class="flex-1 mr-5px last:mr-3px" v-for="(v, i) in item.courseInfo">
+							<div class="flex-1 mr-5px last:mr-3px max-w-100px" v-for="(v, i) in item.courseInfo">
 								<div v-if="i === 0" class="text-center">
 									<p class="text-16px">{{ index + 1 }}</p>
 									<p class="text-12px">{{ v.startTime }}</p>
@@ -124,9 +153,12 @@ watch(
 								<!-- 有课 并且判断有课已备课的颜色-->
 								<div
 									v-else-if="v.startTime"
+									@click="electedCourseHour(v), $emit('onChange')"
 									:class="`w-100% h-50px cursor-pointer center
-									${v.preparingFlag ? 'bg-[rgb(var(--green-2))] hover:bg-[rgb(var(--green-4))]' : 'bg-[rgb(var(--cyan-2))] hover:bg-[rgb(var(--cyan-4))]'} `">
-									{{ v.classDevicePosition }} - {{ v.classDeviceName }}
+									${v.preparingFlag ? 'bg-[rgb(var(--green-2))] hover:bg-[rgb(var(--green-4))]' : 'bg-[rgb(var(--cyan-2))] hover:bg-[rgb(var(--cyan-4))]'} 
+									${v.selected ? 'bg-[rgb(var(--primary-3))] hover:bg-[rgb(var(--primary-4))]' : ''} 
+									`">
+									{{ v.preparingFlag ? '已备课' : '未备课' }}
 								</div>
 								<!-- 无课 -->
 								<div v-else class="bg-[var(--color-fill-2)] w-100% h-50px cursor-pointer hover:bg-[var(--color-fill-4)] transition-all"></div>

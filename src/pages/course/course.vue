@@ -1,8 +1,9 @@
 <script lang="ts" setup>
 import dayjs from 'dayjs'
-import { addColors, getKeysObjec } from '~/utils'
+import { addColors, getKeysObjec, setReactive } from '~/utils'
 import classRoomJpg from '~/assets/img/classroom.png'
 import router from '~/router'
+import { courseInfoStore } from '~/store/courseInfosStore'
 
 const courseInfoList = ref()
 const getCourseInfo = async () => {
@@ -31,8 +32,23 @@ const formatData = (list: Array<any>) => {
 	return arr
 }
 const goLessonPrepare = (info: any) => {
-	const arr = ['className', 'classRoomMac', 'courseName', 'startTime', 'endTime', 'floor', 'classRoom', 'courseHour', 'courseHourAll', 'color', 'classCount']
-	router.push({ path: '/course/prepare', query: getKeysObjec(info, arr) })
+	//需要添加到store的字段
+	const arr = [
+		'className', //班级名称
+		'classDeviceName', //教室位置
+		'classRoomMac', //教室mac
+		'courseHour', //当前课时
+		'courseHourAll', // 总课时
+		'courseName', //课程名称
+		'endTime', //结束时间
+		'startTime', //开始时间
+		'classDevicePosition', //上课楼层
+		'color', //分配颜色
+		'classCount', // 班级人数
+		'preparingFlag' //是否已备课
+	]
+	setReactive(courseInfoStore.value, getKeysObjec(info, arr))
+	router.push('/course/prepare')
 }
 </script>
 
@@ -60,7 +76,7 @@ const goLessonPrepare = (info: any) => {
 										<div class="ml-5px">{{ child.classCount }}</div>
 									</a-tag>
 								</div>
-								<a-tag class="ml-20px" color="green" v-if="child.prepare">
+								<a-tag class="ml-20px" color="green" v-if="child.preparingFlag">
 									<div>已备课</div>
 									<div class="i-ri-check-line"></div>
 								</a-tag>
@@ -73,9 +89,9 @@ const goLessonPrepare = (info: any) => {
 									<div class="center justify-between mt-25px">
 										<div class="icon-box flex items-center text-16px">
 											<a-tag :color="child.color"><div class="i-ri-building-2-line"></div></a-tag>
-											<div class="ml-10px">{{ child.floor }}</div>
+											<div class="ml-10px">{{ child.classDevicePosition }}</div>
 											<a-tag class="ml-20px" :color="child.color"><div class="i-ri-map-pin-line"></div></a-tag>
-											<div class="ml-10px">{{ child.classRoom }}</div>
+											<div class="ml-10px">{{ child.classDeviceName }}</div>
 										</div>
 										<a-button type="primary" @click="goLessonPrepare(child)">去备课</a-button>
 									</div>

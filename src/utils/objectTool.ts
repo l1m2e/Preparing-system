@@ -1,29 +1,47 @@
 /**
- * 将传进来的数组中的key从对象里面筛选出来
- * @param obj 要筛选的对象
- * @param arr 要筛选的 kye 的数组
+ * 将传进来的数组中的key 从对象里面筛选出来 组成新的对象
+ * @param obj 被筛选的对象
+ * @param arr 需要筛选出来的key的数组
  * @returns 筛选后返回的对象
  */
-export const getKeysObjec = (obj: any, arr: Array<string>) => {
-	const res = {}
-	arr.forEach((item) => {
+export const getKeysObjec = <T, K extends keyof T>(obj: T, arr: K[]): { [P in K]: T[P] } => {
+	const res: any = {}
+	arr.forEach((item: K) => {
 		res[item] = obj[item]
 	})
 	return res
 }
 
+// function get<T extends object, K extends keyof T>(o: T, name: K): T[K] {
+// 	return o[name]
+// }
+// export type Res<T, K extends keyof T> = { [P in K]: T[P] }
+// export type fn2 = <T extends Object, K extends keyof T>() => Res<T, K>
+// type pickFromArray<T extends Record<string, any>, K extends Array<string>> = Pick<T, K[number]>
+// type pickFromArray<T extends Record<string, any>, K extends Array<string>> = {
+// 	[k in keyof Pick<T, K[number]>]: any
+// }
+// // type res = <T,K>() =>Pick(T,'name'|'t')
+
 /**
  * 拷贝对象 如果两个对象的key相等将被拷贝对象的key的值赋予原始对象
  * @param reactiveData 原始对象
- * @param setData 被拷贝对象
+ * @param copyData 被拷贝对象
  */
-export const setReactive = (reactiveData: any, setData: any) => {
+export const setReactive = (reactiveData: any, copyData: any) => {
 	Object.keys(reactiveData).forEach((key) => {
-		if (Object.prototype.hasOwnProperty.call(setData, key)) {
-			reactiveData[key] = setData[key]
+		if (Object.hasOwnProperty.call(copyData, key)) {
+			reactiveData[key] = copyData[key]
 		}
 	})
 }
+
+const resData = {} //接口返回的数据
+const data = reactive({
+	//本地数据
+	xxx: 1
+})
+setReactive(data, resData)
 
 /**
  * 批量给对象添加属性
