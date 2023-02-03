@@ -15,7 +15,7 @@ const login = async () => {
 			Message.success('登录成功')
 			useToken.value = res.data.message
 			router.push('/course/list')
-		} else {
+		} else if (res.status === 400) {
 			Message.error('账号或者密码错误')
 		}
 	} else {

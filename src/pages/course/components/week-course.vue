@@ -56,6 +56,7 @@ const getWeekStartTime = async (first = false) => {
 		selectionTime = courseInfoStore.value.startTime
 	} else {
 		selectionTime = weekInfo.startDate
+		console.log(weekInfo.startDate)
 	}
 	getWeekCourseList()
 	//每次获取周开始时间重新计算 当前周日期列表

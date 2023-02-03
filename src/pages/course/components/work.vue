@@ -1,10 +1,27 @@
 <script lang="ts" setup>
-import createIssueDrawer from './createIssue.vue'
-
-const createIssueDrawerRef = ref()
-const openCreateIssueDrawer = () => {
-	console.log('helo')
-	createIssueDrawerRef.value.open()
+import radioQuestionsModal from './modal/radio-questions-modal.vue' //单选题
+import multipleQuestionsModal from './modal/multiple-questions-modal.vue' // 多选题
+import clozeQuestionsModal from './modal/cloze-questions-modal.vue' // 填空题
+import shortAnswerQuestionsModal from './modal/short-answer-questions-modal.vue' //简答题
+// 单选题
+const radioQuestionsModalRef = ref()
+const openRadioQuestionsModal = () => {
+	radioQuestionsModalRef.value.open()
+}
+// 多选题
+const multipleQuestionsModalRef = ref()
+const openMultipleQuestionsModal = () => {
+	multipleQuestionsModalRef.value.open()
+}
+// 填空题
+const clozeQuestionsModalRef = ref()
+const openClozeQuestionsModal = () => {
+	clozeQuestionsModalRef.value.open()
+}
+// 简答题
+const shortAnswerQuestionsModalRef = ref()
+const openShortAnswerQuestionsModal = () => {
+	shortAnswerQuestionsModalRef.value.open()
 }
 //表格
 const selectedKeys = ref(['Jane Doe', 'Alisa Ross'])
@@ -119,10 +136,30 @@ const data = reactive([
 					新建问题
 				</a-button>
 				<template #content>
-					<a-doption @click="openCreateIssueDrawer">单选题</a-doption>
-					<a-doption>多选题</a-doption>
-					<a-doption>填空题</a-doption>
-					<a-doption>简答题</a-doption>
+					<a-doption @click="openRadioQuestionsModal">
+						<div class="center pr-10px">
+							<div class="i-ri-check-line mr-10px"></div>
+							<span>单 选 题</span>
+						</div>
+					</a-doption>
+					<a-doption @click="openMultipleQuestionsModal">
+						<div class="center pr-10px">
+							<div class="i-ri-check-double-line mr-10px"></div>
+							<span>多 选 题</span>
+						</div>
+					</a-doption>
+					<a-doption @click="openClozeQuestionsModal">
+						<div class="center pr-10px">
+							<div class="i-ri-quill-pen-line mr-10px"></div>
+							<span>填 空 题</span>
+						</div>
+					</a-doption>
+					<a-doption @click="openShortAnswerQuestionsModal">
+						<div class="center pr-10px">
+							<div class="i-ri-draft-line mr-10px"></div>
+							<span>简 答 题</span>
+						</div>
+					</a-doption>
 				</template>
 			</a-dropdown>
 			<a-button shape="round" size="large" class="ml-10px">
@@ -144,7 +181,10 @@ const data = reactive([
 				:pagination="pagination" />
 		</main>
 	</div>
-	<createIssueDrawer ref="createIssueDrawerRef"></createIssueDrawer>
+	<radioQuestionsModal ref="radioQuestionsModalRef"></radioQuestionsModal>
+	<multipleQuestionsModal ref="multipleQuestionsModalRef"></multipleQuestionsModal>
+	<clozeQuestionsModal ref="clozeQuestionsModalRef"></clozeQuestionsModal>
+	<shortAnswerQuestionsModal ref="shortAnswerQuestionsModalRef"></shortAnswerQuestionsModal>
 </template>
 
 <style scoped></style>
