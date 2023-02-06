@@ -1,9 +1,6 @@
 <script lang="ts" setup>
 import { Modal } from '@arco-design/web-vue'
-import '@wangeditor/editor/dist/css/style.css' // 引入 富文本 css
-import { Editor, Toolbar } from '@wangeditor/editor-for-vue'
-import { IToolbarConfig } from '@wangeditor/editor'
-
+import wangEdit from './wang-edit.vue'
 const show = ref(false)
 //将打开对话框的open函数暴露出去
 const open = () => {
@@ -22,47 +19,72 @@ const beforeClose = () => {
 	})
 }
 
-// 富文本
-// 编辑器实例，必须用 shallowRef
-const editorRef = shallowRef()
+// 提干
+const outline = ref('')
 
-// 内容 HTML
-const valueHtml = ref('<p>hello</p>')
-
-// 模拟 ajax 异步获取内容
-onMounted(() => {
-	setTimeout(() => {
-		valueHtml.value = '<p>模拟 Ajax 异步设置内容</p>'
-	}, 1500)
+interface LetterOptions {
+	unique: string
+	isAnswer: boolean
+}
+interface textOptions {
+	text: string
+}
+const optionsLetter = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'N', 'M', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
+//字母集合
+const letterList = ref<Array<LetterOptions>>([])
+optionsLetter.forEach((item: string) => {
+	letterList.value.push({ unique: item, isAnswer: false })
 })
 
-const editorConfig = { placeholder: '请输入内容...' }
-
-// 组件销毁时，也及时销毁编辑器
-onBeforeUnmount(() => {
-	const editor = editorRef.value
-	if (editor == null) return
-	editor.destroy()
-})
-
-const handleCreated = (editor: any) => {
-	editorRef.value = editor // 记录 editor 实例，重要！
+//内容集合
+const optionsContentList = ref<Array<textOptions>>([])
+for (let i = 0; i <= optionsLetter.length + 1; i++) {
+	optionsContentList.value.push({ text: '' })
 }
 
-//工具栏配置
-const toolbarConfig: Partial<IToolbarConfig> = {}
-toolbarConfig.excludeKeys = ['blockquote', 'header1', 'header2', 'header3', '|', 'bold', 'underline', 'italic', 'through', 'clearStyle', 'insertLink', 'insertVideo', 'codeBlock']
+//动态计算 选项集合
+let optionsIndex = ref(4)
+const optionsList = computed(() => optionsContentList.value.slice(0, optionsIndex.value))
+
+//添加一个选项
+const addOptions = () => {
+	if (optionsIndex.value >= 26) return Message.error('最多只能添加26个选项')
+	optionsIndex.value++
+}
+
+//删除选项
+const deleteOptions = (index: number) => {
+	optionsIndex.value--
+	optionsContentList.value.splice(index, 1)
+}
+
+//设置答案
+// const set
 </script>
 
 <template>
-	<a-modal :visible="show" title="添加单选题" width="auto" okText="保存" cancelText="取消" :closable="false" :mask-closable="false" :esc-to-close="false" :footer="false">
+	<a-modal :width="1200" :visible="show" title="添加单选题" okText="保存" cancelText="取消" :closable="false" :mask-closable="false" :esc-to-close="false" :footer="false">
 		<!-- 内容 -->
-		<div class="w-1000px h-500px">
-			<div style="border: 1px solid #ccc">
-				<Toolbar style="border-bottom: 1px solid #ccc" :editor="editorRef" :defaultConfig="toolbarConfig" mode="simple" />
-				<Editor style="height: 100px; overflow-y: hidden;" v-model="valueHtml" :defaultConfig="editorConfig" mode="simple" @onCreated="handleCreated" />
+		<a-scrollbar class="h-700px overflow-y-auto py-20px box-border">
+			<div class="w-90% m-auto">
+				<wangEdit placeholder="请输入题干" v-model="outline"></wangEdit>
 			</div>
-		</div>
+			<div class="w-90% m-auto mt-10 flex" v-for="(item, index) in optionsList">
+				<div class="min-w-70px center mr-10px">
+					<div class="w-50px h-50px rounded-full bg-red center">{{ letterList[index].unique }}</div>
+				</div>
+				<div class="w-100%">
+					<wangEdit placeholder="请输入答案" v-model="item.text"></wangEdit>
+				</div>
+				<div class="min-w-50px ml-10px center">
+					<a-button shape="circle" status="danger" @click="deleteOptions(index)"><div class="i-ri-delete-bin-2-line text-18px"></div></a-button>
+				</div>
+			</div>
+			<div class="center w-100% mt-30px">
+				<a-button @click="addOptions">添加一个新的选项</a-button>
+			</div>
+		</a-scrollbar>
+
 		<!-- 底部 -->
 		<div class="center justify-end">
 			<a-button class="mr-10px" @click="beforeClose">取消</a-button>

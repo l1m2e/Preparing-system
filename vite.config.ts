@@ -29,13 +29,13 @@ export default defineConfig({
 					'~/api': [['*', 'api']]
 				}
 			],
-			dts: true,
+			dts: './src/types/auto-import.d.ts',
 			dirs: ['./src/composables'],
 			vueTemplate: true,
 			resolvers: [ArcoResolver()]
 		}),
 		Components({
-			dts: true,
+			dts: './src/types/components.d.ts',
 			resolvers: [
 				ArcoResolver({
 					sideEffect: true
