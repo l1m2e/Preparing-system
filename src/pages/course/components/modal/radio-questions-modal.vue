@@ -1,13 +1,15 @@
 <script lang="ts" setup>
 import { Modal } from '@arco-design/web-vue'
 import wangEdit from './wang-edit.vue'
+import wangEditShow from './wang-edit-show.vue'
 const show = ref(false)
 //将打开对话框的open函数暴露出去
 const open = () => {
 	show.value = true
 }
 defineExpose({ open })
-//对话框关闭之前
+
+//对话框关闭之前 询问用户是否需要保存 如果取消保存 重置表单
 const beforeClose = () => {
 	Modal.info({
 		title: '提示',
@@ -15,6 +17,7 @@ const beforeClose = () => {
 		hideCancel: false,
 		onOk() {
 			show.value = false
+			reset()
 		}
 	})
 }
@@ -59,7 +62,24 @@ const deleteOptions = (index: number) => {
 }
 
 //设置答案
-// const set
+const setAnswer = (index: number) => {
+	letterList.value.forEach((item) => {
+		item.isAnswer = false
+	})
+	letterList.value[index].isAnswer = true
+}
+
+//重置
+const reset = () => {
+	optionsIndex.value = 4
+	outline.value = ''
+	optionsContentList.value.forEach((item) => {
+		item.text = ''
+	})
+	letterList.value.forEach((item) => {
+		item.isAnswer = false
+	})
+}
 </script>
 
 <template>
@@ -69,15 +89,17 @@ const deleteOptions = (index: number) => {
 			<div class="w-90% m-auto">
 				<wangEdit placeholder="请输入题干" v-model="outline"></wangEdit>
 			</div>
-			<div class="w-90% m-auto mt-10 flex" v-for="(item, index) in optionsList">
+			<div class="w-90% m-auto mt-10 flex options-item" v-for="(item, index) in optionsList">
 				<div class="min-w-70px center mr-10px">
-					<div class="w-50px h-50px rounded-full bg-red center">{{ letterList[index].unique }}</div>
+					<a-button shape="circle" :type="letterList[index].isAnswer ? 'primary' : 'secondary'" size="large" @click="setAnswer(index)">
+						{{ letterList[index].unique }}
+					</a-button>
 				</div>
 				<div class="w-100%">
-					<wangEdit placeholder="请输入答案" v-model="item.text"></wangEdit>
+					<wangEditShow placeholder="请输入答案" v-model="item.text"></wangEditShow>
 				</div>
 				<div class="min-w-50px ml-10px center">
-					<a-button shape="circle" status="danger" @click="deleteOptions(index)"><div class="i-ri-delete-bin-2-line text-18px"></div></a-button>
+					<a-button shape="circle" status="danger" size="mini" class="delete-icon" @click="deleteOptions(index)"><div class="i-ri-delete-bin-2-line"></div></a-button>
 				</div>
 			</div>
 			<div class="center w-100% mt-30px">
@@ -86,11 +108,18 @@ const deleteOptions = (index: number) => {
 		</a-scrollbar>
 
 		<!-- 底部 -->
-		<div class="center justify-end">
+		<div class="center justify-end mt-20px">
 			<a-button class="mr-10px" @click="beforeClose">取消</a-button>
 			<a-button @click="show = false" type="primary">保存</a-button>
 		</div>
 	</a-modal>
 </template>
 
-<style scoped></style>
+<style scoped>
+.delete-icon {
+	display: none;
+}
+.options-item:hover .delete-icon {
+	display: flex;
+}
+</style>
