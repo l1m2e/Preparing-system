@@ -27,6 +27,7 @@ onBeforeUnmount(() => {
 	const editor = editorRef.value
 	if (editor == null) return
 	editor.destroy()
+	console.log('销毁')
 })
 
 const handleCreated = (editor: any) => {
@@ -51,7 +52,9 @@ toolbarConfig.excludeKeys = [
 	'codeBlock',
 	'numberedList',
 	'undo',
-	'redo'
+	'redo',
+	'insertImage',
+	'fullScreen'
 ]
 
 //聚焦焦点
@@ -60,7 +63,41 @@ const focus = () => {
 }
 defineExpose({ focus })
 
+//失去焦点
+const saveAction: any = inject('saveAction')
+const getEditIMage: any = inject('getEditIMage')
+watch(
+	() => saveAction.value,
+	(flag) => {
+		if (flag) {
+			console.log('保存按钮', flag)
+			const temp = editorRef.value.getElemsByType('image').map((item: any) => item.src)
+			console.log(temp + 'temp')
+			getEditIMage(temp)
+		}
+	},
+	{ deep: true }
+)
+const onBlur = async () => {
+	emit('onEditBlur')
+	// markImage(editImageList)
+	// 	const temp = fileList.filter((item) => !editImageList.includes(item))
+	// 	if (temp.length !== 0) {
+	// 		console.log(temp, 'temp')
+	// 		const res = await api.deleteFile(temp)
+	// 		temp.forEach((item) => {
+	// 			const index = fileList.findIndex((v) => v === item)
+	// 			if (index !== -1) {
+	// 				fileList.splice(index, 1)
+	// 			}
+	// 		})
+	// 		console.log(res)
+	// 		console.log(fileList)
+	// 	}
+}
+
 //上传图片
+// const fileList: Array<any> = [] // 上传的图片列表
 if (editorConfig.MENU_CONF) {
 	editorConfig.MENU_CONF['uploadImage'] = {
 		server: baseUrl.httpUrl + '/file/updateImage',
@@ -70,14 +107,15 @@ if (editorConfig.MENU_CONF) {
 		//上传成功
 		onSuccess(file: File, res: any) {
 			console.log(`${file.name} 上传成功`, res)
+			// fileList.push(res.data.url)
 		},
 		// 上传失败
 		onFailed(file: File, res: any) {
-			console.log(`${file.name} 上传失败`, res)
+			Message.error(`${file.name} 上传失败`)
 		},
 		// 上传错误，或者触发 timeout 超时
 		onError(file: File, err: any, res: any) {
-			console.log(`${file.name} 上传出错`, err, res)
+			Message.error(`${file.name} 上传出错 ${err}`)
 		}
 	}
 }
@@ -88,7 +126,7 @@ if (editorConfig.MENU_CONF) {
 <template>
 	<div class="richText-box">
 		<Toolbar :editor="editorRef" :defaultConfig="toolbarConfig" mode="simple" />
-		<Editor class="richText-edit" v-model="valueHtml" :defaultConfig="editorConfig" mode="simple" @onCreated="handleCreated" @onBlur="$emit('onEditBlur')" />
+		<Editor class="richText-edit" v-model="valueHtml" :defaultConfig="editorConfig" mode="simple" @onCreated="handleCreated" @onBlur="onBlur" />
 	</div>
 </template>
 

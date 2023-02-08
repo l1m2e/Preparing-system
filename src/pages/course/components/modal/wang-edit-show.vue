@@ -14,8 +14,8 @@ const valueHtml = computed({
 const flag = ref(false)
 const wangEditRef = ref()
 const onClick = () => {
-	wangEditRef.value.focus()
 	flag.value = true
+	wangEditRef.value.focus()
 }
 //编辑器失去焦点
 const editBlur = () => {
@@ -24,8 +24,10 @@ const editBlur = () => {
 </script>
 
 <template>
-	<wangEdit v-if="flag" v-model="valueHtml" :placeholder="props.placeholder" :onOnEditBlur="editBlur"></wangEdit>
-	<div v-else @click="onClick" ref="wangEditRef" class="p-10px w-100% h-45px border-1 border-[var(--color-border-2)] overflow-y-auto show-box" v-html="valueHtml"></div>
+	<div ref="wangEditRef">
+		<wangEdit v-if="flag" v-model="valueHtml" :placeholder="props.placeholder" :onOnEditBlur="editBlur"></wangEdit>
+		<div v-else @click="onClick" class="p-10px w-100% h-45px border-1 border-[var(--color-border-2)] overflow-y-auto show-box" v-html="valueHtml"></div>
+	</div>
 </template>
 
 <style scoped>

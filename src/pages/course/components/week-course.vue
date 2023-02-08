@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import dayjs from 'dayjs'
 import { setReactive, changeTextToCN, getWeekList } from '~/utils'
-import { courseInfoStore } from '~/store/courseInfosStore'
+import { courseInfoStore } from '~/store/courseStore'
 
 let selectionTime: number | string = courseInfoStore.value.startTime
 const weekCourseList = ref()

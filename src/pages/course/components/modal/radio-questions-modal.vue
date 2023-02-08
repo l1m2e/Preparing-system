@@ -74,12 +74,50 @@ const reset = () => {
 	optionsIndex.value = 4
 	outline.value = ''
 	optionsContentList.value.forEach((item) => {
+		console.log(item.text)
 		item.text = ''
 	})
 	letterList.value.forEach((item) => {
 		item.isAnswer = false
 	})
 }
+
+//记录编辑器内部图片
+let saveAction = ref(false)
+let markImageList: Array<string> = []
+provide('saveAction', saveAction)
+provide('getEditIMage', (data: Array<string>) => {
+	markImageList = [...markImageList, ...data]
+	console.log('data', data)
+	saveAction.value = false
+})
+
+const getImageSrc = (richText: string): Array<string> => {
+	let regexp = /<img [^>]*src=['"]([^'"]+)[^>]*>/g
+	richText.replace(regexp, (match, capture) => {
+		console.log(capture)
+	})
+	// richText.replace(regexp,)
+	return []
+}
+//保存
+const saveButton = () => {
+	saveAction.value = true
+	// show.value = false
+	console.log(optionsContentList.value)
+	optionsContentList.value.forEach((item) => {
+		getImageSrc(item.text)
+	})
+}
+
+// 获取富文本里面的全部src
+// const getImgSrc = (rich: any) => {
+// 	let imgList: Array<string> = []
+// 	htmlstr.replace(/<img [^>]*src=['"]([^'"]+)[^>]*>/g, (match, capture) => {
+// 		imgList.push(capture)
+// 	})
+// 	return imgList
+// }
 </script>
 
 <template>
@@ -110,7 +148,7 @@ const reset = () => {
 		<!-- 底部 -->
 		<div class="center justify-end mt-20px">
 			<a-button class="mr-10px" @click="beforeClose">取消</a-button>
-			<a-button @click="show = false" type="primary">保存</a-button>
+			<a-button @click="saveButton" type="primary">保存</a-button>
 		</div>
 	</a-modal>
 </template>

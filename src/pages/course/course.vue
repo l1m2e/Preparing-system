@@ -3,7 +3,7 @@ import dayjs from 'dayjs'
 import { addColors, getKeysObjec, setReactive } from '~/utils'
 import classRoomJpg from '~/assets/img/classroom.png'
 import router from '~/router'
-import { courseInfoStore } from '~/store/courseInfosStore'
+import { courseInfoStore } from '~/store/courseStore'
 
 const courseInfoList = ref()
 const getCourseInfo = async () => {

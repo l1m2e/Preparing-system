@@ -4,7 +4,7 @@ import dayjs from 'dayjs'
 import classRoomJpg from '~/assets/img/classroom.png'
 import weekCourse from './components/week-course.vue'
 import work from './components/work.vue'
-import { courseInfoStore } from '~/store/courseInfosStore'
+import { courseInfoStore } from '~/store/courseStore'
 
 // 查询是否备课 200 已备课 400 未备课
 const queryLessonPrepare = async () => {
