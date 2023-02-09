@@ -2,7 +2,7 @@
 import { changeTextToCN, getKeysObjec } from '~/utils'
 import dayjs from 'dayjs'
 import classRoomJpg from '~/assets/img/classroom.png'
-import weekCourse from './components/week-course.vue'
+import weekCourse from './components/weekSelector/week-course.vue'
 import work from './components/work.vue'
 import { courseInfoStore } from '~/store/courseStore'
 

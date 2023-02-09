@@ -5,11 +5,17 @@ import { IToolbarConfig, IEditorConfig } from '@wangeditor/editor'
 import { baseUrl } from '~/config/baseUrl'
 import { useToken } from '~/composables'
 
-const props = defineProps<{
+interface Props {
 	placeholder: string
 	modelValue: string
-}>()
+	minHeight?: string
+}
+const props = withDefaults(defineProps<Props>(), {
+	minHeight: '80'
+})
 const emit = defineEmits(['update:modelValue', 'onEditBlur'])
+
+const minHeight = computed(() => props.minHeight + 'px')
 
 // 编辑器实例，必须用 shallowRef
 const editorRef = shallowRef()
@@ -57,47 +63,23 @@ toolbarConfig.excludeKeys = [
 	'fullScreen'
 ]
 
-//聚焦焦点
-const focus = () => {
-	editorRef.value.focus()
+//聚集焦点
+const isFocus = ref<boolean>(false)
+const onFocus = () => {
+	editorRef.value.focus(true)
+	isFocus.value = true
 }
-defineExpose({ focus })
-
 //失去焦点
-const saveAction: any = inject('saveAction')
-const getEditIMage: any = inject('getEditIMage')
-watch(
-	() => saveAction.value,
-	(flag) => {
-		if (flag) {
-			console.log('保存按钮', flag)
-			const temp = editorRef.value.getElemsByType('image').map((item: any) => item.src)
-			console.log(temp + 'temp')
-			getEditIMage(temp)
-		}
-	},
-	{ deep: true }
-)
 const onBlur = async () => {
+	isFocus.value = false
 	emit('onEditBlur')
-	// markImage(editImageList)
-	// 	const temp = fileList.filter((item) => !editImageList.includes(item))
-	// 	if (temp.length !== 0) {
-	// 		console.log(temp, 'temp')
-	// 		const res = await api.deleteFile(temp)
-	// 		temp.forEach((item) => {
-	// 			const index = fileList.findIndex((v) => v === item)
-	// 			if (index !== -1) {
-	// 				fileList.splice(index, 1)
-	// 			}
-	// 		})
-	// 		console.log(res)
-	// 		console.log(fileList)
-	// 	}
+	console.log('失去焦点')
 }
-
+const borderColor = computed(() => (isFocus.value ? ' 1px solid rgb(var(--primary-6))' : ' 1px solid var(--color-border-2)'))
+watch(borderColor, (n) => {
+	console.log(n)
+})
 //上传图片
-// const fileList: Array<any> = [] // 上传的图片列表
 if (editorConfig.MENU_CONF) {
 	editorConfig.MENU_CONF['uploadImage'] = {
 		server: baseUrl.httpUrl + '/file/updateImage',
@@ -125,14 +107,22 @@ if (editorConfig.MENU_CONF) {
 
 <template>
 	<div class="richText-box">
-		<Toolbar :editor="editorRef" :defaultConfig="toolbarConfig" mode="simple" />
-		<Editor class="richText-edit" v-model="valueHtml" :defaultConfig="editorConfig" mode="simple" @onCreated="handleCreated" @onBlur="onBlur" />
+		<Toolbar class="richText-toolbar" :editor="editorRef" :defaultConfig="toolbarConfig" mode="simple" />
+		<Editor class="richText-edit" v-model="valueHtml" :defaultConfig="editorConfig" mode="simple" @onCreated="handleCreated" @onBlur="onBlur" @onFocus="onFocus" />
 	</div>
 </template>
 
 <style scoped>
 .richText-box {
 	border-radius: 5px;
-	box-shadow: 2px 2px 10px var(--color-border-2);
+	border: v-bind(borderColor);
+	transition: all 0.6s;
+}
+.richText-toolbar :deep(.w-e-bar) {
+	border-radius: 5px 5px 0px 0px;
+}
+.richText-edit :deep(.w-e-text-container) {
+	border-radius: 0px 0px 5px 5px;
+	min-height: v-bind(minHeight);
 }
 </style>

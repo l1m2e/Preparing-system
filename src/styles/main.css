@@ -14,13 +14,15 @@ body {
 	background-color: #f2f3f5;
 	--w-e-textarea-bg-color: #fff;
 	--w-e-toolbar-bg-color: var(--color-fill-1);
+	--w-e-textarea-slight-color: rgb(var(--gray-5));
 }
 body[arco-theme='dark'] {
 	background: #29292c;
 	color: white;
 	/* 富文本编辑器黑暗模式配置 */
-	--w-e-textarea-bg-color: var(--color-neutral-4);
+	--w-e-textarea-bg-color: var(--color-fill-1);
 	--w-e-textarea-color: var(--color-text-1);
+	--w-e-textarea-slight-color: rgb(var(--gray-5));
 	--w-e-toolbar-color: var(--color-text-1);
 	--w-e-toolbar-bg-color: var(--color-neutral-3);
 	--w-e-toolbar-active-color: var(--color-text-1);
@@ -37,4 +39,20 @@ body::-webkit-scrollbar-thumb {
 }
 #nprogress .bar {
 	background: #6777ef !important;
+}
+
+/* 优化滚动条 */
+.scroll-bar::-webkit-scrollbar {
+	width: 8px;
+	background: #00000000;
+}
+.scroll-bar::-webkit-scrollbar-thumb {
+	background: #00000000;
+	border-radius: 4px;
+}
+.scroll-bar:hover::-webkit-scrollbar {
+	background: var(--color-fill-1);
+}
+.scroll-bar:hover::-webkit-scrollbar-thumb {
+	background: var(--color-fill-4);
 }

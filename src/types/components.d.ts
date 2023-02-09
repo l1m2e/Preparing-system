@@ -25,6 +25,8 @@ declare module '@vue/runtime-core' {
     AOption: typeof import('@arco-design/web-vue')['Option']
     APopconfirm: typeof import('@arco-design/web-vue')['Popconfirm']
     AProgress: typeof import('@arco-design/web-vue')['Progress']
+    ARadio: typeof import('@arco-design/web-vue')['Radio']
+    ARadioGroup: typeof import('@arco-design/web-vue')['RadioGroup']
     AScrollbar: typeof import('@arco-design/web-vue')['Scrollbar']
     ASelect: typeof import('@arco-design/web-vue')['Select']
     ASkeleton: typeof import('@arco-design/web-vue')['Skeleton']

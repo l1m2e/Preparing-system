@@ -44,7 +44,7 @@ const weekInfo = reactive({
 	maxWeek: 0, // 最大周
 	schoolStartTime: '', // 开学时间
 	startDate: '', // 周开始时间
-	weekNum: 0 // 当前周数
+	weekNum: 1 // 当前周数
 })
 const weekNumCN = computed(() => `第${changeTextToCN(weekInfo.weekNum)}周`)
 // 获取周开始的时间
@@ -132,7 +132,7 @@ defineExpose({ onPreparesLessonInfoChange })
 			</a-tooltip>
 		</div>
 		<div class="w-100% h-100% pr-60px">
-			<div class="w-100% h-100% overflow-auto relative week-box">
+			<div class="w-100% h-100% overflow-auto relative scroll-bar">
 				<div class="w-100%">
 					<!-- 头部星期几 -->
 					<div class="center h-40px backdrop-blur-xl w-100% sticky top-0 text-center">
@@ -175,20 +175,5 @@ defineExpose({ onPreparesLessonInfoChange })
 .text {
 	writing-mode: vertical-rl;
 	letter-spacing: 5px;
-}
-.week-box::-webkit-scrollbar {
-	width: 8px;
-	background: #00000000;
-}
-
-.week-box::-webkit-scrollbar-thumb {
-	background: #00000000;
-	border-radius: 4px;
-}
-.week-box:hover::-webkit-scrollbar {
-	background: var(--color-fill-1);
-}
-.week-box:hover::-webkit-scrollbar-thumb {
-	background: var(--color-fill-4);
 }
 </style>
