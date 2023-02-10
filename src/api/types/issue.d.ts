@@ -1,13 +1,13 @@
 export interface IaddIssue {
 	analysis: string
 	answer: Array<string>
-	choices: Array<Ichoices>
+	choices?: Array<Ichoices>
 	difficulty: number
 	fid?: number
-	share_flag: boolean
-	srcId: Array<any>
+	share_flag?: boolean
+	srcId?: Array<any>
 	title: string
-	type?: 1 | 2 | 3 | 4
+	type?: number
 }
 interface Ichoices {
 	unique: string

@@ -1,28 +1,36 @@
 <script lang="ts" setup>
-import radioQuestionsModal from './modal/radio-questions-modal.vue' //单选题
-import multipleQuestionsModal from './modal/multiple-questions-modal.vue' // 多选题
+import multipleChoiceQuestionModal from './modal/multiple-choice-question-modal.vue' //单选题 & 多选题
+import judgementQuestionsModal from './modal/judgement-questions-modal.vue' // 多选题
 import clozeQuestionsModal from './modal/cloze-questions-modal.vue' // 填空题
 import shortAnswerQuestionsModal from './modal/short-answer-questions-modal.vue' //简答题
 // 单选题
-const radioQuestionsModalRef = ref()
+const multipleChoiceQuestionModalRef = ref()
 const openRadioQuestionsModal = () => {
-	radioQuestionsModalRef.value.open()
+	multipleChoiceQuestionModalRef.value.open('radio')
 }
 // 多选题
-const multipleQuestionsModalRef = ref()
-const openMultipleQuestionsModal = () => {
-	multipleQuestionsModalRef.value.open()
+const openMultipleQuestionModal = () => {
+	multipleChoiceQuestionModalRef.value.open('multiSelect')
 }
+
+// 判断题
+const judgementQuestionsModalRef = ref()
+const openJudgementQuestionsModal = () => {
+	judgementQuestionsModalRef.value.open()
+}
+
 // 填空题
 const clozeQuestionsModalRef = ref()
 const openClozeQuestionsModal = () => {
 	clozeQuestionsModalRef.value.open()
 }
+
 // 简答题
 const shortAnswerQuestionsModalRef = ref()
 const openShortAnswerQuestionsModal = () => {
 	shortAnswerQuestionsModalRef.value.open()
 }
+
 //表格
 const selectedKeys = ref(['Jane Doe', 'Alisa Ross'])
 const rowSelection = reactive({
@@ -142,10 +150,16 @@ const data = reactive([
 							<span>单 选 题</span>
 						</div>
 					</a-doption>
-					<a-doption @click="openMultipleQuestionsModal">
+					<a-doption @click="openMultipleQuestionModal">
 						<div class="center pr-10px">
 							<div class="i-ri-check-double-line mr-10px"></div>
 							<span>多 选 题</span>
+						</div>
+					</a-doption>
+					<a-doption @click="openJudgementQuestionsModal">
+						<div class="center pr-10px">
+							<div class="i-ri-question-mark mr-10px"></div>
+							<span>判 断 题</span>
 						</div>
 					</a-doption>
 					<a-doption @click="openClozeQuestionsModal">
@@ -181,8 +195,8 @@ const data = reactive([
 				:pagination="pagination" />
 		</main>
 	</div>
-	<radioQuestionsModal ref="radioQuestionsModalRef"></radioQuestionsModal>
-	<multipleQuestionsModal ref="multipleQuestionsModalRef"></multipleQuestionsModal>
+	<multipleChoiceQuestionModal ref="multipleChoiceQuestionModalRef"></multipleChoiceQuestionModal>
+	<judgementQuestionsModal ref="judgementQuestionsModalRef"></judgementQuestionsModal>
 	<clozeQuestionsModal ref="clozeQuestionsModalRef"></clozeQuestionsModal>
 	<shortAnswerQuestionsModal ref="shortAnswerQuestionsModalRef"></shortAnswerQuestionsModal>
 </template>
