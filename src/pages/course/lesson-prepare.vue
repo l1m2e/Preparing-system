@@ -3,6 +3,7 @@ import { changeTextToCN, getKeysObjec } from '~/utils'
 import dayjs from 'dayjs'
 import classRoomJpg from '~/assets/img/classroom.png'
 import weekCourse from './components/weekSelector/week-course.vue'
+import prepareLessonsModal from './components/modal/prepare-lessons-modal.vue'
 import work from './components/work.vue'
 import { courseInfoStore } from '~/store/courseStore'
 
@@ -22,16 +23,13 @@ const courseHourChange = () => {
 	queryLessonPrepare()
 }
 // 开启备课
-const weekCourseRef = ref()
+const prepareLessonsModalRef = ref()
 const openPreparesLesson = async () => {
-	const param = getKeysObjec(courseInfoStore.value, ['classDeviceName', 'classDevicePosition', 'className', 'classRoomMac', 'courseHour', 'courseName', 'endTime', 'startTime'])
-	const res = await api.openPreparing(param)
-	if (res.status === 200) {
-		courseInfoStore.value.preparingFlag = true
-		weekCourseRef.value.onPreparesLessonInfoChange()
-	} else {
-		Message.error('开启备课失败')
-	}
+	prepareLessonsModalRef.value.open()
+}
+const weekCourseRef = ref()
+const onPreparesLessonInfoChange = () => {
+	weekCourseRef.value.onPreparesLessonInfoChange()
 }
 </script>
 
@@ -111,6 +109,7 @@ const openPreparesLesson = async () => {
 			<a-tab-pane key="3" title="课件"></a-tab-pane>
 		</a-tabs>
 	</a-card>
+	<prepareLessonsModal ref="prepareLessonsModalRef" @change="onPreparesLessonInfoChange"></prepareLessonsModal>
 </template>
 
 <style scoped>

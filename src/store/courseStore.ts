@@ -12,3 +12,5 @@ export const courseInfoStore = useStorage('courseInfo', {
 	classCount: '', //班级人数
 	preparingFlag: false // 是否已备课
 })
+
+export const dataStore = ref()

@@ -19,3 +19,9 @@ export interface IopenPreparing {
 	endTime: number
 	startTime: number
 }
+
+export interface IGetCourseList {
+	semester: string
+	time: number
+	year: string
+}

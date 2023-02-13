@@ -7,7 +7,7 @@ import { courseInfoStore } from '~/store/courseStore'
 
 const courseInfoList = ref()
 const getCourseInfo = async () => {
-	const res = await api.getSemesterCourse(dayjs().valueOf())
+	const res = await api.getSemesterCourse({ semester: '', time: dayjs().valueOf(), year: dayjs().format('YYYY') })
 	if (res.status === 200) {
 		addColors(res.data, 'className') // 添加颜色
 		courseInfoList.value = formatData(res.data) // 格式化数据结构

@@ -25,7 +25,7 @@ const beforeClose = () => {
 const topic = ref('') //题目富文本
 const analysis = ref('') //答案解析富文本
 
-// 问题难度
+// 判断题选项
 const udgementOptions = [
 	{
 		value: 'A',

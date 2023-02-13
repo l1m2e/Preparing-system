@@ -1,7 +1,7 @@
 import { axios } from '~/service'
-import { ILessonPreparation, IopenPreparing, IWeekCourse } from './types'
+import { IGetCourseList, ILessonPreparation, IopenPreparing, IWeekCourse } from './types'
 // 获取学期课程
-export const getSemesterCourse = (time: number) => axios.get('/teacherWeb/course/semesterCourse', { params: { time } })
+export const getSemesterCourse = (data: IGetCourseList) => axios.get('/teacherWeb/course/semesterCourse', { params: data })
 // 根据课程名和班级名获取当前周的课程表
 export const getWeekCourse = (data: IWeekCourse) => axios.get('/teacherWeb/course/queryWeekCourse', { params: data })
 // 获取第几周的详细时间
@@ -12,3 +12,5 @@ export const weekCourseFormat = (data: IWeekCourse) => axios.get('/teacherWeb/co
 export const isLessonPreparation = (data: ILessonPreparation) => axios.get('/teacherWeb/preparing/infoByCourse', { params: data })
 // 开启备课
 export const openPreparing = (data: IopenPreparing) => axios.post('/teacherWeb/preparing/add', data)
+// 获取当学年和学期
+export const getSemester = () => axios.get('/teacherWeb/course/getYearAndSemester')
