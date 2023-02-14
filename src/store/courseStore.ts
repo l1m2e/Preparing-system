@@ -10,7 +10,10 @@ export const courseInfoStore = useStorage('courseInfo', {
 	classDevicePosition: '', //上课楼层
 	color: '', // 分配的颜色
 	classCount: '', //班级人数
-	preparingFlag: false // 是否已备课
+	preparingFlag: false // 是否已备课,
 })
 
-export const dataStore = ref()
+export const semesterStore = useStorage('semester', {
+	year: '', //学年度
+	semester: '' //学期
+})

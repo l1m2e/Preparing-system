@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { getKeysObjec } from '~/utils'
-import { courseInfoStore } from '~/store/courseStore'
+import { courseInfoStore, semesterStore } from '~/store/courseStore'
+
 const emits = defineEmits(['change'])
 const show = ref(false)
 //将打开对话框的open函数暴露出去
@@ -14,10 +15,8 @@ const handleBeforeOk = async () => {
 		Message.error('您必须输入备课主题的名称')
 		return false
 	}
-	const semesterRes = await api.getSemester()
-	if (semesterRes.status !== 200) return false
 	const param = getKeysObjec(courseInfoStore.value, ['classDeviceName', 'classDevicePosition', 'className', 'classRoomMac', 'courseHour', 'courseName', 'endTime', 'startTime'])
-	const res = await api.openPreparing({ ...param, ...form, ...semesterRes.data })
+	const res = await api.openPreparing({ ...param, ...form, ...semesterStore.value })
 	if (res.status === 200) {
 		courseInfoStore.value.preparingFlag = true
 		Message.success('开启备课成功')

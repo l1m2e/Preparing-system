@@ -2,6 +2,7 @@
 import { Modal } from '@arco-design/web-vue'
 import wangEdit from '../editor/wang-edit.vue'
 import wangEditShow from '../editor/wang-edit-show.vue'
+import { changeTextToCN } from '~/utils'
 import { getImageSrcId, markUseImage } from './utils/modalUtils'
 const show = ref(false)
 //将打开对话框的open函数暴露出去
@@ -25,19 +26,6 @@ const beforeClose = () => {
 const topic = ref('') //题目富文本
 const analysis = ref('') //答案解析富文本
 
-// 判断题选项
-const udgementOptions = [
-	{
-		value: 'A',
-		label: '对'
-	},
-	{
-		value: 'B',
-		label: '错'
-	}
-]
-const judgementOptionsValue = ref('A')
-
 // 问题难度
 const difficultyOptions = [
 	{
@@ -55,21 +43,38 @@ const difficultyOptions = [
 ]
 const difficultyOptionsValue = ref(1)
 
+//问题列表
+const answerList = ref([{ text: '' }])
+//添加答案
+const addAnswer = () => {
+	const obj = { text: '' }
+	answerList.value.push(obj)
+}
+//删除答案
+const deleteAnswer = (index: number) => {
+	if (answerList.value.length <= 1) return Message.error('填空题必须保留一个空')
+	answerList.value.splice(index, 1)
+}
+
 //重置
 const reset = () => {
 	topic.value = ''
 	analysis.value = ''
+	answerList.value.length = 1
+	answerList.value[0].text = ''
 }
 
 //提交
 const submit = async () => {
 	if (topic.value === '' || topic.value === '<p><br></p>') return { message: '题目不能为空', isSuccess: false }
+	if (answerList.value.some((item) => item.text === '')) return { message: '请将所有空填写完整', isSuccess: false }
+	const answer = answerList.value.map((item) => item.text)
 	const param = {
 		analysis: analysis.value, // 答案解析
-		answer: [judgementOptionsValue.value], //答案
+		answer: answer, //答案
 		difficulty: difficultyOptionsValue.value, // 难度
 		title: topic.value, //题目标题
-		type: 4 // 题目类型 1单选 5多选
+		type: 2
 	}
 	const res = await api.addIssue(param)
 	if (res.status === 200) {
@@ -102,13 +107,26 @@ const saveButton = async () => {
 </script>
 
 <template>
-	<a-modal :visible="show" title="添加判断题" :width="1200" okText="保存" cancelText="取消" :closable="false" :mask-closable="false" :esc-to-close="false" :footer="false">
-		<wang-edit v-model="topic" placeholder="请输入题目" min-height="200"></wang-edit>
+	<a-modal :visible="show" title="添加填空题" :width="1200" okText="保存" cancelText="取消" :closable="false" :mask-closable="false" :esc-to-close="false" :footer="false">
+		<wang-edit v-model="topic" placeholder="请输入题目 每个填空请用____( 下划线 )表示"></wang-edit>
+		<div class="m-auto mt10 flex options-item" v-for="(item, index) in answerList">
+			<div class="min-w-70px center mr-10px">
+				<a-button size="large" shape="circle">{{ index + 1 }}</a-button>
+			</div>
+			<div class="w-100%">
+				<a-input size="large" :placeholder="`请输入第${changeTextToCN(index + 1)}个空的答案`" v-model="item.text"></a-input>
+			</div>
+			<div class="min-w-50px ml-10px center">
+				<a-button shape="circle" status="danger" size="mini" class="delete-icon" @click="deleteAnswer(index)"><div class="i-ri-delete-bin-2-line"></div></a-button>
+			</div>
+		</div>
+		<div class="center justify-start w-100% box-border mt-30px">
+			<a-button @click="addAnswer" type="text">添加一个新的空</a-button>
+		</div>
 		<wangEditShow class="mt-20px" placeholder="请输入答案解析 非必填" v-model="analysis"></wangEditShow>
+
 		<div class="mt-20px center justify-start">
-			<span>答案：</span>
-			<a-select class="max-w-200px" :default-value="1" v-model="judgementOptionsValue" :options="udgementOptions"></a-select>
-			<span class="ml-30px">难度：</span>
+			<span>难度：</span>
 			<a-select class="max-w-200px" :default-value="1" v-model="difficultyOptionsValue" :options="difficultyOptions"></a-select>
 		</div>
 
@@ -125,4 +143,16 @@ const saveButton = async () => {
 	</a-modal>
 </template>
 
-<style scoped></style>
+<style scoped>
+.delete-icon {
+	display: none;
+	max-width: 30px;
+}
+.options-item:hover .delete-icon {
+	display: flex;
+}
+.form:deep(.arco-form-item-label-col) {
+	max-width: 30px;
+	margin-left: 20px;
+}
+</style>

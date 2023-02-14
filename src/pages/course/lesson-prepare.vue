@@ -5,11 +5,11 @@ import classRoomJpg from '~/assets/img/classroom.png'
 import weekCourse from './components/weekSelector/week-course.vue'
 import prepareLessonsModal from './components/modal/prepare-lessons-modal.vue'
 import work from './components/work.vue'
-import { courseInfoStore } from '~/store/courseStore'
+import { courseInfoStore, semesterStore } from '~/store/courseStore'
 
 // 查询是否备课 200 已备课 400 未备课
 const queryLessonPrepare = async () => {
-	const res = await api.isLessonPreparation(getKeysObjec(courseInfoStore.value, ['className', 'courseHour', 'courseName']))
+	const res = await api.isLessonPreparation({ ...getKeysObjec(courseInfoStore.value, ['className', 'courseHour', 'courseName']), ...semesterStore.value })
 	if (res.status === 200) {
 		courseInfoStore.value.preparingFlag = true
 	}
@@ -31,6 +31,15 @@ const weekCourseRef = ref()
 const onPreparesLessonInfoChange = () => {
 	weekCourseRef.value.onPreparesLessonInfoChange()
 }
+
+const classOptions = ref('')
+//通过课程名称查询班级名称
+const getClassList = async () => {
+	const res = await api.getClassList({ time: dayjs().valueOf(), courseName: courseInfoStore.value.courseName })
+	if (res.status !== 200) return Message.error('获取班级名称失败')
+	classOptions.value = res.data
+}
+getClassList()
 </script>
 
 <template>
@@ -49,7 +58,7 @@ const onPreparesLessonInfoChange = () => {
 					<div class="icon-box mt-20px flex items-center text-16px">
 						<a-tag color="blue"><div class="i-ri-group-line"></div></a-tag>
 						<a-select class="ml-10px max-w-120px" v-model="courseInfoStore.className" placeholder="班级选择">
-							<a-option>班级名称2</a-option>
+							<a-option v-for="item in classOptions">{{ item }}</a-option>
 						</a-select>
 						<a-tag class="ml-20px" color="blue"><div class="i-ri-parent-line"></div></a-tag>
 						<div class="ml-10px w-120px truncate">{{ courseInfoStore.classCount }} 人</div>
@@ -69,7 +78,7 @@ const onPreparesLessonInfoChange = () => {
 					</div>
 					<div class="icon-box mt-10px flex items-center text-16px">
 						<a-tag color="blue"><div class="i-ri-book-3-line"></div></a-tag>
-						<div class="ml-10px">课时 {{ courseInfoStore.courseHourAll }} / {{ courseInfoStore.courseHour }}</div>
+						<div class="ml-10px">当前课时 {{ courseInfoStore.courseHour }} 总课时 {{ courseInfoStore.courseHourAll }}</div>
 					</div>
 					<div class="icon-box mt-20px flex items-center text-12px">
 						<div class="w-20px h-20px rounded-sm bg-[rgb(var(--primary-3))] mr-10px ml-5px"></div>

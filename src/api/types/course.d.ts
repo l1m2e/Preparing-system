@@ -7,6 +7,8 @@ export interface ILessonPreparation {
 	className: string
 	courseName: string
 	courseHour: number
+	year: string
+	semester: string
 }
 
 export interface IopenPreparing {
@@ -18,10 +20,11 @@ export interface IopenPreparing {
 	courseName: string
 	endTime: number
 	startTime: number
+	year: string
+	semester: string
 }
 
-export interface IGetCourseList {
-	semester: string
+export interface IgetClassList {
+	courseName: string
 	time: number
-	year: string
 }

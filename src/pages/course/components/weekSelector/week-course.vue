@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import dayjs from 'dayjs'
 import { setReactive, changeTextToCN, getWeekList } from '~/utils'
-import { courseInfoStore } from '~/store/courseStore'
+import { courseInfoStore, semesterStore } from '~/store/courseStore'
 
 let selectionTime: number | string = courseInfoStore.value.startTime
 const weekCourseList = ref()
@@ -13,6 +13,7 @@ const getWeekCourseList = async () => {
 		time: dayjs(selectionTime).format('YYYY-MM-DD')
 	})
 	if (res.status !== 200) return Message.error('获取课程列表失败')
+	setReactive(semesterStore.value, res.data)
 	weekCourseList.value = weekCourseListFormat(res.data.weekCourseSim)
 	weekInfo.weekNum = res.data.weekNum
 	//给选中的课程标记颜色
