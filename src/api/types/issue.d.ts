@@ -13,3 +13,24 @@ interface Ichoices {
 	unique: string
 	text: string
 }
+export interface IqueryIssueList {
+	bankFlag?: boolean
+	current: number
+	shareFlag?: boolean
+	size: number
+	endTime?: number
+	keyword?: string
+	startTime?: number
+	title?: string
+	type?: number
+}
+export interface IqueryIssueListFromId {
+	pid: number
+	current: number
+	size: number
+	endTime?: number
+	keyword?: string
+	startTime?: number
+	title?: string
+	type?: number
+}

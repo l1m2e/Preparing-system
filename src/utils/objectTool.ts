@@ -1,10 +1,11 @@
+import { Ref } from 'vue'
+
 /**
  * 将传进来的数组中的key 从对象里面筛选出来 组成新的对象
  * @param obj 被筛选的对象
  * @param arr 需要筛选出来的key的数组
  * @returns 筛选后返回的对象
  */
-
 export const getKeysObjec = <T, K extends keyof T>(obj: T, arr: K[]): { [P in K]: T[P] } => {
 	const res: any = {}
 	arr.forEach((item: K) => {
@@ -18,20 +19,13 @@ export const getKeysObjec = <T, K extends keyof T>(obj: T, arr: K[]): { [P in K]
  * @param reactiveData 原始对象
  * @param copyData 被拷贝对象
  */
-export const setReactive = (reactiveData: any, copyData: any) => {
-	Object.keys(reactiveData).forEach((key) => {
+export const setReactive = (reactiveData: Ref<object> | object, copyData: object) => {
+	Object.keys(unref(reactiveData)).forEach((key) => {
 		if (Object.hasOwnProperty.call(copyData, key)) {
 			reactiveData[key] = copyData[key]
 		}
 	})
 }
-
-const resData = {} //接口返回的数据
-const data = reactive({
-	//本地数据
-	xxx: 1
-})
-setReactive(data, resData)
 
 /**
  * 批量给对象添加属性

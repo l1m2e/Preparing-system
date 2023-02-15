@@ -4,17 +4,21 @@ import dayjs from 'dayjs'
 import classRoomJpg from '~/assets/img/classroom.png'
 import weekCourse from './components/weekSelector/week-course.vue'
 import prepareLessonsModal from './components/modal/prepare-lessons-modal.vue'
-import work from './components/work.vue'
+import work from './components/tabs/courseIssue.vue'
 import { courseInfoStore, semesterStore } from '~/store/courseStore'
+import noDataSvg from '~/assets/svg/noData.svg'
 
 // 查询是否备课 200 已备课 400 未备课
 const queryLessonPrepare = async () => {
+	console.log('备课请求 ')
 	const res = await api.isLessonPreparation({ ...getKeysObjec(courseInfoStore.value, ['className', 'courseHour', 'courseName']), ...semesterStore.value })
 	if (res.status === 200) {
 		courseInfoStore.value.preparingFlag = true
+		courseInfoStore.value.id = res.data.id
 	}
 	if (res.status === 400) {
 		courseInfoStore.value.preparingFlag = false
+		courseInfoStore.value.id = null
 	}
 }
 queryLessonPrepare()
@@ -108,15 +112,12 @@ getClassList()
 	</a-card>
 	<!-- 未开启备课遮罩层 -->
 	<a-card :bordered="false" class="mt-30px h-550px overflow-hidden relative" v-else>
+		<!-- backdrop-blur-xl -->
 		<div class="absolute top-0 left-0 right-0 bottom-0 z-1 backdrop-blur-xl center flex-col">
 			<h1>当前课时暂未开启备课，是否开启备课</h1>
 			<a-button shape="round" size="large" type="primary" class="ml-20px" @click="openPreparesLesson">开启备课</a-button>
 		</div>
-		<a-tabs default-active-key="1">
-			<a-tab-pane key="1" title="课堂问题"><work></work></a-tab-pane>
-			<a-tab-pane key="2" title="课堂测验">Content of Tab Panel 2</a-tab-pane>
-			<a-tab-pane key="3" title="课件"></a-tab-pane>
-		</a-tabs>
+		<img :src="noDataSvg" class="min-w-100% h-550px object-cover" />
 	</a-card>
 	<prepareLessonsModal ref="prepareLessonsModalRef" @change="onPreparesLessonInfoChange"></prepareLessonsModal>
 </template>

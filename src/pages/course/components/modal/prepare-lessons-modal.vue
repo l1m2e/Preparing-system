@@ -19,6 +19,7 @@ const handleBeforeOk = async () => {
 	const res = await api.openPreparing({ ...param, ...form, ...semesterStore.value })
 	if (res.status === 200) {
 		courseInfoStore.value.preparingFlag = true
+		courseInfoStore.value.id = res.data.message
 		Message.success('开启备课成功')
 		emits('change')
 		return true
