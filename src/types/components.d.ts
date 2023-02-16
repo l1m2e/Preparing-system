@@ -18,6 +18,7 @@ declare module '@vue/runtime-core' {
     AImagePreviewGroup: typeof import('@arco-design/web-vue')['ImagePreviewGroup']
     AInput: typeof import('@arco-design/web-vue')['Input']
     AInputPassword: typeof import('@arco-design/web-vue')['InputPassword']
+    AInputSearch: typeof import('@arco-design/web-vue')['InputSearch']
     ALayoutSider: typeof import('@arco-design/web-vue')['LayoutSider']
     ALink: typeof import('@arco-design/web-vue')['Link']
     AMenu: typeof import('@arco-design/web-vue')['Menu']

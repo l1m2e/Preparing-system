@@ -10,11 +10,8 @@ const open = () => {
 }
 defineExpose({ open })
 
-const handleBeforeOk = async () => {
-	if (!form.title) {
-		Message.error('您必须输入备课主题的名称')
-		return false
-	}
+const ok = async () => {
+	if (!form.title) return Message.error('您必须输入备课主题的名称')
 	const param = getKeysObjec(courseInfoStore.value, ['classDeviceName', 'classDevicePosition', 'className', 'classRoomMac', 'courseHour', 'courseName', 'endTime', 'startTime'])
 	const res = await api.openPreparing({ ...param, ...form, ...semesterStore.value })
 	if (res.status === 200) {
@@ -22,10 +19,10 @@ const handleBeforeOk = async () => {
 		courseInfoStore.value.id = res.data.message
 		Message.success('开启备课成功')
 		emits('change')
-		return true
+		show.value = false
+		beforeCancel()
 	} else {
 		Message.error('开启备课失败')
-		return false
 	}
 }
 
@@ -40,7 +37,7 @@ const form = reactive({
 </script>
 
 <template>
-	<a-modal v-model:visible="show" title="创建主题" @cancel="show = false" @before-ok="handleBeforeOk" @before-cancel="beforeCancel">
+	<a-modal v-model:visible="show" title="创建主题" @cancel="show = false" @ok="ok" @before-cancel="beforeCancel">
 		<a-form :model="form" layout="vertical">
 			<a-form-item field="name" label="主题名称">
 				<a-input v-model="form.title" placeholder="请输入主题名称" />

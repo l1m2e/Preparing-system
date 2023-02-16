@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { changeTextToCN, getKeysObjec } from '~/utils'
+import { changeTextToCN, getKeysObjec, setReactive } from '~/utils'
 import dayjs from 'dayjs'
 import classRoomJpg from '~/assets/img/classroom.png'
 import weekCourse from './components/weekSelector/week-course.vue'
@@ -32,10 +32,6 @@ const openPreparesLesson = async () => {
 	prepareLessonsModalRef.value.open()
 }
 const weekCourseRef = ref()
-const onPreparesLessonInfoChange = () => {
-	weekCourseRef.value.onPreparesLessonInfoChange()
-}
-
 const classOptions = ref('')
 //通过课程名称查询班级名称
 const getClassList = async () => {
@@ -44,6 +40,19 @@ const getClassList = async () => {
 	classOptions.value = res.data
 }
 getClassList()
+
+//班级改变
+const classChange: any = async (className: string) => {
+	const res = await api.getNextCourseInfo({
+		className,
+		courseName: courseInfoStore.value.courseName,
+		time: dayjs().valueOf()
+	})
+	if (res.status !== 200) return Message.error('获取班级详细信息失败')
+	weekCourseRef.value.getWeekCourseList()
+	setReactive(courseInfoStore.value, res.data)
+	console.log(res.data)
+}
 </script>
 
 <template>
@@ -61,7 +70,7 @@ getClassList()
 					</div>
 					<div class="icon-box mt-20px flex items-center text-16px">
 						<a-tag color="blue"><div class="i-ri-group-line"></div></a-tag>
-						<a-select class="ml-10px max-w-120px" v-model="courseInfoStore.className" placeholder="班级选择">
+						<a-select class="ml-10px max-w-120px" v-model="courseInfoStore.className" placeholder="班级选择" @change="classChange">
 							<a-option v-for="item in classOptions">{{ item }}</a-option>
 						</a-select>
 						<a-tag class="ml-20px" color="blue"><div class="i-ri-parent-line"></div></a-tag>
@@ -119,7 +128,7 @@ getClassList()
 		</div>
 		<img :src="noDataSvg" class="min-w-100% h-550px object-cover" />
 	</a-card>
-	<prepareLessonsModal ref="prepareLessonsModalRef" @change="onPreparesLessonInfoChange"></prepareLessonsModal>
+	<prepareLessonsModal ref="prepareLessonsModalRef" @change="weekCourseRef.getWeekCourseList()"></prepareLessonsModal>
 </template>
 
 <style scoped>

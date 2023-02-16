@@ -28,3 +28,9 @@ export interface IgetClassList {
 	courseName: string
 	time: number
 }
+
+export interface IgetNextCourseInfo {
+	className: string
+	courseName: string
+	time: number
+}

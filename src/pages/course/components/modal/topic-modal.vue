@@ -61,6 +61,7 @@ const reset = () => {
 	}
 }
 
+const emit = defineEmits(['change'])
 //保存
 const loading = ref(false)
 const save = async () => {
@@ -70,6 +71,7 @@ const save = async () => {
 		const res = await topicRef.value.save()
 		if (res) {
 			show.value = false
+			emit('change')
 		}
 		loading.value = false
 	}

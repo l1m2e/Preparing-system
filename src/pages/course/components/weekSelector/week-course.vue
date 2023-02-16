@@ -16,12 +16,12 @@ const getWeekCourseList = async () => {
 	setReactive(semesterStore.value, res.data)
 	weekCourseList.value = weekCourseListFormat(res.data.weekCourseSim)
 	weekInfo.weekNum = res.data.weekNum
+
 	//给选中的课程标记颜色
 	weekCourseList.value.forEach((item: any) => {
 		item.courseInfo.forEach((course: any) => {
-			if (course.startTime) {
-				if (course.startTime === courseInfoStore.value.startTime) {
-					console.log(course.startTime, courseInfoStore.value.startTime)
+			if (course.courseHour) {
+				if (course.courseHour === courseInfoStore.value.courseHour) {
 					course.selected = true
 				}
 			}
@@ -86,12 +86,6 @@ const getSelectedWeekList = (date: string) => {
 	weekDateArr.value = getWeekList(date)
 }
 
-//监听班级改变重新拉取课程表
-watch(
-	() => courseInfoStore.value.className,
-	() => getWeekCourseList()
-)
-
 //选中课时 修改store里面的数据
 const electedCourseHour = (info: any) => {
 	setReactive(courseInfoStore.value, info)
@@ -102,14 +96,9 @@ const electedCourseHour = (info: any) => {
 		})
 	})
 	info.selected = true
-	console.log(weekCourseList.value)
 }
 // 开启备课的时候重新查询周课表
-
-const onPreparesLessonInfoChange = () => {
-	getWeekCourseList()
-}
-defineExpose({ onPreparesLessonInfoChange })
+defineExpose({ getWeekCourseList })
 </script>
 
 <template>
