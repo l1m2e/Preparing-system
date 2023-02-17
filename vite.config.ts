@@ -44,5 +44,5 @@ export default defineConfig({
 		}),
 		Unocss()
 	],
-	base: './'
+	base: '/webapp'
 })

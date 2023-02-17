@@ -1,4 +1,4 @@
-import { createRouter, createWebHashHistory } from 'vue-router'
+import { createRouter, createWebHistory } from 'vue-router'
 import { close, start } from '~/utils/nporgress'
 const layout = () => import('~/layout/layout.vue')
 const routes = [
@@ -34,6 +34,18 @@ const routes = [
 		]
 	},
 	{
+		path: '/question-bank',
+		name: 'question-bank',
+		component: layout,
+		children: [
+			{
+				path: 'list',
+				name: 'question-bank-list',
+				component: () => import('~/pages/question-bank/index.vue')
+			}
+		]
+	},
+	{
 		path: '/scan-qr-login',
 		name: 'scan-qr-login',
 		component: () => import('~/pages/login/scan-qr-codes.vue')
@@ -41,7 +53,7 @@ const routes = [
 ]
 
 const router = createRouter({
-	history: createWebHashHistory(),
+	history: createWebHistory('/webapp'),
 	routes
 })
 

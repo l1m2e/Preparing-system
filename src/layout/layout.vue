@@ -13,7 +13,8 @@ const onCollapse = () => {
 const menuList = ref([
 	{ text: '日常', icon: 'i-ri-star-line', routerLink: '/1' },
 	{ text: '课程', icon: 'i-ri-book-mark-line', routerLink: '/course/list' },
-	{ text: '课表', icon: 'i-ri-calendar-2-line', routerLink: '/3' }
+	{ text: '课表', icon: 'i-ri-calendar-2-line', routerLink: '/3' },
+	{ text: '问题库', icon: 'i-ri-database-line', routerLink: '/question-bank/list' }
 ])
 const route = useRoute()
 //路由跳转
