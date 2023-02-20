@@ -56,3 +56,10 @@ body::-webkit-scrollbar-thumb {
 .scroll-bar:hover::-webkit-scrollbar-thumb {
 	background: var(--color-fill-4);
 }
+.regionMask {
+	position: absolute;
+	background-color: #6777ef;
+	width: 100px;
+	height: 100px;
+	z-index: 999;
+}
