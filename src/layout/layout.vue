@@ -34,7 +34,7 @@ const onClickMenuItem = (key: string) => {
 		<div class="w-50% h-100% center justify-end pr-20px"><ToggleDarkSwitch></ToggleDarkSwitch></div>
 	</div>
 	<!-- 侧边 -->
-	<div class="side">
+	<div class="side z-99">
 		<a-menu :default-selected-keys="[route.path]" @menuItemClick="onClickMenuItem">
 			<div class="w-100% h-25px hover:bg-[var(--color-fill-1)] center mb-10px" @click="onCollapse">
 				<div class="i-ri-more-line"></div>

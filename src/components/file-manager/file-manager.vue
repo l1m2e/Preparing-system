@@ -49,7 +49,8 @@ const fileIconTextList = [
 </script>
 
 <template>
-	<div>
+	<!-- <div class="min-h-850px" v-region="{ customProperties: 'text', data: checkedList }"> -->
+	<div class="min-h-850px" v-region:[arg]="checkedList">
 		<a-dropdown trigger="contextMenu" alignPoint class="block">
 			<div class="w-100% h-100%">
 				<header class="center justify-between bg-[var(--color-bg-2)] h-40px">
@@ -70,7 +71,7 @@ const fileIconTextList = [
 					</a-radio-group>
 				</header>
 				<main class="w-100% h-auto mt-5px max-h-[calc(100%-50px)] overflow-y-auto scroll-bar">
-					<div v-if="uiModel === 'grid'" class="w-100% grid-centen" v-region>
+					<div v-if="uiModel === 'grid'" class="w-100% grid-centen">
 						<a-checkbox-group v-model="checkedList">
 							<template v-for="item in fileListUi" :key="item.id">
 								<div :class="`${item.checked ? 'checkbox-card-checked' : 'checkbox-card'} `">
