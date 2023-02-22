@@ -39,10 +39,12 @@ declare module '@vue/runtime-core' {
     ATabs: typeof import('@arco-design/web-vue')['Tabs']
     ATag: typeof import('@arco-design/web-vue')['Tag']
     ATooltip: typeof import('@arco-design/web-vue')['Tooltip']
+    ATree: typeof import('@arco-design/web-vue')['Tree']
     ATypographyText: typeof import('@arco-design/web-vue')['TypographyText']
     ATypographyTitle: typeof import('@arco-design/web-vue')['TypographyTitle']
     FileManager: typeof import('./../components/file-manager/file-manager.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    TreeFolder: typeof import('./../components/file-manager/modal/treeFolder.vue')['default']
   }
 }
