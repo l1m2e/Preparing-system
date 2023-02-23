@@ -4,8 +4,9 @@ import folderSvg from '~/assets/svg/folder.svg'
 import fileSvg from '~/assets/svg/file.svg'
 import { useRegion } from '~/composables'
 import treeFolder from './modal/treeFolder.vue'
+import createdFolder from './modal/createdFolder.vue'
 // 布局模式
-const uiModel = ref<'grid' | 'list'>('grid')
+const uiModel = useStorage<'grid' | 'list'>('fileUiModel', 'grid')
 
 const fileList = ref([])
 const getFileList = async () => {
@@ -15,6 +16,7 @@ const getFileList = async () => {
 	}
 }
 getFileList()
+
 const checkedList = ref<Array<number>>([])
 const fileListUi = computed(() =>
 	fileList.value.map((item: any) => {
@@ -25,7 +27,6 @@ const fileListUi = computed(() =>
 		}
 	})
 )
-
 //框选逻辑
 const regionRef = ref()
 onMounted(() => {
@@ -38,34 +39,40 @@ onMounted(() => {
 const fileIconTextList = [
 	{
 		text: '单选题',
-		icon: 'i-ri-check-line'
+		icon: 'i-ri-check-line',
+		color: 'cyan'
 	},
 	{
 		text: '填空题',
-		icon: 'i-ri-quill-pen-line'
+		icon: 'i-ri-quill-pen-line',
+		color: 'blue'
 	},
 	{
 		text: '简答题',
-		icon: 'i-ri-draft-line'
+		icon: 'i-ri-draft-line',
+		color: 'arcoblue'
 	},
 	{
 		text: '判断题',
-		icon: 'i-ri-question-mark'
+		icon: 'i-ri-question-mark',
+		color: 'purple'
 	},
 	{
 		text: '多选题',
-		icon: 'i-ri-check-double-line'
+		icon: 'i-ri-check-double-line',
+		color: 'green'
 	}
 ]
 
-const treeFolderRef = ref()
+const treeFolderRef = ref() // 移动文件夹Ref
+const createdFolderRef = ref() // 创建文件夹Ref
 </script>
 
 <template>
 	<a-dropdown trigger="contextMenu" alignPoint class="block">
 		<div class="relative" ref="regionRef">
 			<header class="center justify-between items-center bg-[var(--color-bg-2)] h-50px">
-				<a-button size="large" type="primary" shape="round">新建文件夹</a-button>
+				<a-button size="large" type="primary" shape="round" @click="createdFolderRef.open()">新建文件夹</a-button>
 				<a-radio-group type="button" size="large" v-model="uiModel">
 					<a-radio value="grid">
 						<div class="center">
@@ -123,7 +130,52 @@ const treeFolderRef = ref()
 						</template>
 					</a-checkbox-group>
 				</div>
-				<div v-else class="flex bg-blue w-100% h-100px"></div>
+				<div v-else class="w-100% h-auto checkbox-list-box">
+					<a-checkbox-group v-model="checkedList" class="block">
+						<a-row class="w-100% bg-[var(--color-fill-1)] h-40px mt-10px px-10px">
+							<a-col :span="6" class="list-col">文件</a-col>
+							<a-col :span="6" class="list-col">创建时间</a-col>
+							<a-col :span="6" class="list-col">类型</a-col>
+							<a-col :span="5" class="list-col">操作</a-col>
+							<a-col :span="1" class="list-col">选中</a-col>
+						</a-row>
+						<a-row class="w-100% hover:bg-[var(--color-fill-1)] h-40px cursor-pointer px-10px" v-for="item in fileListUi" :key="item.id" :data-file-id="item.id">
+							<a-col :span="6" class="list-col">
+								<img :src="folderSvg" class="w-20px h-20px" v-if="item.type === 0" />
+								<div v-else class="w-20px h-20px">
+									<img :src="fileSvg" />
+								</div>
+								<div class="ml-20px">{{ item.title }}</div>
+							</a-col>
+							<a-col class="list-col" :span="6">{{ dayjs(item.createdTimestamp).format('YYYY-MM-DD HH:mm') }}</a-col>
+							<a-col class="list-col" :span="6">
+								<a-tag v-if="item.type === 0" color="orange">文件夹</a-tag>
+								<a-tag v-else :color="fileIconTextList[item.type + 1].color">{{ fileIconTextList[item.type + 1].text }}</a-tag>
+							</a-col>
+							<a-col :span="5" class="list-col text-[var(--color-text-2)] text-15px list-col-tag">
+								<a-tooltip content="重命名" position="top" mini>
+									<a-tag color="blue" v-if="item.type === 0"><div class="i-ri-edit-line"></div></a-tag>
+								</a-tooltip>
+								<a-tooltip content="删除" position="top" mini>
+									<a-tag color="red" class="ml-20px first:ml-0px"><div class="i-ri-delete-bin-line"></div></a-tag>
+								</a-tooltip>
+								<a-tooltip content="移动" position="top" mini>
+									<a-tag color="arcoblue" class="ml-20px"><div class="i-ri-share-forward-line"></div></a-tag>
+								</a-tooltip>
+							</a-col>
+							<a-col :span="1" class="list-col">
+								<a-checkbox :value="item.id">
+									<template #checkbox="row">
+										<div
+											:class="`w-15px h-15px  rounded-full  border-solid transition ${
+												row.checked ? 'border-5px border-[rgb(var(--primary-6))]' : 'border-1px border-[var(--color-border-3)]'
+											}`"></div>
+									</template>
+								</a-checkbox>
+							</a-col>
+						</a-row>
+					</a-checkbox-group>
+				</div>
 			</main>
 			<footer class="flex w-100% h-100px absolute bottom-0 left-0 right-0 center" @mousedown.stop="">
 				<div class="py-10px px-20px border border-1px border-[var(--color-border-1)] shadow-lg rounded-xl center overflow-hidden" v-if="checkedList.length !== 0">
@@ -131,7 +183,7 @@ const treeFolderRef = ref()
 						<div class="action-bar"><div class="i-ri-delete-bin-6-line"></div></div>
 					</a-tooltip>
 					<a-tooltip content="移动" position="top" mini @click="treeFolderRef.open()">
-						<div class="action-bar"><div class="i-carbon:folder-move-to"></div></div>
+						<div class="action-bar"><div class="i-ri-share-forward-line"></div></div>
 					</a-tooltip>
 					<a-tooltip content="取消选中" position="top" mini>
 						<div class="action-bar"><div class="i-ri-close-circle-line" @click="checkedList.length = 0"></div></div>
@@ -151,10 +203,13 @@ const treeFolderRef = ref()
 			</a-doption>
 		</template>
 	</a-dropdown>
+
 	<treeFolder ref="treeFolderRef"></treeFolder>
+	<createdFolder ref="createdFolderRef"></createdFolder>
 </template>
 
 <style scoped>
+
 .checkbox-card {
 	width: 150px;
 	height: 180px;
@@ -165,8 +220,8 @@ const treeFolderRef = ref()
 	align-items: center;
 	position: relative;
 	border-radius: 0.5rem;
-
 	margin-top: 20px;
+
 }
 .checkbox-card:hover {
 	background-color: var(--color-fill-2);
@@ -184,7 +239,6 @@ const treeFolderRef = ref()
 	margin-top: 20px;
 	background-color: var(--color-primary-light-1);
 }
-
 .checkbox-card-checked :deep(.arco-checkbox),
 .checkbox-card :deep(.arco-checkbox) {
 	position: absolute;
@@ -219,5 +273,24 @@ const treeFolderRef = ref()
 	justify-content: center;
 	align-items: center;
 	--at-apply: hover:bg-[var(--color-fill-1)]  hover:text-[var(--color-text-1)]  rounded mr-10px last:mr0
+}
+
+.checkbox-list-box :deep(.arco-checkbox-group){
+	display: block;
+}
+.list-col{
+	display: flex;
+	justify-content: start;
+	align-items: center;
+	height: 100%;
+}
+.list-col-tag:deep(.arco-tag){
+  border-radius: 100%;
+  width: 25px;
+  height: 25px;
+	padding:2px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
 }
 </style>

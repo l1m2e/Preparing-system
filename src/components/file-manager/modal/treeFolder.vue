@@ -11,6 +11,7 @@ const open = async () => {
 }
 defineExpose({ open })
 
+//获取文件列表并且格式化
 const getFileList = async (fid?: number) => {
 	const param = fid ? { fid } : {}
 	const res = await api.queryQuestionBankList(param)
@@ -22,6 +23,7 @@ const getFileList = async (fid?: number) => {
 	}
 }
 
+//加载目录
 const loadMore = async (nodeData: any) => {
 	console.log(nodeData)
 	return new Promise<void>(async (resolve) => {

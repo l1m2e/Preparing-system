@@ -8,3 +8,7 @@ export interface IqueryQuestionBankList {
 	title?: string
 	type?: number
 }
+export interface AddKeywordParams {
+	title: string
+	fid?: number
+}
