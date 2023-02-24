@@ -18,14 +18,13 @@ const getFileList = async (fid?: number) => {
 	if (res.status === 200) {
 		const data = res.data.records.filter((item: any) => item.type === 0)
 		return data.map((item: any) => {
-			return { title: item.title, key: item.id }
+			return { title: item.keyword, key: item.id }
 		})
 	}
 }
 
 //加载目录
 const loadMore = async (nodeData: any) => {
-	console.log(nodeData)
 	return new Promise<void>(async (resolve) => {
 		nodeData.children = await getFileList(nodeData.key)
 		resolve()

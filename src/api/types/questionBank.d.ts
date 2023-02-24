@@ -9,6 +9,6 @@ export interface IqueryQuestionBankList {
 	type?: number
 }
 export interface AddKeywordParams {
-	title: string
+	keyword: string
 	fid?: number
 }

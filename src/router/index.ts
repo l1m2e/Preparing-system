@@ -24,7 +24,7 @@ const routes = [
 			{
 				path: 'list',
 				name: 'course',
-				component: () => import('~/pages/course/course.vue')
+				component: () => import('~/pages/test/A.vue')
 			},
 			{
 				path: 'prepare',

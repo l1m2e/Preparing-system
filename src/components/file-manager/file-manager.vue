@@ -5,33 +5,17 @@ import fileSvg from '~/assets/svg/file.svg'
 import { useRegion } from '~/composables'
 import treeFolder from './modal/treeFolder.vue'
 import createdFolder from './modal/createdFolder.vue'
+import { checkedIdList, fileListSelectedStateState, getFileList } from '~/store/fileStore'
+//请求列表数据
+getFileList()
 // 布局模式
 const uiModel = useStorage<'grid' | 'list'>('fileUiModel', 'grid')
 
-const fileList = ref([])
-const getFileList = async () => {
-	const res = await api.queryQuestionBankList({})
-	if (res.status === 200) {
-		fileList.value = res.data.records
-	}
-}
-getFileList()
-
-const checkedList = ref<Array<number>>([])
-const fileListUi = computed(() =>
-	fileList.value.map((item: any) => {
-		if (checkedList.value.includes(item.id)) {
-			return { ...item, ...{ checked: true } }
-		} else {
-			return { ...item, ...{ checked: false } }
-		}
-	})
-)
 //框选逻辑
 const regionRef = ref()
 onMounted(() => {
 	useRegion(regionRef.value, 'data-file-id', (data) => {
-		checkedList.value = data
+		checkedIdList.value = data
 	})
 })
 
@@ -88,10 +72,10 @@ const createdFolderRef = ref() // 创建文件夹Ref
 					</a-radio>
 				</a-radio-group>
 			</header>
-			<main class="w-100% h-auto min-h-76vh overflow-y-auto scroll-bar">
+			<main class="w-100% h-76vh overflow-y-auto scroll-bar" v-on-reach-bottom="">
 				<div v-if="uiModel === 'grid'" class="w-100% grid-centen">
-					<a-checkbox-group v-model="checkedList">
-						<template v-for="item in fileListUi" :key="item.id">
+					<a-checkbox-group v-model="checkedIdList">
+						<template v-for="item in fileListSelectedStateState" :key="item.id">
 							<div :class="`${item.checked ? 'checkbox-card-checked' : 'checkbox-card'} `" :data-file-id="item.id">
 								<a-checkbox :value="item.id" class="absolute top-6px left-1px">
 									<template #checkbox="row">
@@ -107,10 +91,11 @@ const createdFolderRef = ref() // 创建文件夹Ref
 									<div :class="`w-20px h-20px absolute left-[calc(50%-10px)] top-40% text-white ${fileIconTextList[item.type + 1].icon}`"></div>
 									<div :class="`absolute left-30% top-65% text-white`">{{ fileIconTextList[item.type + 1].text }}</div>
 								</div>
-								<div>{{ item.title }}</div>
+								<div>{{ item.type === 0 ? item.keyword : item.title }}</div>
 								<div class="text-12px mt-5px text-[var(--color-text-3)]">{{ dayjs(item.createdTimestamp).format('YYYY-MM-DD HH:mm') }}</div>
 								<a-dropdown trigger="click">
-									<div class="absolute right-5px top-5px i-ri-more-line text-[var(--color-border-3)] hover:text-[rgb(var(--primary-6))] text-20px operation"></div>
+									<div
+										class="absolute right-5px top-5px i-ri-more-line text-[var(--color-border-3)] hover:text-[rgb(var(--primary-6))] text-20px operation"></div>
 									<template #content>
 										<a-doption v-if="item.type === 0">
 											<template #icon><icon-edit /></template>
@@ -131,7 +116,7 @@ const createdFolderRef = ref() // 创建文件夹Ref
 					</a-checkbox-group>
 				</div>
 				<div v-else class="w-100% h-auto checkbox-list-box">
-					<a-checkbox-group v-model="checkedList" class="block">
+					<a-checkbox-group v-model="checkedIdList" class="block">
 						<a-row class="w-100% bg-[var(--color-fill-1)] h-40px mt-10px px-10px">
 							<a-col :span="6" class="list-col">文件</a-col>
 							<a-col :span="6" class="list-col">创建时间</a-col>
@@ -139,13 +124,17 @@ const createdFolderRef = ref() // 创建文件夹Ref
 							<a-col :span="5" class="list-col">操作</a-col>
 							<a-col :span="1" class="list-col">选中</a-col>
 						</a-row>
-						<a-row class="w-100% hover:bg-[var(--color-fill-1)] h-40px cursor-pointer px-10px" v-for="item in fileListUi" :key="item.id" :data-file-id="item.id">
+						<a-row
+							class="w-100% hover:bg-[var(--color-fill-1)] h-40px cursor-pointer px-10px"
+							v-for="item in fileListSelectedStateState"
+							:key="item.id"
+							:data-file-id="item.id">
 							<a-col :span="6" class="list-col">
 								<img :src="folderSvg" class="w-20px h-20px" v-if="item.type === 0" />
 								<div v-else class="w-20px h-20px">
 									<img :src="fileSvg" />
 								</div>
-								<div class="ml-20px">{{ item.title }}</div>
+								<div class="ml-20px">{{ item.type === 0 ? item.keyword : item.title }}</div>
 							</a-col>
 							<a-col class="list-col" :span="6">{{ dayjs(item.createdTimestamp).format('YYYY-MM-DD HH:mm') }}</a-col>
 							<a-col class="list-col" :span="6">
@@ -178,7 +167,9 @@ const createdFolderRef = ref() // 创建文件夹Ref
 				</div>
 			</main>
 			<footer class="flex w-100% h-100px absolute bottom-0 left-0 right-0 center" @mousedown.stop="">
-				<div class="py-10px px-20px border border-1px border-[var(--color-border-1)] shadow-lg rounded-xl center overflow-hidden" v-if="checkedList.length !== 0">
+				<div
+					class="py-10px px-20px border border-1px border-[var(--color-border-1)] shadow-lg rounded-xl center overflow-hidden"
+					v-if="checkedIdList.length !== 0">
 					<a-tooltip content="删除" position="top" mini>
 						<div class="action-bar"><div class="i-ri-delete-bin-6-line"></div></div>
 					</a-tooltip>
@@ -186,7 +177,7 @@ const createdFolderRef = ref() // 创建文件夹Ref
 						<div class="action-bar"><div class="i-ri-share-forward-line"></div></div>
 					</a-tooltip>
 					<a-tooltip content="取消选中" position="top" mini>
-						<div class="action-bar"><div class="i-ri-close-circle-line" @click="checkedList.length = 0"></div></div>
+						<div class="action-bar"><div class="i-ri-close-circle-line" @click="checkedIdList.length = 0"></div></div>
 					</a-tooltip>
 				</div>
 			</footer>
@@ -209,7 +200,6 @@ const createdFolderRef = ref() // 创建文件夹Ref
 </template>
 
 <style scoped>
-
 .checkbox-card {
 	width: 150px;
 	height: 180px;
@@ -221,7 +211,6 @@ const createdFolderRef = ref() // 创建文件夹Ref
 	position: relative;
 	border-radius: 0.5rem;
 	margin-top: 20px;
-
 }
 .checkbox-card:hover {
 	background-color: var(--color-fill-2);
@@ -263,32 +252,39 @@ const createdFolderRef = ref() // 创建文件夹Ref
 	grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
 	gap: 10px;
 }
-.action-bar{
+.action-bar {
 	width: 30px;
 	height: 30px;
 	cursor: pointer;
 	font-size: 15px;
-	color:var(--color-text-2);
+	color: var(--color-text-2);
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	--at-apply: hover:bg-[var(--color-fill-1)]  hover:text-[var(--color-text-1)]  rounded mr-10px last:mr0
+	border-radius: 5px;
+}
+.action-bar:hover {
+	background-color: var(--color-fill-1);
+	color: var(--color-text-1);
+}
+.action-bar:last-child {
+	margin-right: 0px;
 }
 
-.checkbox-list-box :deep(.arco-checkbox-group){
+.checkbox-list-box :deep(.arco-checkbox-group) {
 	display: block;
 }
-.list-col{
+.list-col {
 	display: flex;
 	justify-content: start;
 	align-items: center;
 	height: 100%;
 }
-.list-col-tag:deep(.arco-tag){
-  border-radius: 100%;
-  width: 25px;
-  height: 25px;
-	padding:2px;
+.list-col-tag:deep(.arco-tag) {
+	border-radius: 100%;
+	width: 25px;
+	height: 25px;
+	padding: 2px;
 	display: flex;
 	justify-content: center;
 	align-items: center;

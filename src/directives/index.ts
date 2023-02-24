@@ -1,8 +1,8 @@
 // 导入自定义指令
 import { App } from 'vue'
-import { region } from './modules'
+import { onReachBottom } from './modules'
 //自定义指令合集
-const directivesList = { region }
+const directivesList = { onReachBottom }
 
 const directives = {
 	install: function (app: App<Element>) {
