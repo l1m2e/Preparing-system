@@ -7,7 +7,7 @@ import treeFolder from './modal/treeFolder.vue'
 import createdFolder from './modal/createdFolder.vue'
 import { checkedIdList, fileListSelectedStateState, getFileList } from '~/store/fileStore'
 //请求列表数据
-getFileList()
+getFileList('first')
 // 布局模式
 const uiModel = useStorage<'grid' | 'list'>('fileUiModel', 'grid')
 
@@ -72,11 +72,11 @@ const createdFolderRef = ref() // 创建文件夹Ref
 					</a-radio>
 				</a-radio-group>
 			</header>
-			<main class="w-100% h-76vh overflow-y-auto scroll-bar" v-on-reach-bottom="">
+			<main class="w-100% h-76vh overflow-y-auto scroll-bar" v-on-reach-bottom="getFileList">
 				<div v-if="uiModel === 'grid'" class="w-100% grid-centen">
 					<a-checkbox-group v-model="checkedIdList">
 						<template v-for="item in fileListSelectedStateState" :key="item.id">
-							<div :class="`${item.checked ? 'checkbox-card-checked' : 'checkbox-card'} `" :data-file-id="item.id">
+							<div :class="`${item.checked ? 'checkbox-card-checked' : 'checkbox-card'}`" :data-file-id="item.id">
 								<a-checkbox :value="item.id" class="absolute top-6px left-1px">
 									<template #checkbox="row">
 										<div
@@ -92,7 +92,9 @@ const createdFolderRef = ref() // 创建文件夹Ref
 									<div :class="`absolute left-30% top-65% text-white`">{{ fileIconTextList[item.type + 1].text }}</div>
 								</div>
 								<div>{{ item.type === 0 ? item.keyword : item.title }}</div>
-								<div class="text-12px mt-5px text-[var(--color-text-3)]">{{ dayjs(item.createdTimestamp).format('YYYY-MM-DD HH:mm') }}</div>
+								<div class="text-12px mt-5px text-[var(--color-text-3)]">
+									{{ dayjs(item.createdTimestamp).format('YYYY-MM-DD HH:mm') }}
+								</div>
 								<a-dropdown trigger="click">
 									<div
 										class="absolute right-5px top-5px i-ri-more-line text-[var(--color-border-3)] hover:text-[rgb(var(--primary-6))] text-20px operation"></div>

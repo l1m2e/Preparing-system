@@ -6,7 +6,7 @@ export const region: Directive = {
 		const mask = el.appendChild(initSelectMask()) //添加选框蒙板子
 		el.onmousedown = (event) => mousedown(event, el, mask)
 		el.onmouseup = (event) => onmouseup(event, el, mask)
-		console.log(binding.arg)
+		console.log(binding.value)
 	}
 }
 
