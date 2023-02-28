@@ -21,3 +21,9 @@ export interface Ilogin {
 	jobNum: string
 	password: string
 }
+
+export interface RegisterSchoolUserParams {
+	studentName: string
+	studentId: string
+	password: string
+}

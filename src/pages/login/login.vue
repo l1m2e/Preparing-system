@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import router from '~/router'
 import { useToken } from '~/composables'
+import { getKeysObjec } from '~/utils'
 const flag = ref(true)
 //登陆表单
 const form = reactive({
@@ -24,14 +25,35 @@ const login = async () => {
 }
 
 const registerForm = reactive({
-	uid: '',
-	name: '',
+	studentId: '',
+	studentName: '',
 	password: '',
-	phone: '',
-	info: '',
 	repassword: ''
 })
 
+const register = async () => {
+	if (!registerForm.studentId) return Message.error('工号不能为空')
+	if (!registerForm.studentName) return Message.error('昵称不能为空')
+	if (!registerForm.password) return Message.error('密码不能为空')
+	if (!registerForm.repassword) return Message.error('请输入确认密码')
+	if (registerForm.password === registerForm.repassword) {
+		const res = await api.register(getKeysObjec(registerForm, ['studentId', 'studentName', 'password']))
+		if (res.status === 200) {
+			Message.success('注册成功，请前往登录')
+			empty(registerForm)
+		} else {
+			Message.error(`注册失败 ${res.data.message}`)
+		}
+	} else {
+		Message.error('两次输入的秘密不一致')
+	}
+}
+// 清空
+const empty = (obj: object) => {
+	Object.keys(obj).forEach((item) => {
+		obj[item] = ''
+	})
+}
 const scanQRcodesLogin = () => {
 	router.push('/scan-qr-login')
 }
@@ -79,14 +101,14 @@ const scanQRcodesLogin = () => {
 				<p font-700 color="#6777ef" text-5 mt-5>注册</p>
 				<a-form :model="registerForm" layout="vertical" p-5>
 					<a-form-item field="name" label="昵称" mt-2>
-						<a-input v-model="registerForm.name" size="large" placeholder="请输入教师姓名">
+						<a-input v-model="registerForm.studentName" size="large" placeholder="请输入教师姓名">
 							<template #prefix>
 								<div i-carbon:user text-4 />
 							</template>
 						</a-input>
 					</a-form-item>
 					<a-form-item field="uid" label="工号" mt-2>
-						<a-input v-model="registerForm.uid" size="large" placeholder="请输入教师工号">
+						<a-input v-model="registerForm.studentId" size="large" placeholder="请输入教师工号">
 							<template #prefix>
 								<div i-carbon:account text-4 />
 							</template>
@@ -108,7 +130,7 @@ const scanQRcodesLogin = () => {
 					</a-form-item>
 					<a-form-item>
 						<div w="100%" h="100%" center>
-							<div class="button" @click="">立即注册</div>
+							<div class="button" @click="register">立即注册</div>
 						</div>
 					</a-form-item>
 				</a-form>
@@ -126,5 +148,6 @@ const scanQRcodesLogin = () => {
   --at-apply: w-280px h-50px bg-#6777ef mt-5 rounded center color-#ffffff hover:bg-#4e59ad;
   box-shadow: 0 0 20px #6777ef56;
   transition: all 0.6s;
+	cursor:pointer;
 }
 </style>
