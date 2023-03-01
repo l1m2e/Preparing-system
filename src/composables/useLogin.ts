@@ -1,5 +1,5 @@
 import { getUuid } from '~/utils'
-import { io } from '~/service'
+import { baseUrl } from '~/config/baseUrl'
 export const useToken = useStorage('token', '')
 export const useUserInfo = useStorage('userInfo', {
 	userId: 0,
@@ -27,14 +27,15 @@ export const useGetLoginQrCode = async () => {
 	}
 }
 
-export let useloginIo = io()
+export let useloginIo: any
 
 // 重连ws
-const reconnection = (uuid: string) => {
-	useloginIo.disconnect()
+const reconnection = async (uuid: string) => {
+	await getWSUrl()
 	useloginIo = api.onLoginIo(uuid)
 	//监听登录事件
 	useloginIo.on('onAccredit', onLogin)
+	console.log('链接')
 }
 
 const onLogin = (res: any) => {
@@ -42,6 +43,16 @@ const onLogin = (res: any) => {
 		useToken.value = res.message
 		useGetUserInfo() // 获取token成功则获取用户信息
 		useloginIo.disconnect() // 登录成功断开 ws
+		console.log('断开')
+	}
+}
+
+export const getWSUrl = async () => {
+	const res = await api.getWSUrl()
+	if (res.status === 200) {
+		baseUrl.websocketUrl = res.data.websocketUrl
+	} else {
+		Message.error('获取ws链接失败')
 	}
 }
 

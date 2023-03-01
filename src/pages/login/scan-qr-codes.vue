@@ -5,6 +5,7 @@ onMounted(() => {
 })
 onUnmounted(() => {
 	useloginIo.disconnect()
+	console.log('主动断开')
 })
 </script>
 
