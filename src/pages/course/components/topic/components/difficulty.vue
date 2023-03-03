@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-defineProps<{
+const props = defineProps<{
 	modelValue: number
 }>()
 const difficultyOptions = [
@@ -16,8 +16,15 @@ const difficultyOptions = [
 		label: '难'
 	}
 ]
+const emit = defineEmits(['update:modelValue'])
+const selected = computed({
+	get: () => props.modelValue,
+	set: (value) => {
+		emit('update:modelValue', value)
+	}
+})
 </script>
 
 <template>
-	<a-select class="max-w-200px" :default-value="1" v-model="modelValue" :options="difficultyOptions"></a-select>
+	<a-select class="max-w-200px" :default-value="1" v-model="selected" :options="difficultyOptions"></a-select>
 </template>

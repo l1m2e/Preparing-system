@@ -5,9 +5,20 @@ import fileSvg from '~/assets/svg/file.svg'
 import { useRegion } from '~/composables'
 import treeFolder from './modal/treeFolder.vue'
 import createdFolder from './modal/createdFolder.vue'
-import { checkedIdList, fileListSelectedStateState, getFileList } from '~/store/fileStore'
+import {
+	checkedIdList,
+	fileListSelectedStateState,
+	getFileList,
+	fileTableReset,
+	batchDelete,
+	updateFileList,
+	singleDelete,
+	onFileClick,
+	breadcrumbList,
+	onClickBreadcrumb
+} from '~/store/fileStore'
 //请求列表数据
-getFileList('first')
+getFileList()
 // 布局模式
 const uiModel = useStorage<'grid' | 'list'>('fileUiModel', 'grid')
 
@@ -19,6 +30,9 @@ onMounted(() => {
 	})
 })
 
+onUnmounted(() => {
+	fileTableReset()
+})
 // 顺序对应后端返回的数组下标
 const fileIconTextList = [
 	{
@@ -72,11 +86,14 @@ const createdFolderRef = ref() // 创建文件夹Ref
 					</a-radio>
 				</a-radio-group>
 			</header>
+			<a-breadcrumb>
+				<a-breadcrumb-item v-for="item in breadcrumbList" @click="onClickBreadcrumb(item.fid)">{{ item.title }}</a-breadcrumb-item>
+			</a-breadcrumb>
 			<main class="w-100% h-76vh overflow-y-auto scroll-bar" v-on-reach-bottom="getFileList">
 				<div v-if="uiModel === 'grid'" class="w-100% grid-centen">
 					<a-checkbox-group v-model="checkedIdList">
 						<template v-for="item in fileListSelectedStateState" :key="item.id">
-							<div :class="`${item.checked ? 'checkbox-card-checked' : 'checkbox-card'}`" :data-file-id="item.id">
+							<div :class="`${item.checked ? 'checkbox-card-checked' : 'checkbox-card'}`" :data-file-id="item.id" @click="onFileClick(item)">
 								<a-checkbox :value="item.id" class="absolute top-6px left-1px">
 									<template #checkbox="row">
 										<div
@@ -86,12 +103,12 @@ const createdFolderRef = ref() // 创建文件夹Ref
 									</template>
 								</a-checkbox>
 								<img :src="folderSvg" v-if="item.type === 0" class="w-120px h-120px mt-10px" />
-								<div v-if="item.type === 1 || item.type === 2 || item.type === 3 || item.type === 4 || item.type === 5" class="relative">
+								<div v-if="[1, 2, 3, 4, 5].includes(item.type)" class="relative">
 									<img :src="fileSvg" class="w-100px h-100px mt-20px mb-10px" />
 									<div :class="`w-20px h-20px absolute left-[calc(50%-10px)] top-40% text-white ${fileIconTextList[item.type + 1].icon}`"></div>
-									<div :class="`absolute left-30% top-65% text-white`">{{ fileIconTextList[item.type + 1].text }}</div>
+									<div :class="`absolute left-30% top-65% text-white `">{{ fileIconTextList[item.type + 1].text }}</div>
 								</div>
-								<div>{{ item.type === 0 ? item.keyword : item.title }}</div>
+								<div class="truncate max-w-130px">{{ item.type === 0 ? item.keyword : item.title }}</div>
 								<div class="text-12px mt-5px text-[var(--color-text-3)]">
 									{{ dayjs(item.createdTimestamp).format('YYYY-MM-DD HH:mm') }}
 								</div>
@@ -107,7 +124,7 @@ const createdFolderRef = ref() // 创建文件夹Ref
 											<template #icon><icon-to-right /></template>
 											移动
 										</a-doption>
-										<a-doption>
+										<a-doption @click="singleDelete(item)">
 											<template #icon><icon-delete /></template>
 											删除
 										</a-doption>
@@ -148,7 +165,7 @@ const createdFolderRef = ref() // 创建文件夹Ref
 									<a-tag color="blue" v-if="item.type === 0"><div class="i-ri-edit-line"></div></a-tag>
 								</a-tooltip>
 								<a-tooltip content="删除" position="top" mini>
-									<a-tag color="red" class="ml-20px first:ml-0px"><div class="i-ri-delete-bin-line"></div></a-tag>
+									<a-tag @click="singleDelete(item)" color="red" class="ml-20px first:ml-0px"><div class="i-ri-delete-bin-line"></div></a-tag>
 								</a-tooltip>
 								<a-tooltip content="移动" position="top" mini>
 									<a-tag color="arcoblue" class="ml-20px"><div class="i-ri-share-forward-line"></div></a-tag>
@@ -173,7 +190,7 @@ const createdFolderRef = ref() // 创建文件夹Ref
 					class="py-10px px-20px border border-1px border-[var(--color-border-1)] shadow-lg rounded-xl center overflow-hidden"
 					v-if="checkedIdList.length !== 0">
 					<a-tooltip content="删除" position="top" mini>
-						<div class="action-bar"><div class="i-ri-delete-bin-6-line"></div></div>
+						<div class="action-bar" @click="batchDelete"><div class="i-ri-delete-bin-6-line"></div></div>
 					</a-tooltip>
 					<a-tooltip content="移动" position="top" mini @click="treeFolderRef.open()">
 						<div class="action-bar"><div class="i-ri-share-forward-line"></div></div>
@@ -186,11 +203,11 @@ const createdFolderRef = ref() // 创建文件夹Ref
 		</div>
 		<!-- 右键菜单 -->
 		<template #content>
-			<a-doption>
+			<a-doption @click="createdFolderRef.open()">
 				<template #icon><IconFolderAdd /></template>
 				新建文件夹
 			</a-doption>
-			<a-doption>
+			<a-doption @click="updateFileList">
 				<template #icon><IconRefresh /></template>
 				刷新
 			</a-doption>
@@ -252,6 +269,7 @@ const createdFolderRef = ref() // 创建文件夹Ref
 .grid-centen :deep(.arco-checkbox-group) {
 	display: grid;
 	grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+	justify-items: center;
 	gap: 10px;
 }
 .action-bar {

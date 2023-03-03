@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { Modal } from '@arco-design/web-vue'
-import { getFileList } from '~/store/fileStore'
+import { updateFileList, breadcrumbList } from '~/store/fileStore'
 
 const params = reactive({
 	keyword: '',
@@ -8,11 +8,13 @@ const params = reactive({
 })
 
 const addFolder = async () => {
+	params.fid = breadcrumbList.slice(-1)[0].fid
 	const res = await api.addFolder(params)
 	if (res.status === 200) {
 		Message.success('添加文件夹成功')
-		await getFileList()
+		await updateFileList()
 		show.value = false
+		params.keyword = ''
 	} else {
 		Message.error('添加文件夹失败')
 	}

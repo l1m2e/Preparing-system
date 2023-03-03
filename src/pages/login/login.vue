@@ -6,7 +6,7 @@ const flag = ref(true)
 //登陆表单
 const form = reactive({
 	jobNum: 'P1000100',
-	password: '123456'
+	password: '12345678'
 })
 
 const login = async () => {
