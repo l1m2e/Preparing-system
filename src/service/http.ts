@@ -29,7 +29,9 @@ axios.interceptors.response.use(
 		} catch (error) {
 			console.log('[ error ] >', error)
 		}
-
+		if (err.code === 'ECONNABORTED' || err.message === 'Network Error' || err.message.includes('timeout')) {
+			Message.error('连接超时,请检查网络')
+		}
 		return err.response
 	}
 )

@@ -1,8 +1,8 @@
 <script lang="ts" setup>
 import dayjs from 'dayjs'
-import { addColors, getKeysObjec, setReactive } from '~/utils'
 import classRoomJpg from '~/assets/img/classroom.png'
 import router from '~/router'
+import { addColors, getKeysObjec, setReactive } from '~/utils'
 import { courseInfoStore } from '~/store/courseStore'
 
 const courseInfoList = ref()

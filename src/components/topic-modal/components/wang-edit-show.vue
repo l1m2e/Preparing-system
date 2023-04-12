@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import wangEdit from './wang-edit.vue'
 const props = defineProps<{
 	placeholder: string
 	modelValue: string
@@ -25,13 +24,16 @@ const editBlur = () => {
 
 <template>
 	<div>
-		<wangEdit v-if="flag" v-model="valueHtml" :placeholder="props.placeholder" :onOnEditBlur="editBlur" :minHeight="props.minHeight"></wangEdit>
+		<wang-edit v-if="flag" v-model="valueHtml" :placeholder="props.placeholder" :onOnEditBlur="editBlur" :minHeight="props.minHeight"></wang-edit>
 		<div
 			v-else-if="valueHtml && valueHtml !== '<p><br></p>'"
 			@click="onClick"
 			class="cursor-pointer p-10px bg-[var(--color-fill-1)] w-100% h-42px overflow-y-auto scroll-bar rounded-5px"
 			v-html="valueHtml"></div>
-		<div @click="onClick" v-else class="cursor-pointer p-10px bg-[var(--color-fill-1)] w-100% h-42px overflow-y-auto scroll-bar rounded-5px text-[rgb(var(--gray-5))]">
+		<div
+			@click="onClick"
+			v-else
+			class="cursor-pointer p-10px bg-[var(--color-fill-1)] w-100% h-42px overflow-y-auto scroll-bar rounded-5px text-[rgb(var(--gray-5))]">
 			{{ props.placeholder }}
 		</div>
 	</div>

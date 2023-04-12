@@ -94,7 +94,7 @@ const createdFolderRef = ref() // 创建文件夹Ref
 					<a-checkbox-group v-model="checkedIdList">
 						<template v-for="item in fileListSelectedStateState" :key="item.id">
 							<div :class="`${item.checked ? 'checkbox-card-checked' : 'checkbox-card'}`" :data-file-id="item.id" @click="onFileClick(item)">
-								<a-checkbox :value="item.id" class="absolute top-6px left-1px">
+								<a-checkbox :value="item.id" class="absolute top-6px left-1px" @click.stop="">
 									<template #checkbox="row">
 										<div
 											:class="`w-15px h-15px  rounded-full  border-solid transition ${
@@ -114,6 +114,7 @@ const createdFolderRef = ref() // 创建文件夹Ref
 								</div>
 								<a-dropdown trigger="click">
 									<div
+										@click.stop=""
 										class="absolute right-5px top-5px i-ri-more-line text-[var(--color-border-3)] hover:text-[rgb(var(--primary-6))] text-20px operation"></div>
 									<template #content>
 										<a-doption v-if="item.type === 0">
@@ -269,7 +270,7 @@ const createdFolderRef = ref() // 创建文件夹Ref
 .grid-centen :deep(.arco-checkbox-group) {
 	display: grid;
 	grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-	justify-items: center;
+	/* justify-items: center; */
 	gap: 10px;
 }
 .action-bar {

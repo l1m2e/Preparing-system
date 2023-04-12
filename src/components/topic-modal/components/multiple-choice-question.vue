@@ -1,32 +1,50 @@
 <script lang="ts" setup>
-import wangEdit from '../editor/wang-edit.vue'
-import wangEditShow from '../editor/wang-edit-show.vue'
-import difficulty from './components/difficulty.vue'
-import { useTopicSubmit, useGetImageSrcId, useMarkUseImage } from './composables/useTopic'
+import { useTopicSubmit, useGetImageSrcId, useMarkUseImage } from '../composables/useTopic'
 
 const props = defineProps<{
 	type: '单选题' | '多选题'
 }>()
 
 let modalType = computed(() => (props.type === '单选题' ? true : false)) // true 为单选 false 为多选
-const outline = ref('') // 提干
+const outline = ref('') // 题目标题
 const answerResolution = ref('') //答案解析
-const optionsLetter = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'N', 'M', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
-//字母集合
-interface LetterOptions {
-	unique: string
-	isAnswer: boolean
-}
-interface textOptions {
-	text: string
-}
-const letterList = ref<Array<LetterOptions>>([])
+const optionsLetter = [
+	'A',
+	'B',
+	'C',
+	'D',
+	'E',
+	'F',
+	'G',
+	'H',
+	'I',
+	'J',
+	'K',
+	'L',
+	'N',
+	'M',
+	'O',
+	'P',
+	'Q',
+	'R',
+	'S',
+	'T',
+	'U',
+	'V',
+	'W',
+	'X',
+	'Y',
+	'Z'
+]
+
+const letterList = ref<Array<{ unique: string; isAnswer: boolean }>>([])
+
 optionsLetter.forEach((item: string) => {
 	letterList.value.push({ unique: item, isAnswer: false })
 })
 
-//内容集合
-const optionsContentList = ref<Array<textOptions>>([])
+const optionsContentList = ref<Array<{ text: string }>>([])
+
 for (let i = 0; i <= optionsLetter.length + 1; i++) {
 	optionsContentList.value.push({ text: '' })
 }
@@ -106,6 +124,7 @@ const filterOptions = () => optionsList.value.map((item, index) => ({ unique: op
 
 //重置
 const reset = () => {
+	console.log('重置')
 	optionsIndex.value = 4
 	outline.value = ''
 	answerResolution.value = ''
@@ -173,7 +192,7 @@ defineExpose({ reset, save })
 	<!-- 内容 -->
 	<div class="h-700px overflow-y-auto overflow-x-hidden py-20px box-border scroll-bar">
 		<div class="w-90% m-auto">
-			<wangEdit min-height="50" placeholder="请输入题目" v-model="outline"></wangEdit>
+			<wang-edit min-height="50" placeholder="请输入题目" v-model="outline"></wang-edit>
 		</div>
 		<div class="w-90% m-auto">
 			<div class="m-auto mt-10 flex options-item" v-for="(item, index) in optionsList">
@@ -185,10 +204,12 @@ defineExpose({ reset, save })
 					</a-tooltip>
 				</div>
 				<div class="w-100%">
-					<wangEditShow placeholder="请输入答案选项内容" v-model="item.text"></wangEditShow>
+					<wang-edit-show placeholder="请输入答案选项内容" v-model="item.text"></wang-edit-show>
 				</div>
 				<div class="min-w-50px ml-10px center">
-					<a-button shape="circle" status="danger" size="mini" class="delete-icon" @click="deleteOptions(index)"><div class="i-ri-delete-bin-2-line"></div></a-button>
+					<a-button shape="circle" status="danger" size="mini" class="delete-icon" @click="deleteOptions(index)">
+						<div class="i-ri-delete-bin-2-line"></div>
+					</a-button>
 				</div>
 			</div>
 			<div class="center justify-start w-100% mt-30px box-border">
@@ -196,7 +217,7 @@ defineExpose({ reset, save })
 			</div>
 			<a-divider dashed />
 			<div class="w-100%">
-				<wangEditShow placeholder="答案解析" v-model="answerResolution"></wangEditShow>
+				<wang-edit-show placeholder="答案解析" v-model="answerResolution"></wang-edit-show>
 			</div>
 			<div class="mt-20px center justify-start">
 				<span>难度：</span>

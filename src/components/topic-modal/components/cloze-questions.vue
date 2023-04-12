@@ -1,9 +1,6 @@
 <script lang="ts" setup>
-import wangEdit from '../editor/wang-edit.vue'
-import wangEditShow from '../editor/wang-edit-show.vue'
-import difficulty from './components/difficulty.vue'
 import { changeTextToCN } from '~/utils'
-import { useTopicSubmit, useGetImageSrcId, useMarkUseImage } from './composables/useTopic'
+import { useTopicSubmit, useGetImageSrcId, useMarkUseImage } from '../composables/useTopic'
 
 const topic = ref('') //题目富文本
 const analysis = ref('') //答案解析富文本
@@ -39,7 +36,7 @@ const save = async () => {
 		Message.error('请将所有空填写完整')
 		return false
 	}
-	
+
 	//保存编辑器中的图片
 	const imageIdList = [...useGetImageSrcId(topic.value), ...useGetImageSrcId(analysis.value)]
 	const markImgeRes = await useMarkUseImage(imageIdList)
@@ -81,13 +78,16 @@ defineExpose({ reset, save })
 				<a-input size="large" :placeholder="`请输入第${changeTextToCN(index + 1)}个空的答案`" v-model="item.text"></a-input>
 			</div>
 			<div class="min-w-50px ml-10px center">
-				<a-button shape="circle" status="danger" size="mini" class="delete-icon" @click="deleteAnswer(index)"><div class="i-ri-delete-bin-2-line"></div></a-button>
+				<a-button shape="circle" status="danger" size="mini" class="delete-icon" @click="deleteAnswer(index)">
+					<div class="i-ri-delete-bin-2-line"></div>
+				</a-button>
 			</div>
 		</div>
 		<div class="center justify-start w-100% box-border mt-30px">
 			<a-button @click="addAnswer" type="text">添加一个新的空</a-button>
 		</div>
-		<wangEditShow class="mt-20px" placeholder="请输入答案解析 非必填" v-model="analysis"></wangEditShow>
+
+		<wang-edit-show class="mt-20px" placeholder="请输入答案解析 非必填" v-model="analysis"></wang-edit-show>
 
 		<div class="mt-20px center justify-start">
 			<span>难度：</span>

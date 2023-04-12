@@ -33,18 +33,12 @@ export default defineConfig({
 			resolvers: [ArcoResolver()]
 		}),
 		Components({
-			dirs: ['src/components'],
-			deep: true,
-			extensions: ['vue'],
-			// 用于转换目标的过滤器
-			include: [/.vue$/, /.vue?vue/],
-			exclude: [/[\/]node_modules[\/]/, /[\/].git[\/]/, /[\/].nuxt[\/]/],
+			dts: './src/types/components.d.ts',
 			resolvers: [
 				ArcoResolver({
 					sideEffect: true
 				})
-			],
-			dts: './src/types/components.d.ts'
+			]
 		}),
 		Unocss()
 	],

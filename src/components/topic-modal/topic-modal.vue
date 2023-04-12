@@ -1,23 +1,23 @@
 <script lang="ts" setup>
 import { Modal } from '@arco-design/web-vue'
-import clozeQuestions from '../topic/cloze-questions.vue'
-import judgementQuestions from '../topic/judgement-questions.vue'
-import multipleChoiceQuestion from '../topic/multiple-choice-question.vue'
-import shortAnswerQuestion from '../topic/short-answer-question.vue'
+import { getTopic, resetTopicStore } from '~/store/topicStore'
 const show = ref(false)
 const topicType = ref()
-const data = ref()
+
 /**
  * 关闭或者打开模态框
  * @param topic 题型
  * @param operations 是否打开模态框
  * @param param 参数
  */
-const toggleModal = (topic: string, operations: boolean, param?: any) => {
+const toggleModal = async (topic: string, operations: boolean, id?: any) => {
+	//如果为打开 并且存在id请求则为编辑提问请求 请求一以前的数据
+	if (operations && id) {
+		await getTopic(id)
+	}
 	show.value = operations
 	topicType.value = topic
-	data.value = param
-	console.log(topic, operations, param)
+	console.log(topic, operations, id)
 }
 
 defineExpose({ toggleModal })
@@ -79,12 +79,20 @@ const save = async () => {
 </script>
 
 <template>
-	<a-modal :visible="show" :title="topicType" :width="1200" :closable="false" :mask-closable="false" :esc-to-close="false" :footer="false">
-		<clozeQuestions v-if="topicType === '填空题'" ref="clozeQuestionsRef"></clozeQuestions>
-		<judgementQuestions v-if="topicType === '判断题'" ref="judgementQuestionsRef"></judgementQuestions>
-		<multipleChoiceQuestion v-if="topicType === '单选题'" type="单选题" ref="multipleChoiceQuestionRef"></multipleChoiceQuestion>
-		<multipleChoiceQuestion v-if="topicType === '多选题'" type="多选题" ref="multipleChoiceQuestionRef"></multipleChoiceQuestion>
-		<shortAnswerQuestion v-if="topicType === '简答题'" ref="shortAnswerQuestionRef"></shortAnswerQuestion>
+	<a-modal
+		:visible="show"
+		:title="topicType"
+		:width="1200"
+		:closable="false"
+		:mask-closable="false"
+		:esc-to-close="false"
+		:footer="false"
+		@before-close="resetTopicStore(), reset()">
+		<cloze-questions v-if="topicType === '填空题'" ref="clozeQuestionsRef"></cloze-questions>
+		<judgement-questions v-if="topicType === '判断题'" ref="judgementQuestionsRef"></judgement-questions>
+		<multiple-choice-question v-if="topicType === '单选题'" type="单选题" ref="multipleChoiceQuestionRef"></multiple-choice-question>
+		<multiple-choice-question v-if="topicType === '多选题'" type="多选题" ref="multipleChoiceQuestionRef"></multiple-choice-question>
+		<short-answer-question v-if="topicType === '简答题'" ref="shortAnswerQuestionRef"></short-answer-question>
 		<div class="center justify-between mt-30px">
 			<a-tooltip content="清空入的内容" position="right" mini>
 				<a-button @click="reset">重置</a-button>

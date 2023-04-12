@@ -108,7 +108,14 @@ if (editorConfig.MENU_CONF) {
 <template>
 	<div class="richText-box">
 		<Toolbar class="richText-toolbar" :editor="editorRef" :defaultConfig="toolbarConfig" mode="simple" />
-		<Editor class="richText-edit" v-model="valueHtml" :defaultConfig="editorConfig" mode="simple" @onCreated="handleCreated" @onBlur="onBlur" @onFocus="onFocus" />
+		<Editor
+			class="richText-edit"
+			v-model="valueHtml"
+			:defaultConfig="editorConfig"
+			mode="simple"
+			@onCreated="handleCreated"
+			@onBlur="onBlur"
+			@onFocus="onFocus" />
 	</div>
 </template>
 

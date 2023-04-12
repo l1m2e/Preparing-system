@@ -1,17 +1,20 @@
 <script lang="ts" setup>
-import { changeTextToCN, getKeysObjec, setReactive } from '~/utils'
 import dayjs from 'dayjs'
 import classRoomJpg from '~/assets/img/classroom.png'
-import weekCourse from './components/weekSelector/week-course.vue'
-import prepareLessonsModal from './components/modal/prepare-lessons-modal.vue'
-import work from './components/tabs/courseIssue.vue'
-import { courseInfoStore, semesterStore } from '~/store/courseStore'
+import weekCourse from './components/week-course.vue'
+import prepareLessonsModal from './components/prepare-lessons-modal.vue'
+import work from './components/courseIssue.vue'
 import noDataSvg from '~/assets/svg/noData.svg'
+import { changeTextToCN, getKeysObjec, setReactive } from '~/utils'
+import { courseInfoStore, semesterStore } from '~/store/courseStore'
 
 // 查询是否备课 200 已备课 400 未备课
 const queryLessonPrepare = async () => {
 	console.log('备课请求 ')
-	const res = await api.isLessonPreparation({ ...getKeysObjec(courseInfoStore.value, ['className', 'courseHour', 'courseName']), ...semesterStore.value })
+	const res = await api.isLessonPreparation({
+		...getKeysObjec(courseInfoStore.value, ['className', 'courseHour', 'courseName']),
+		...semesterStore.value
+	})
 	if (res.status === 200) {
 		courseInfoStore.value.preparingFlag = true
 		courseInfoStore.value.id = res.data.id
@@ -85,8 +88,10 @@ const classChange: any = async (className: string) => {
 					<div class="icon-box mt-10px flex items-center text-16px">
 						<a-tag color="blue"><div class="i-ri-timer-line"></div></a-tag>
 						<div class="ml-10px">
-							{{ dayjs(courseInfoStore.startTime).format('YYYY-MM-DD') }} &nbsp; {{ `星期${changeTextToCN(dayjs(courseInfoStore.startTime).day())}` }} &nbsp;
-							{{ dayjs(courseInfoStore.startTime).format('HH:mm') }}~{{ dayjs(courseInfoStore.endTime).format('HH:mm') }}
+							{{ dayjs(courseInfoStore.startTime).format('YYYY-MM-DD') }} &nbsp;
+							{{ `星期${changeTextToCN(dayjs(courseInfoStore.startTime).day())}` }} &nbsp; {{ dayjs(courseInfoStore.startTime).format('HH:mm') }}~{{
+								dayjs(courseInfoStore.endTime).format('HH:mm')
+							}}
 						</div>
 					</div>
 					<div class="icon-box mt-10px flex items-center text-16px">

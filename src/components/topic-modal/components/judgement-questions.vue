@@ -1,8 +1,5 @@
 <script lang="ts" setup>
-import wangEdit from '../editor/wang-edit.vue'
-import wangEditShow from '../editor/wang-edit-show.vue'
-import difficulty from './components/difficulty.vue'
-import { useTopicSubmit, useGetImageSrcId, useMarkUseImage } from './composables/useTopic'
+import { useTopicSubmit, useGetImageSrcId, useMarkUseImage } from '../composables/useTopic'
 
 const topic = ref('') //题目富文本
 const analysis = ref('') //答案解析富文本
@@ -67,7 +64,7 @@ defineExpose({ reset, save })
 <template>
 	<div>
 		<wang-edit v-model="topic" placeholder="请输入题目" min-height="200"></wang-edit>
-		<wangEditShow class="mt-20px" placeholder="请输入答案解析 非必填" v-model="analysis"></wangEditShow>
+		<wang-edit-show class="mt-20px" placeholder="请输入答案解析 非必填" v-model="analysis"></wang-edit-show>
 		<div class="mt-20px center justify-start">
 			<span>答案：</span>
 			<a-select class="max-w-200px" :default-value="1" v-model="judgementOptionsValue" :options="udgementOptions"></a-select>

@@ -1,15 +1,18 @@
 <script lang="ts" setup>
-import topicModal from '../modal/topic-modal.vue'
+import topicModal from '~/components/topic-modal/topic-modal.vue'
 import { courseInfoStore } from '~/store/courseStore'
 import { TableRowSelection } from '@arco-design/web-vue'
-import { useGetImageSrcId } from '../topic/composables/useTopic'
+import { useGetImageSrcId } from '~/components/topic-modal/composables/useTopic'
 import { Modal } from '@arco-design/web-vue'
 
 import dayjs from 'dayjs'
 import { baseUrl } from '~/config/baseUrl'
+import { richTextFilterText } from '~/utils'
 const topicModalRef = ref()
-const openTopicModal = (type: '单选题' | '多选题' | '判断题' | '简答题' | '填空题') => {
-	topicModalRef.value.toggleModal(type, true)
+
+// 打开模态框
+const openTopicModal = (type: '单选题' | '多选题' | '判断题' | '简答题' | '填空题' | string, id?: number) => {
+	topicModalRef.value.toggleModal(type, true, id)
 }
 
 //表格
@@ -49,6 +52,7 @@ const topicTypeOptions = reactive([
 	{ value: 5, label: '多选题' }
 ])
 const topicTypeSelectValue = ref(0)
+
 const topicTypeSelectChange = () => {
 	queryIssueList()
 }
@@ -57,9 +61,11 @@ const rowSelection = reactive<TableRowSelection>({
 	showCheckedAll: true,
 	onlyCurrent: false
 })
+
 const pageChange = (current: number) => {
 	queryIssueList(current)
 }
+
 const queryIssueList = async (current?: number) => {
 	if (!courseInfoStore.value.id) return
 	let param = {
@@ -122,14 +128,20 @@ const batchDeleteIssue = () => {
 		}
 	})
 }
+
 //删除问题 api
 const deleteIssue = async (idList: Array<number>) => {
-	const res = await api.deleteIssueById(idList)
+	if (!courseInfoStore.value.id) return
+	const res = await api.deleteIssueById(idList, courseInfoStore.value.id)
 	if (res.status === 200) {
 		Message.success('删除问题成功')
 		return true
 	} else {
-		Message.error('删除问题失败')
+		if (res.data.message) {
+			Message.error(res.data.message)
+		} else {
+			Message.error('删除问题失败 未知错误')
+		}
 		return false
 	}
 }
@@ -223,11 +235,15 @@ const deleteIssue = async (idList: Array<number>) => {
 				<!-- 表格内容 -->
 				<template #title="{ record }">
 					<div class="flex items-center">
-						<a-tooltip :content="record.title.replace(/<[^>]+>/g, '')">
-							<div class="max-w-70% truncate mr-10px">{{ record.title.replace(/<[^>]+>/g, '') }}</div>
+						<a-tooltip :content="richTextFilterText(record.title)">
+							<div class="max-w-70% truncate mr-10px">{{ richTextFilterText(record.title) }}</div>
 						</a-tooltip>
 						<a-tooltip content="点击查看图片">
-							<a-tag v-if="useGetImageSrcId(record.title).length !== 0" class="cursor-pointer" color="green" @click="openImagePreviewGroup(useGetImageSrcId(record.title))">
+							<a-tag
+								v-if="useGetImageSrcId(record.title).length !== 0"
+								class="cursor-pointer"
+								color="green"
+								@click="openImagePreviewGroup(useGetImageSrcId(record.title))">
 								<template #icon>
 									<icon-file-image />
 								</template>
@@ -265,7 +281,13 @@ const deleteIssue = async (idList: Array<number>) => {
 					</a-tag>
 				</template>
 				<template #action="{ record }">
-					<a-button shape="circle" size="medium" class="mr-20px"><icon-edit /></a-button>
+					<a-button
+						shape="circle"
+						size="medium"
+						class="mr-20px"
+						@click="openTopicModal(topicTypeOptions.find((item) => item.value === record.type)!.label, record.id)">
+						<icon-edit />
+					</a-button>
 					<a-button shape="circle" status="danger" size="medium" @click="deleteOneIssueConfirm(record.id)"><icon-delete /></a-button>
 				</template>
 			</a-table>
