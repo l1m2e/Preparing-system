@@ -33,6 +33,7 @@ export let useloginIo: any
 const reconnection = async (uuid: string) => {
 	await getWSUrl()
 	useloginIo = api.onLoginIo(uuid)
+
 	//监听登录事件
 	useloginIo.on('onAccredit', onLogin)
 	console.log('链接')

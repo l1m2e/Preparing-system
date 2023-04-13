@@ -16,6 +16,7 @@ const getCourseInfo = async () => {
 	}
 }
 getCourseInfo()
+
 //将数据格式化成嵌套结构
 const formatData = (list: Array<any>) => {
 	const arr: Array<any> = []
@@ -31,6 +32,7 @@ const formatData = (list: Array<any>) => {
 	})
 	return arr
 }
+
 const goLessonPrepare = (info: any) => {
 	//需要添加到store的字段
 	const arr = [

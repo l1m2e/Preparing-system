@@ -1,5 +1,5 @@
 import { Ref } from 'vue'
-
+import { cloneDeep } from 'lodash-es'
 /**
  * 将传进来的数组中的key 从对象里面筛选出来 组成新的对象
  * @param obj 被筛选的对象
@@ -19,10 +19,11 @@ export const getKeysObjec = <T, K extends keyof T>(obj: T, arr: K[]): { [P in K]
  * @param reactiveData 原始对象
  * @param copyData 被拷贝对象
  */
-export const setReactive = (reactiveData: Ref<object> | object, copyData: object) => {
+export const setReactive = (reactiveData: Ref<object> | object, cloneData: object) => {
+	const temp = cloneDeep(cloneData)
 	Object.keys(unref(reactiveData)).forEach((key) => {
-		if (Object.hasOwnProperty.call(copyData, key)) {
-			reactiveData[key] = copyData[key]
+		if (Object.hasOwnProperty.call(temp, key)) {
+			reactiveData[key] = temp[key]
 		}
 	})
 }
