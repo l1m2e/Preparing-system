@@ -2,7 +2,7 @@
 import topicModal from '~/components/topic-modal/topic-modal.vue'
 import { courseInfoStore } from '~/store/courseStore'
 import { TableRowSelection } from '@arco-design/web-vue'
-import { useGetImageSrcId } from '~/components/topic-modal/composables/useTopic'
+import { getRichTextImageIds } from '~/utils'
 import { Modal } from '@arco-design/web-vue'
 
 import dayjs from 'dayjs'
@@ -240,10 +240,10 @@ const deleteIssue = async (idList: Array<number>) => {
 						</a-tooltip>
 						<a-tooltip content="点击查看图片">
 							<a-tag
-								v-if="useGetImageSrcId(record.title).length !== 0"
+								v-if="getRichTextImageIds(record.title).length !== 0"
 								class="cursor-pointer"
 								color="green"
-								@click="openImagePreviewGroup(useGetImageSrcId(record.title))">
+								@click="openImagePreviewGroup(getRichTextImageIds(record.title))">
 								<template #icon>
 									<icon-file-image />
 								</template>

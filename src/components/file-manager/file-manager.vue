@@ -3,8 +3,8 @@ import dayjs from 'dayjs'
 import folderSvg from '~/assets/svg/folder.svg'
 import fileSvg from '~/assets/svg/file.svg'
 import { useRegion } from '~/composables'
-import treeFolder from './modal/treeFolder.vue'
-import createdFolder from './modal/createdFolder.vue'
+import treeFolder from './components/treeFolder.vue'
+import createdFolder from './components/createdFolder.vue'
 import {
 	checkedIdList,
 	fileListSelectedStateState,

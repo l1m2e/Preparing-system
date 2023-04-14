@@ -1,8 +1,8 @@
 import { axios } from '~/service'
 import { IaddIssue, IqueryIssueList, IqueryIssueListFromId } from './types'
 
-/** 删除文件 */
-export const addIssue = (data: IaddIssue, id: number) => axios.post(`/teacherWeb/question/add/${id}`, data)
+/** 添加问题 */
+export const addIssue = (id: number, data: IaddIssue) => axios.post(`/teacherWeb/question/add/${id}`, data)
 /** 查询问题列表 */
 export const queryIssueList = (data: IqueryIssueList) => axios.get('/teacherWeb/question/query', { params: data })
 /** 根据备课id查询问题列表 */

@@ -1,5 +1,4 @@
 import { Ref } from 'vue'
-import { cloneDeep } from 'lodash-es'
 /**
  * 将传进来的数组中的key 从对象里面筛选出来 组成新的对象
  * @param obj 被筛选的对象
@@ -16,14 +15,14 @@ export const getKeysObjec = <T, K extends keyof T>(obj: T, arr: K[]): { [P in K]
 
 /**
  * 拷贝对象 如果两个对象的key相等将被拷贝对象的key的值赋予原始对象
+ * 此拷贝为浅拷贝 如果需要深拷贝 请使用deepClone包裹被拷贝对象再传输进来
  * @param reactiveData 原始对象
  * @param copyData 被拷贝对象
  */
 export const setReactive = (reactiveData: Ref<object> | object, cloneData: object) => {
-	const temp = cloneDeep(cloneData)
 	Object.keys(unref(reactiveData)).forEach((key) => {
-		if (Object.hasOwnProperty.call(temp, key)) {
-			reactiveData[key] = temp[key]
+		if (Object.hasOwnProperty.call(cloneData, key)) {
+			reactiveData[key] = cloneData[key]
 		}
 	})
 }

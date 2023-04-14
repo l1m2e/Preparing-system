@@ -19,5 +19,7 @@ export interface ITopicStore {
 	/** 判断题选项答案 */
 	judgementOptionsAnswer: string
 	/** 简答题答案 */
-	shortQuestionAnswer: ''
+	shortQuestionAnswer: string
+	/** 填空题大难 */
+	clozeQuestionList: Array<{ text: string }>
 }

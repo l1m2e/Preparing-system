@@ -1,6 +1,5 @@
 <script lang="ts" setup>
-import { useTopicSubmit, useGetImageSrcId, useMarkUseImage } from '../composables/useTopic'
-import { topicStore, resetTopicStore } from '../store'
+import { topicStore } from '../store'
 
 // 判断题选项
 const udgementOptions = [
@@ -13,46 +12,6 @@ const udgementOptions = [
 		label: '错'
 	}
 ]
-
-//重置
-const reset = () => resetTopicStore()
-
-//保存
-const save = async () => {
-	//判空
-	if (topicStore.title === '' || topicStore.title === '<p><br></p>') {
-		Message.error('题目不能为空')
-		return false
-	}
-
-	//保存编辑器中的图片
-	const imageIdList = [...useGetImageSrcId(topicStore.title), ...useGetImageSrcId(topicStore.analysis)]
-	const markImgeRes = await useMarkUseImage(imageIdList)
-	if (!markImgeRes) {
-		Message.error('图片保存失败')
-		return
-	}
-
-	//提交
-	const param = {
-		analysis: topicStore.analysis, // 答案解析
-		answer: [topicStore.judgementOptionsAnswer], //答案
-		difficulty: topicStore.difficulty, // 难度
-		title: topicStore.title, //题目标题
-		type: 4 // 题目类型 1单选 5多选
-	}
-	const submitRes = await useTopicSubmit(param)
-	if (submitRes.isSuccess) {
-		Message.success(submitRes.message)
-		reset()
-		return true
-	} else {
-		Message.error(submitRes.message)
-		return false
-	}
-}
-
-defineExpose({ reset, save })
 </script>
 
 <template>

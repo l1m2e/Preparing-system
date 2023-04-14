@@ -23,6 +23,7 @@ export const courseInfoStore = useStorage('courseInfo', {
 	classCount: '',
 	/** 是否已备课, */
 	preparingFlag: false,
+	/** 课程id */
 	id: null
 })
 
