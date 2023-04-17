@@ -1,20 +1,20 @@
 <script lang="ts" setup>
 import { Modal } from '@arco-design/web-vue'
-import { updateFileList, breadcrumbList } from '~/store/fileStore'
+import { updateFileList, breadcrumbList } from '../stroe'
 
 const params = reactive({
 	keyword: '',
 	fid: 0
 })
-
 const addFolder = async () => {
+	if (params.keyword === '') return Message.error('文件夹昵称不能为空')
 	params.fid = breadcrumbList.slice(-1)[0].fid
 	const res = await api.addFolder(params)
 	if (res.status === 200) {
-		Message.success('添加文件夹成功')
 		await updateFileList()
 		show.value = false
 		params.keyword = ''
+		Message.success('添加文件夹成功')
 	} else {
 		Message.error('添加文件夹失败')
 	}
@@ -26,6 +26,7 @@ const open = async (fid?: number) => {
 	if (fid) {
 		params.fid = fid
 	}
+	window.addEventListener('keydown', watchEnter)
 }
 defineExpose({ open })
 
@@ -39,6 +40,14 @@ const close = () => {
 			params.keyword = ''
 		}
 	})
+	window.removeEventListener('keydown', watchEnter)
+}
+
+//监听回车按钮
+const watchEnter = (event: KeyboardEvent) => {
+	if (event.key === 'Enter') {
+		addFolder()
+	}
 }
 </script>
 

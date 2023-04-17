@@ -1,13 +1,13 @@
 <script lang="ts" setup>
 import { Modal } from '@arco-design/web-vue'
-import { getKeysObjec, setReactive } from '~/utils'
+import { pick, setReactive } from '~/utils'
 import { topicStore, resetTopicStore } from './store'
 import { courseInfoStore } from '~/store/courseStore'
 import { getRichTextImageIds } from '~/utils'
 
 const show = ref(false)
 const topicType = ref<string>('')
-
+let topicId = 0
 /**
  * 关闭或者打开模态框
  * @param topic 题型
@@ -18,9 +18,10 @@ const toggleModal = async (topic: string, operations: boolean, id?: any) => {
 	topicType.value = topic
 	//如果为打开 并且存在id请求则为编辑提问请求 请求一以前的数据
 	if (operations && id) {
+		topicId = id
 		await getTopic(id)
+		console.log(id)
 	}
-
 	show.value = operations
 }
 
@@ -28,7 +29,7 @@ const toggleModal = async (topic: string, operations: boolean, id?: any) => {
 const getTopic = async (id: number) => {
 	const res = await api.getTopicInfoById(id)
 	if (res.status === 200) {
-		const obj = getKeysObjec(res.data, ['analysis', 'title', 'difficulty'])
+		const obj = pick(res.data, ['analysis', 'title', 'difficulty'])
 		setReactive(topicStore, obj)
 
 		switch (topicType.value) {
@@ -82,7 +83,6 @@ const loading = ref(false)
 //保存
 const save = async () => {
 	const isImageSaved = await saveImage()
-
 	if (!isImageSaved) return Message.error('图片保存失败')
 
 	const isTopicSaved = await saveTopic()
@@ -139,14 +139,19 @@ const saveTopic = async () => {
 	const params = {
 		answer,
 		type,
-		...getKeysObjec(topicStore, ['analysis', 'title', 'difficulty']),
+		...pick(topicStore, ['analysis', 'title', 'difficulty']),
 		...(['单选题', '多选题'].includes(topicType.value) && { choices })
 	}
 
 	if (!courseInfoStore.value.id) return message('没有获得课程id')
 
 	loading.value = true
-	const res = await api.addIssue(courseInfoStore.value.id, params)
+	let res
+	if (topicId) {
+		res = await api.editIssue(topicId, params)
+	} else {
+		res = await api.addIssue(courseInfoStore.value.id, params)
+	}
 	loading.value = false
 
 	return res.status === 200
@@ -154,30 +159,21 @@ const saveTopic = async () => {
 
 //获取答案
 const getAnswer = () => {
-	switch (topicType.value) {
-		case '单选题':
-			const answer = topicStore.optionList.find((item) => item.isAnswer === true)?.unique
-			return answer ? [answer] : []
-
-		case '多选题':
-			return [...topicStore.optionList.filter((item) => item.isAnswer === true).map((item) => item.unique)]
-
-		case '填空题':
-			return [...topicStore.clozeQuestionList.map((item) => item.text)]
-
-		case '判断题':
-			return [topicStore.judgementOptionsAnswer]
-
-		case '简答题':
-			return [topicStore.shortQuestionAnswer]
+	const { optionList, clozeQuestionList, judgementOptionsAnswer, shortQuestionAnswer } = topicStore
+	const answer = {
+		单选题: [topicStore.optionList.find((item) => item.isAnswer === true)?.unique].filter(Boolean),
+		多选题: [...optionList.filter((item) => item.isAnswer === true).map((item) => item.unique)],
+		填空题: [...clozeQuestionList.map((item) => item.text)],
+		判断题: [judgementOptionsAnswer],
+		简答题: [shortQuestionAnswer]
 	}
-	return []
+	return answer[topicType.value] || []
 }
 
 //判空
 const checkEmpty = (answerList: Array<string | undefined>) => {
 	if (!topicStore.title || topicStore.title === '<p><br></p>') return message('标题不能为空')
-	console.log(topicType.value)
+
 	switch (topicType.value) {
 		case '单选题':
 		case '多选题':

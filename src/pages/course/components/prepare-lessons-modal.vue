@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { getKeysObjec } from '~/utils'
+import { pick } from '~/utils'
 import { courseInfoStore, semesterStore } from '~/store/courseStore'
 
 const emits = defineEmits(['change'])
@@ -12,7 +12,16 @@ defineExpose({ open })
 
 const ok = async () => {
 	if (!form.title) return Message.error('您必须输入备课主题的名称')
-	const param = getKeysObjec(courseInfoStore.value, ['classDeviceName', 'classDevicePosition', 'className', 'classRoomMac', 'courseHour', 'courseName', 'endTime', 'startTime'])
+	const param = pick(courseInfoStore.value, [
+		'classDeviceName',
+		'classDevicePosition',
+		'className',
+		'classRoomMac',
+		'courseHour',
+		'courseName',
+		'endTime',
+		'startTime'
+	])
 	const res = await api.openPreparing({ ...param, ...form, ...semesterStore.value })
 	if (res.status === 200) {
 		courseInfoStore.value.preparingFlag = true

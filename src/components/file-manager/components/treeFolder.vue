@@ -11,10 +11,16 @@ const open = async () => {
 }
 defineExpose({ open })
 
-//获取文件列表并且格式化
+const pagination = {
+	current: 1,
+	size: 20,
+	page: 1
+}
+//获取文件列表并且格式化为需要的格式
 const getFileList = async (fid?: number) => {
-	const param = fid ? { fid } : {}
+	const param = { ...pagination, ...(fid && { fid }) }
 	const res = await api.queryQuestionBankList(param)
+
 	if (res.status === 200) {
 		const data = res.data.records.filter((item: any) => item.type === 0)
 		return data.map((item: any) => {

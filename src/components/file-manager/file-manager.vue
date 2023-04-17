@@ -16,7 +16,7 @@ import {
 	onFileClick,
 	breadcrumbList,
 	onClickBreadcrumb
-} from '~/store/fileStore'
+} from './stroe'
 //请求列表数据
 getFileList()
 // 布局模式
@@ -33,6 +33,7 @@ onMounted(() => {
 onUnmounted(() => {
 	fileTableReset()
 })
+
 // 顺序对应后端返回的数组下标
 const fileIconTextList = [
 	{

@@ -1,11 +1,12 @@
 import { Ref } from 'vue'
+
 /**
  * 将传进来的数组中的key 从对象里面筛选出来 组成新的对象
  * @param obj 被筛选的对象
  * @param arr 需要筛选出来的key的数组
  * @returns 筛选后返回的对象
  */
-export const getKeysObjec = <T, K extends keyof T>(obj: T, arr: K[]): { [P in K]: T[P] } => {
+export const pick = <T, K extends keyof T>(obj: T, arr: K[]): { [P in K]: T[P] } => {
 	const res: any = {}
 	arr.forEach((item: K) => {
 		res[item] = obj[item]

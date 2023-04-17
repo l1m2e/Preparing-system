@@ -5,14 +5,14 @@ import weekCourse from './components/week-course.vue'
 import prepareLessonsModal from './components/prepare-lessons-modal.vue'
 import work from './components/courseIssue.vue'
 import noDataSvg from '~/assets/svg/noData.svg'
-import { changeTextToCN, getKeysObjec, setReactive } from '~/utils'
+import { changeTextToCN, pick, setReactive } from '~/utils'
 import { courseInfoStore, semesterStore } from '~/store/courseStore'
 
 // 查询是否备课 200 已备课 400 未备课
 const queryLessonPrepare = async () => {
 	console.log('备课请求 ')
 	const res = await api.isLessonPreparation({
-		...getKeysObjec(courseInfoStore.value, ['className', 'courseHour', 'courseName']),
+		...pick(courseInfoStore.value, ['className', 'courseHour', 'courseName']),
 		...semesterStore.value
 	})
 	if (res.status === 200) {

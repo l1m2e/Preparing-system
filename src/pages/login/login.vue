@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import router from '~/router'
 import { useToken } from '~/composables'
-import { getKeysObjec } from '~/utils'
+import { pick } from '~/utils'
 const flag = ref(true)
 //登陆表单
 const form = reactive({
@@ -37,7 +37,7 @@ const register = async () => {
 	if (!registerForm.password) return Message.error('密码不能为空')
 	if (!registerForm.repassword) return Message.error('请输入确认密码')
 	if (registerForm.password === registerForm.repassword) {
-		const res = await api.register(getKeysObjec(registerForm, ['studentId', 'studentName', 'password']))
+		const res = await api.register(pick(registerForm, ['studentId', 'studentName', 'password']))
 		if (res.status === 200) {
 			Message.success('注册成功，请前往登录')
 			empty(registerForm)

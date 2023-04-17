@@ -2,7 +2,7 @@
 import dayjs from 'dayjs'
 import classRoomJpg from '~/assets/img/classroom.png'
 import router from '~/router'
-import { addColors, getKeysObjec, setReactive } from '~/utils'
+import { addColors, pick, setReactive } from '~/utils'
 import { courseInfoStore } from '~/store/courseStore'
 
 const courseInfoList = ref()
@@ -49,7 +49,7 @@ const goLessonPrepare = (info: any) => {
 		'classCount', // 班级人数
 		'preparingFlag' //是否已备课
 	]
-	setReactive(courseInfoStore.value, getKeysObjec(info, arr))
+	setReactive(courseInfoStore.value, pick(info, arr))
 	router.push('/course/prepare')
 }
 </script>

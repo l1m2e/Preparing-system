@@ -11,5 +11,5 @@ export const getUserInfo = () => axios.get('/teacherWeb/user/userInfo')
 export const loggin = (data: Ilogin) => axios.post('/teacherWeb/user/login', data)
 //注册
 export const register = (data: RegisterSchoolUserParams) => axios.post('/teacherWeb/user/register', data)
-//获取ws路径
+// 获取ws路径
 export const getWSUrl = () => axios.get(`/common/address`)
