@@ -9,8 +9,12 @@
 export const useRegion = (el: HTMLElement, customProperties: string, callback: (checkedIdList: Array<number>) => void, tag = 'div') => {
 	el.style.position = 'relative' //设置元素为相对定位
 	const mask = el.appendChild(initSelectMask()) //添加选框蒙板
+
+	let timestamp = 0 //记录时间戳
+
 	//鼠标按下
 	el.onmousedown = (event: MouseEvent) => {
+		timestamp = Date.now()
 		const elRect = el.getBoundingClientRect()
 		mask.style.opacity = '1' // 显示框选元素
 
@@ -62,9 +66,20 @@ export const useRegion = (el: HTMLElement, customProperties: string, callback: (
 
 	//鼠标松开
 	el.onmouseup = () => {
+		//如果用户在200毫秒内松开鼠标 视为点击事件 直接清空数组
+		if (Date.now() - timestamp <= 200) {
+			callback([])
+		}
 		maskHidden(mask) // 隐藏框选元素
 		el.onmousemove = null //移除监听鼠标移动监听事件
 	}
+
+	onUnmounted(() => {
+		//移除鼠标监听 防止内存泄漏
+		el.onmousemove = null
+		el.onmousedown = null
+		el.onmouseup = null
+	})
 }
 
 //矩形碰撞计算
@@ -86,9 +101,10 @@ const maskHidden = (mask: HTMLDivElement) => {
 	mask.style.opacity = '0'
 }
 
+//初始化框框和样式
 const initSelectMask = () => {
 	let mask = document.createElement('div')
 	mask.style.cssText =
-		' pointer-events:none;width: 0px; height: 0px;	border-radius: 2px; background: #4080ff20;border: 2px solid #4080ff; opacity: 0;position: absolute; opacity: 0;'
+		' pointer-events:none;width: 0px; height: 0px;	 background: #4080ff20;border: 1px solid #4080ff; opacity: 0;position: absolute; opacity: 0;'
 	return mask
 }

@@ -1,4 +1,5 @@
 import { defineConfig, presetAttributify, presetIcons, presetUno, presetWebFonts, transformerDirectives, transformerVariantGroup } from 'unocss'
+import { presetExtra } from 'unocss-preset-extra'
 
 export default defineConfig({
 	shortcuts: [
@@ -14,6 +15,7 @@ export default defineConfig({
 	],
 	presets: [
 		presetUno(),
+		presetExtra(),
 		presetAttributify(),
 		presetIcons({
 			scale: 1.2,

@@ -6,7 +6,7 @@ export const checkedIdList = ref<any[]>([]) //被选中的id
 export const fileTable = reactive({
 	list: new Array<any>(),
 	current: 1,
-	size: 6,
+	size: 100,
 	pages: 1
 })
 

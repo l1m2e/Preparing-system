@@ -47,11 +47,16 @@ const close = () => {
 		}
 	})
 }
+
+const fn = () => {
+	Message.success('滑动到底部了')
+	console.log('触底了')
+}
 </script>
 
 <template>
 	<a-modal :visible="show" title="请选择您的目录" :width="500" :closable="false" :mask-closable="false" :esc-to-close="false" :footer="false">
-		<div class="h-300px w-100%">
+		<div class="h-300px w-100% overflow-y-auto scroll-bar" v-on-reach-bottom="fn">
 			<a-tree :show-line="true" :data="treeData" :load-more="loadMore" />
 		</div>
 		<div class="center justify-end mt-30px">

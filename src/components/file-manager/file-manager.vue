@@ -94,7 +94,7 @@ const createdFolderRef = ref() // 创建文件夹Ref
 				<div v-if="uiModel === 'grid'" class="w-100% grid-centen">
 					<a-checkbox-group v-model="checkedIdList">
 						<template v-for="item in fileListSelectedStateState" :key="item.id">
-							<div :class="`${item.checked ? 'checkbox-card-checked' : 'checkbox-card'}`" :data-file-id="item.id" @click="onFileClick(item)">
+							<div :class="`${item.checked ? 'checkbox-card-checked' : 'checkbox-card'}`" :data-file-id="item.id" @dblclick="onFileClick(item)">
 								<a-checkbox :value="item.id" class="absolute top-6px left-1px" @click.stop="">
 									<template #checkbox="row">
 										<div
@@ -122,7 +122,7 @@ const createdFolderRef = ref() // 创建文件夹Ref
 											<template #icon><icon-edit /></template>
 											重命名
 										</a-doption>
-										<a-doption>
+										<a-doption @click="treeFolderRef.open()">
 											<template #icon><icon-to-right /></template>
 											移动
 										</a-doption>
@@ -187,20 +187,22 @@ const createdFolderRef = ref() // 创建文件夹Ref
 					</a-checkbox-group>
 				</div>
 			</main>
-			<footer class="flex w-100% h-100px absolute bottom-0 left-0 right-0 center" @mousedown.stop="">
-				<div
-					class="py-10px px-20px border border-1px border-[var(--color-border-1)] shadow-lg rounded-xl center overflow-hidden"
-					v-if="checkedIdList.length !== 0">
-					<a-tooltip content="删除" position="top" mini>
-						<div class="action-bar" @click="batchDelete"><div class="i-ri-delete-bin-6-line"></div></div>
-					</a-tooltip>
-					<a-tooltip content="移动" position="top" mini @click="treeFolderRef.open()">
-						<div class="action-bar"><div class="i-ri-share-forward-line"></div></div>
-					</a-tooltip>
-					<a-tooltip content="取消选中" position="top" mini>
-						<div class="action-bar"><div class="i-ri-close-circle-line" @click="checkedIdList.length = 0"></div></div>
-					</a-tooltip>
-				</div>
+			<footer class="flex w-100% h-100px absolute bottom-0 left-0 right-0 center overflow-hidden" @mousedown.stop="">
+				<Transition class="animated animated-faster" enter-active-class="animated-fade-in-up" leave-active-class="animated-fade-out-down">
+					<div
+						class="py-10px px-20px border border-1px border-[var(--color-border-1)] shadow-lg rounded-xl center overflow-hidden"
+						v-if="checkedIdList.length !== 0">
+						<a-tooltip content="删除" position="top" mini>
+							<div class="action-bar" @click="batchDelete"><div class="i-ri-delete-bin-6-line"></div></div>
+						</a-tooltip>
+						<a-tooltip content="移动" position="top" mini @click="treeFolderRef.open()">
+							<div class="action-bar"><div class="i-ri-share-forward-line"></div></div>
+						</a-tooltip>
+						<a-tooltip content="取消选中" position="top" mini>
+							<div class="action-bar"><div class="i-ri-close-circle-line" @click="checkedIdList.length = 0"></div></div>
+						</a-tooltip>
+					</div>
+				</Transition>
 			</footer>
 		</div>
 		<!-- 右键菜单 -->
@@ -267,6 +269,9 @@ const createdFolderRef = ref() // 创建文件夹Ref
 }
 .checkbox-card-checked :deep(.arco-checkbox) {
 	display: block;
+}
+:deep(.arco-breadcrumb-item):hover {
+	color: #306fff;
 }
 .grid-centen :deep(.arco-checkbox-group) {
 	display: grid;

@@ -51,8 +51,6 @@ declare module '@vue/runtime-core' {
     ShortAnswerQuestion: typeof import('./../components/topic-modal/components/short-answer-question.vue')['default']
     TopicModal: typeof import('./../components/topic-modal/topic-modal.vue')['default']
     TreeFolder: typeof import('./../components/file-manager/components/treeFolder.vue')['default']
-    'wang-edit': typeof import('./../components/topic-modal/components/wang-edit.vue')['default']
-    'wang-edit-show': typeof import('./../components/topic-modal/components/wang-edit-show.vue')['default']
     WangEdit: typeof import('./../components/topic-modal/components/wang-edit.vue')['default']
     WangEditShow: typeof import('./../components/topic-modal/components/wang-edit-show.vue')['default']
   }
