@@ -31,7 +31,6 @@ export const useRegion = (el: HTMLElement, customProperties: string, callback: (
 			rect: DOMRect
 			id: number | null
 		}
-
 		const itemsDom = el.querySelectorAll(`${tag}[${customProperties}]`)
 		const elementRectID: Array<IelementRectID> = [] //元素矩形和id的合集
 		itemsDom.forEach((item) => {

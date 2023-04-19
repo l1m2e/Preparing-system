@@ -8,6 +8,7 @@ import { Modal } from '@arco-design/web-vue'
 import dayjs from 'dayjs'
 import { baseUrl } from '~/config/baseUrl'
 import { richTextFilterText } from '~/utils'
+
 const topicModalRef = ref()
 
 // 打开模态框
@@ -145,6 +146,8 @@ const deleteIssue = async (idList: Array<number>) => {
 		return false
 	}
 }
+
+const moveFileModalRef = ref() // 题库选择器弹窗
 </script>
 
 <template>
@@ -191,7 +194,7 @@ const deleteIssue = async (idList: Array<number>) => {
 						</a-doption>
 					</template>
 				</a-dropdown>
-				<a-button class="ml-10px" size="large" shape="round">
+				<a-button class="ml-10px" size="large" shape="round" @click="moveFileModalRef.open('select')">
 					<template #icon>
 						<icon-import />
 					</template>
@@ -295,6 +298,7 @@ const deleteIssue = async (idList: Array<number>) => {
 		</main>
 	</div>
 	<topicModal @change="queryIssueList" ref="topicModalRef"></topicModal>
+	<move-file-modal ref="moveFileModalRef"></move-file-modal>
 </template>
 
 <style scoped></style>

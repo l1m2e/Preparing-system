@@ -7,6 +7,7 @@ import treeFolder from './components/treeFolder.vue'
 import createdFolder from './components/createdFolder.vue'
 import {
 	checkedIdList,
+	fileTable,
 	fileListSelectedStateState,
 	getFileList,
 	fileTableReset,
@@ -17,6 +18,7 @@ import {
 	breadcrumbList,
 	onClickBreadcrumb
 } from './stroe'
+
 //请求列表数据
 getFileList()
 // 布局模式
@@ -24,10 +26,13 @@ const uiModel = useStorage<'grid' | 'list'>('fileUiModel', 'grid')
 
 //框选逻辑
 const regionRef = ref()
+
 onMounted(() => {
 	useRegion(regionRef.value, 'data-file-id', (data) => {
 		checkedIdList.value = data
 	})
+
+	fill()
 })
 
 onUnmounted(() => {
@@ -63,6 +68,46 @@ const fileIconTextList = [
 	}
 ]
 
+const gridboxRef = ref()
+const { width: bigBoxWidth } = useElementSize(gridboxRef)
+watch(bigBoxWidth, () => {
+	fill()
+})
+watch(fileTable.list, () => {
+	fill()
+})
+
+const fill = () => {
+	const boxSize = 150 + 10 // 小盒子宽度
+	const boxCount = fileTable.list.length // 盒子的数量
+	const row = Math.floor(bigBoxWidth.value / boxSize) // 一行有多少个盒子
+	const lastRow = boxCount - Math.ceil(boxCount / row - 1) * row // 最后一行
+	const count = row - lastRow // 我应该填多少个盒子
+
+	console.log('一行有多少个', row, '最后一行', lastRow, '我应该填多少个', count)
+
+	// 清空
+	const fileNullbox = gridboxRef.value.querySelectorAll('.data-file-null')
+	fileNullbox.forEach((item: HTMLElement) => item.remove())
+
+	// 添加盒子
+	for (let i = 0; i < count; i++) {
+		let box = document.createElement('div')
+		box.style.cssText = 'width: 150px; height: 180px;'
+		box.classList.add('data-file-null')
+		gridboxRef.value.querySelector('.arco-checkbox-group').appendChild(box)
+	}
+}
+
+// 单击选中 取消选中
+const clickSelected = (id: number) => {
+	if (!checkedIdList.value.includes(id)) {
+		checkedIdList.value.push(id)
+	} else {
+		checkedIdList.value.splice(checkedIdList.value.indexOf(id), 1)
+	}
+}
+
 const treeFolderRef = ref() // 移动文件夹Ref
 const createdFolderRef = ref() // 创建文件夹Ref
 </script>
@@ -91,10 +136,15 @@ const createdFolderRef = ref() // 创建文件夹Ref
 				<a-breadcrumb-item v-for="item in breadcrumbList" @click="onClickBreadcrumb(item.fid)">{{ item.title }}</a-breadcrumb-item>
 			</a-breadcrumb>
 			<main class="w-100% h-76vh overflow-y-auto scroll-bar" v-on-reach-bottom="getFileList">
-				<div v-if="uiModel === 'grid'" class="w-100% grid-centen">
+				<div v-if="uiModel === 'grid'" class="w-100% grid-centen" ref="gridboxRef">
 					<a-checkbox-group v-model="checkedIdList">
 						<template v-for="item in fileListSelectedStateState" :key="item.id">
-							<div :class="`${item.checked ? 'checkbox-card-checked' : 'checkbox-card'}`" :data-file-id="item.id" @dblclick="onFileClick(item)">
+							<div
+								:class="`${item.checked ? 'checkbox-card-checked' : 'checkbox-card'}`"
+								:data-file-id="item.id"
+								@dblclick="onFileClick(item)"
+								@click="clickSelected(item.id)"
+								ref="gridItemsRef">
 								<a-checkbox :value="item.id" class="absolute top-6px left-1px" @click.stop="">
 									<template #checkbox="row">
 										<div
