@@ -3,8 +3,6 @@ import dayjs from 'dayjs'
 import folderSvg from '~/assets/svg/folder.svg'
 import fileSvg from '~/assets/svg/file.svg'
 import { useRegion } from '~/composables'
-import treeFolder from './components/treeFolder.vue'
-import createdFolder from './components/createdFolder.vue'
 import {
 	checkedIdList,
 	fileTable,
@@ -108,8 +106,13 @@ const clickSelected = (id: number) => {
 	}
 }
 
-const treeFolderRef = ref() // 移动文件夹Ref
+const moveFileModalRef = ref() // 移动文件夹Ref
 const createdFolderRef = ref() // 创建文件夹Ref
+
+//移动文件或者文件夹
+const moveFile = (arr: number[]) => {
+	console.log(arr)
+}
 </script>
 
 <template>
@@ -172,7 +175,7 @@ const createdFolderRef = ref() // 创建文件夹Ref
 											<template #icon><icon-edit /></template>
 											重命名
 										</a-doption>
-										<a-doption @click="treeFolderRef.open()">
+										<a-doption @click="moveFileModalRef.open('move')">
 											<template #icon><icon-to-right /></template>
 											移动
 										</a-doption>
@@ -245,7 +248,7 @@ const createdFolderRef = ref() // 创建文件夹Ref
 						<a-tooltip content="删除" position="top" mini>
 							<div class="action-bar" @click="batchDelete"><div class="i-ri-delete-bin-6-line"></div></div>
 						</a-tooltip>
-						<a-tooltip content="移动" position="top" mini @click="treeFolderRef.open()">
+						<a-tooltip content="移动" position="top" mini @click="moveFileModalRef.open('move')">
 							<div class="action-bar"><div class="i-ri-share-forward-line"></div></div>
 						</a-tooltip>
 						<a-tooltip content="取消选中" position="top" mini>
@@ -268,8 +271,8 @@ const createdFolderRef = ref() // 创建文件夹Ref
 		</template>
 	</a-dropdown>
 
-	<treeFolder ref="treeFolderRef"></treeFolder>
-	<createdFolder ref="createdFolderRef"></createdFolder>
+	<createdFolder ref="createdFolderRef" :fid="breadcrumbList.slice().pop()?.fid || 0" @ok="updateFileList()"></createdFolder>
+	<move-file-modal ref="moveFileModalRef" @ok="moveFile"></move-file-modal>
 </template>
 
 <style scoped>

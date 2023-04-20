@@ -7,6 +7,8 @@ export {}
 
 declare module '@vue/runtime-core' {
   export interface GlobalComponents {
+    AAvatar: typeof import('@arco-design/web-vue')['Avatar']
+    ABadge: typeof import('@arco-design/web-vue')['Badge']
     ABreadcrumb: typeof import('@arco-design/web-vue')['Breadcrumb']
     ABreadcrumbItem: typeof import('@arco-design/web-vue')['BreadcrumbItem']
     AButton: typeof import('@arco-design/web-vue')['Button']
@@ -33,6 +35,7 @@ declare module '@vue/runtime-core' {
     ARadioGroup: typeof import('@arco-design/web-vue')['RadioGroup']
     ARow: typeof import('@arco-design/web-vue')['Row']
     ASelect: typeof import('@arco-design/web-vue')['Select']
+    ASpin: typeof import('@arco-design/web-vue')['Spin']
     ASwitch: typeof import('@arco-design/web-vue')['Switch']
     ATable: typeof import('@arco-design/web-vue')['Table']
     ATabPane: typeof import('@arco-design/web-vue')['TabPane']
@@ -41,7 +44,7 @@ declare module '@vue/runtime-core' {
     ATooltip: typeof import('@arco-design/web-vue')['Tooltip']
     ATree: typeof import('@arco-design/web-vue')['Tree']
     ClozeQuestions: typeof import('./../components/topic-modal/components/cloze-questions.vue')['default']
-    CreatedFolder: typeof import('./../components/file-manager/components/createdFolder.vue')['default']
+    CreatedFolder: typeof import('./../components/createdFolder/createdFolder.vue')['default']
     Difficulty: typeof import('./../components/topic-modal/components/difficulty.vue')['default']
     FileManager: typeof import('./../components/file-manager/file-manager.vue')['default']
     JudgementQuestions: typeof import('./../components/topic-modal/components/judgement-questions.vue')['default']

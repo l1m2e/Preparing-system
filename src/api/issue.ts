@@ -8,8 +8,10 @@ export const queryIssueList = (data: IqueryIssueList) => axios.get('/teacherWeb/
 /** 根据备课id查询问题列表 */
 export const queryIssueListFromId = (data: IqueryIssueListFromId) => axios.get('/teacherWeb/question/queryByPid', { params: data })
 /** 根据问题id删除问题 */
-export const deleteIssueById = (idList: Array<number>, pid: string) => axios.delete(`/teacherWeb/question/del/${pid}`, { data: idList })
+export const deleteIssueById = (idList: Array<number>, pid: number | string) => axios.delete(`/teacherWeb/question/del/${pid}`, { data: idList })
 /** 根据问题id获取问题详细信息 */
 export const getTopicInfoById = (id: number | string) => axios.get(`/teacherWeb/question/getQuestionInfo/${id}`)
 /** 修改问题 */
 export const editIssue = (id: number, data: IaddIssue) => axios.put(`/teacherWeb/question/putQuestion/${id}`, data)
+/** 导入问题到备课 */
+export const importQuestion = (pid: number, data: number[]) => axios.post(`/teacherWeb/question/importQuestion/${pid}`, data)

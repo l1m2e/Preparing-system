@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { toggleDark, isDark } from '~/composables'
 const flag = ref(isDark.value)
 </script>
 

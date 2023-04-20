@@ -148,6 +148,13 @@ const deleteIssue = async (idList: Array<number>) => {
 }
 
 const moveFileModalRef = ref() // 题库选择器弹窗
+//题库选择器点击保存
+const moveFileModalSave = async (arr: number[]) => {
+	const res = await api.importQuestion(courseInfoStore.value.id, arr)
+	if (res.status === 200) {
+		queryIssueList()
+	}
+}
 </script>
 
 <template>
@@ -298,7 +305,7 @@ const moveFileModalRef = ref() // 题库选择器弹窗
 		</main>
 	</div>
 	<topicModal @change="queryIssueList" ref="topicModalRef"></topicModal>
-	<move-file-modal ref="moveFileModalRef"></move-file-modal>
+	<move-file-modal ref="moveFileModalRef" @ok="moveFileModalSave"></move-file-modal>
 </template>
 
 <style scoped></style>

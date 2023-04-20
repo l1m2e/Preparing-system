@@ -27,6 +27,7 @@ const ok = async () => {
 		courseInfoStore.value.preparingFlag = true
 		courseInfoStore.value.id = res.data.message
 		Message.success('开启备课成功')
+		console.log(courseInfoStore.value)
 		emits('change')
 		show.value = false
 		beforeCancel()

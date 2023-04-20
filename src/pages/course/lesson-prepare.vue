@@ -21,7 +21,7 @@ const queryLessonPrepare = async () => {
 	}
 	if (res.status === 400) {
 		courseInfoStore.value.preparingFlag = false
-		courseInfoStore.value.id = null
+		courseInfoStore.value.id = 0
 	}
 }
 queryLessonPrepare()

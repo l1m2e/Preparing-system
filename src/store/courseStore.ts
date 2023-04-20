@@ -24,7 +24,7 @@ export const courseInfoStore = useStorage('courseInfo', {
 	/** 是否已备课, */
 	preparingFlag: false,
 	/** 课程id */
-	id: null
+	id: 0
 })
 
 export const semesterStore = useStorage('semester', {
