@@ -82,8 +82,6 @@ const fill = () => {
 	const lastRow = boxCount - Math.ceil(boxCount / row - 1) * row // 最后一行
 	const count = row - lastRow // 我应该填多少个盒子
 
-	console.log('一行有多少个', row, '最后一行', lastRow, '我应该填多少个', count)
-
 	// 清空
 	const fileNullbox = gridboxRef.value.querySelectorAll('.data-file-null')
 	fileNullbox.forEach((item: HTMLElement) => item.remove())
@@ -110,8 +108,13 @@ const moveFileModalRef = ref() // 移动文件夹Ref
 const createdFolderRef = ref() // 创建文件夹Ref
 
 //移动文件或者文件夹
-const moveFile = (arr: number[]) => {
-	console.log(arr)
+const moveFile = async (arr: number[]) => {
+	const fid = arr[0]
+	const res = await api.moveFolder({ fid, ids: checkedIdList.value })
+	if (res.status === 200) {
+		fileTable.list.length = 0
+		getFileList()
+	}
 }
 </script>
 
@@ -175,7 +178,7 @@ const moveFile = (arr: number[]) => {
 											<template #icon><icon-edit /></template>
 											重命名
 										</a-doption>
-										<a-doption @click="moveFileModalRef.open('move')">
+										<a-doption @click="moveFileModalRef.open('move', checkedIdList)">
 											<template #icon><icon-to-right /></template>
 											移动
 										</a-doption>
@@ -248,7 +251,7 @@ const moveFile = (arr: number[]) => {
 						<a-tooltip content="删除" position="top" mini>
 							<div class="action-bar" @click="batchDelete"><div class="i-ri-delete-bin-6-line"></div></div>
 						</a-tooltip>
-						<a-tooltip content="移动" position="top" mini @click="moveFileModalRef.open('move')">
+						<a-tooltip content="移动" position="top" mini @click="moveFileModalRef.open('move', checkedIdList)">
 							<div class="action-bar"><div class="i-ri-share-forward-line"></div></div>
 						</a-tooltip>
 						<a-tooltip content="取消选中" position="top" mini>

@@ -17,7 +17,7 @@ const addFolder = async () => {
 	if (res.status === 200) {
 		show.value = false
 		params.keyword = ''
-		emits('ok')
+		emits('ok', res.data)
 		Message.success('添加文件夹成功')
 	} else {
 		Message.error('添加文件夹失败')

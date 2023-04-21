@@ -2,41 +2,32 @@
 import { richTextFilterText } from '~/utils'
 import folderSvg from '~/assets/svg/folder.svg'
 import fileSvg from '~/assets/svg/file.svg'
-
+import { useFilePagination } from '~/composables'
 const show = ref(false)
 const model = ref<'select' | 'move'>('select')
-
+const excludeList = ref<Array<number>>([])
 /**
  * 打开模态框 有两个 模式 选择模态框 和 移动模态框
- * @param model 'select' | 'move'
+ * @param openModel 'select' | 'move'
+ * @param openExcludeList 如果是移动模式 需要排除的数组
  */
-const open = (openModel: 'select' | 'move') => {
+const open = (openModel: 'select' | 'move', openExcludeList: Array<number>) => {
+	//进入页面前清空页面数据
+	resetFlieState()
 	getFileList()
 	show.value = true
 	model.value = openModel
+	excludeList.value = openExcludeList
 }
 defineExpose({ open })
 
-//分页配置
-const pagination = {
-	current: 1,
-	size: 20,
-	page: 1
-}
-const fileList = ref<Array<any>>([])
-//请求文件列表
-const getFileList = async (fid = 0) => {
-	const res = await api.queryQuestionBankList({ ...pagination, fid })
-	if (res.status === 200) {
-		if (model.value === 'move') {
-			res.data.records = res.data.records.filter((item: any) => item.type === 0)
-			console.log(res.data.records)
-		}
-		fileList.value = res.data.records
-		pagination.current++
-		return true
-	}
-	return false
+const { pagination, fileList, breadcrumbList, breadcrumbLastId, clickBreadcrumb, resetFlieState, getFileList } = useFilePagination()
+
+//滚动到底部刷新
+const pullLoad = () => {
+	if (pagination.current > pagination.pages) return
+	pagination.current++
+	Message.success('下拉加载更多被触发')
 }
 
 //被选中的数组
@@ -46,43 +37,26 @@ const selectedList = ref<Array<any>>([])
 const clickFile = async (item: any) => {
 	//如果是文件夹
 	if (item.type === 0) {
-		fileList.value.length = 0
-		const res = await getFileList(item.id)
-		if (res) {
-			breadcrumbList.push({ title: item.keyword, fid: item.id })
-		}
+		breadcrumbList.push({ title: item.keyword, fid: item.id })
+		fileList.length = 0
+		getFileList()
+		return
+	}
+	//如果是文件
+	if (!selectedList.value.includes(item.id)) {
+		selectedList.value.push(item.id)
 	} else {
-		//如果是文件
-		if (!selectedList.value.includes(item.id)) {
-			selectedList.value.push(item.id)
-		} else {
-			//如果已经被选中从数组中删除
-			selectedList.value.splice(selectedList.value.indexOf(item.id), 1)
-		}
+		//如果已经被选中从数组中删除
+		selectedList.value.splice(selectedList.value.indexOf(item.id), 1)
 	}
 }
 
 // 创建文件夹 ref
-const CreatedFolderRef = ref()
+const createdFolderRef = ref()
 
-//面包屑数组
-const breadcrumbList = reactive([{ title: '所有问题', fid: 0 }])
-//点击面包屑处理函数
-const onClickBreadcrumb = (id: number) => {
-	const index = breadcrumbList.findIndex((item) => item.fid === id)
-	if (index !== -1) {
-		breadcrumbList.splice(index + 1, breadcrumbList.length - index - 1)
-		fileList.value.length = 0
-		getFileList(id)
-	}
-}
-const breadcrumbLastId = computed(() => breadcrumbList.slice().pop()?.fid || 0)
-
-//在关闭之前
-const beforeClose = () => {
-	fileList.value.length = 0
-	selectedList.value.length = 0
-	breadcrumbList.length = 1
+//创建文件夹
+const createdFolderSuccess = (res: any) => {
+	breadcrumbList.push({ title: res.keyword, fid: res.id })
 }
 
 const emit = defineEmits(['ok'])
@@ -103,16 +77,15 @@ const save = () => {
 		:mask-closable="false"
 		:esc-to-close="false"
 		:footer="false"
-		:body-style="{ padding: 0 }"
-		@before-close="beforeClose">
+		:body-style="{ padding: 0 }">
 		<header>
 			<a-breadcrumb separator=">" :max-count="3" class="ml-10px my-10px">
-				<a-breadcrumb-item v-for="item in breadcrumbList" @click="onClickBreadcrumb(item.fid)" class="max-w-120px truncate">
+				<a-breadcrumb-item v-for="item in breadcrumbList" @click="clickBreadcrumb(item.fid)" class="max-w-120px truncate">
 					{{ item.title }}
 				</a-breadcrumb-item>
 			</a-breadcrumb>
 		</header>
-		<main class="w-100% h-500px overflow-y-auto scroll-bar overflow-x-hidden">
+		<main class="w-100% h-500px overflow-y-auto scroll-bar overflow-x-hidden" v-on-reach-bottom="pullLoad">
 			<a-row
 				v-for="item in fileList"
 				@click="clickFile(item)"
@@ -125,7 +98,7 @@ const save = () => {
 		</main>
 		<footer class="w-100% flex items-center justify-between mt-15px p-15px">
 			<div>
-				<a-button type="text" v-if="model === 'move'" @click="CreatedFolderRef.open()">新建文件夹</a-button>
+				<a-button type="text" v-if="model === 'move'" @click="createdFolderRef.open()">新建文件夹</a-button>
 			</div>
 			<div>
 				<a-button @click="show = false">取消</a-button>
@@ -134,6 +107,6 @@ const save = () => {
 				</a-badge>
 			</div>
 		</footer>
-		<CreatedFolder ref="CreatedFolderRef" :fid="breadcrumbLastId" @ok="getFileList(breadcrumbLastId)"></CreatedFolder>
+		<CreatedFolder ref="createdFolderRef" :fid="breadcrumbLastId" @ok="createdFolderSuccess"></CreatedFolder>
 	</a-modal>
 </template>

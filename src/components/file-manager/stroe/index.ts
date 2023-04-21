@@ -103,6 +103,9 @@ export const batchDelete = async () => {
 			Message.success(`成功删除${folderIdList.length}个文件夹`)
 		}
 	}
+
+	//清空选中的数组
+	checkedIdList.value.length = 0
 }
 
 //文件夹重命名

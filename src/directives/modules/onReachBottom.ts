@@ -14,6 +14,7 @@ export const onReachBottom: Directive = {
 
 			if (isReachBottom) {
 				if (throttle) return
+				if (clientHeight === scrollHeight) return
 
 				binding.value()
 				throttle = true

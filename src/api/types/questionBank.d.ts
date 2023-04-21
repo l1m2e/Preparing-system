@@ -12,3 +12,8 @@ export interface AddKeywordParams {
 	keyword: string
 	fid?: number
 }
+
+export interface MoveQuestionParams {
+	ids: number[]
+	fid: number
+}
