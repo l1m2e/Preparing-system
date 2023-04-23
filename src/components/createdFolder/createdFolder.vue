@@ -1,6 +1,4 @@
 <script lang="ts" setup>
-import { Modal } from '@arco-design/web-vue'
-
 const props = defineProps<{
 	fid: number
 }>()
@@ -34,15 +32,8 @@ const open = async () => {
 defineExpose({ open })
 
 const close = () => {
-	Modal.info({
-		title: '提示',
-		content: '您确定要取消操作吗？',
-		hideCancel: false,
-		onOk: () => {
-			show.value = false
-			params.keyword = ''
-		}
-	})
+	params.keyword = ''
+	show.value = false
 	window.removeEventListener('keydown', watchEnter)
 }
 

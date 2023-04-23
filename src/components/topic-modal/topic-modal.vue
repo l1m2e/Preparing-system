@@ -8,20 +8,27 @@ import { getRichTextImageIds } from '~/utils'
 const show = ref(false)
 const topicType = ref<string>('')
 let topicId = 0
+let topicFid = -1
 /**
  * 关闭或者打开模态框
  * @param topic 题型
  * @param operations 是否打开模态框
  * @param param 参数
  */
-const toggleModal = async (topic: string, operations: boolean, id?: any) => {
+const toggleModal = async (topic: string, operations: boolean, param: { id?: any; fid?: number }) => {
 	topicType.value = topic
-	//如果为打开 并且存在id请求则为编辑提问请求 请求一以前的数据
-	if (operations && id) {
-		topicId = id
-		await getTopic(id)
-		console.log(id)
+
+	//如果为打开 并且存在id请求则为编辑提问请求 请求 以前的数据
+	if (operations && param.id) {
+		topicId = param.id
+		await getTopic(param.id)
 	}
+
+	//如果为打开 并且存在父id
+	if (operations && param.fid !== -1) {
+		topicFid = param.fid as number
+	}
+
 	show.value = operations
 }
 
@@ -134,7 +141,7 @@ const saveTopic = async () => {
 		简答题: 3,
 		判断题: 4,
 		多选题: 5
-	}[topicType.value]
+	}[topicType.value]!
 
 	const params = {
 		answer,
@@ -147,6 +154,13 @@ const saveTopic = async () => {
 
 	loading.value = true
 	let res
+
+	if (topicFid !== -1) {
+		res = await api.addBankIssue({ ...params, fid: topicFid })
+		loading.value = false
+		return res.status === 200
+	}
+
 	if (topicId) {
 		res = await api.editIssue(topicId, params)
 	} else {

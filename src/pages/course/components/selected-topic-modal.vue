@@ -4,20 +4,10 @@ import folderSvg from '~/assets/svg/folder.svg'
 import fileSvg from '~/assets/svg/file.svg'
 import { useFilePagination } from '~/composables'
 const show = ref(false)
-const model = ref<'select' | 'move'>('select')
-const excludeList = ref<Array<number>>([])
-/**
- * 打开模态框 有两个 模式 选择模态框 和 移动模态框
- * @param openModel 'select' | 'move'
- * @param openExcludeList 如果是移动模式 需要排除的数组
- */
-const open = (openModel: 'select' | 'move', openExcludeList: Array<number>) => {
-	//进入页面前清空页面数据
-	resetFlieState()
+
+const open = () => {
 	getFileList()
 	show.value = true
-	model.value = openModel
-	excludeList.value = openExcludeList
 }
 defineExpose({ open })
 
@@ -25,7 +15,6 @@ const { pagination, fileList, breadcrumbList, breadcrumbLastId, clickBreadcrumb,
 
 //滚动到底部刷新
 const pullLoad = () => {
-	if (pagination.current > pagination.pages) return
 	pagination.current++
 	Message.success('下拉加载更多被触发')
 }
@@ -63,21 +52,28 @@ const emit = defineEmits(['ok'])
 
 //保存
 const save = () => {
-	emit('ok', model.value === 'select' ? [...selectedList.value] : [breadcrumbLastId.value])
+	emit('ok', [...selectedList.value])
+	selectedList.value.length = 0
 	show.value = false
+}
+
+const beforClose = () => {
+	resetFlieState()
+	selectedList.value.length = 0
 }
 </script>
 
 <template>
 	<a-modal
 		:visible="show"
-		:title="model === 'select' ? '请选择您的问题' : '移动到'"
+		title="添加题目到备课"
 		:width="500"
 		:closable="false"
 		:mask-closable="false"
 		:esc-to-close="false"
 		:footer="false"
-		:body-style="{ padding: 0 }">
+		:body-style="{ padding: 0 }"
+		@before-close="beforClose">
 		<header>
 			<a-breadcrumb separator=">" :max-count="3" class="ml-10px my-10px">
 				<a-breadcrumb-item v-for="item in breadcrumbList" @click="clickBreadcrumb(item.fid)" class="max-w-120px truncate">
@@ -96,14 +92,11 @@ const save = () => {
 				<a-col :span="21" v-else class="truncate">{{ item.keyword }}</a-col>
 			</a-row>
 		</main>
-		<footer class="w-100% flex items-center justify-between mt-15px p-15px">
-			<div>
-				<a-button type="text" v-if="model === 'move'" @click="createdFolderRef.open()">新建文件夹</a-button>
-			</div>
+		<footer class="w-100% flex items-center justify-end mt-15px p-15px">
 			<div>
 				<a-button @click="show = false">取消</a-button>
 				<a-badge :count="selectedList.length" :dotStyle="{ background: '#3b82f6' }">
-					<a-button type="primary" class="ml-10px" @click="save">{{ model === 'select' ? '添加到备课' : '移动到此处' }}</a-button>
+					<a-button type="primary" class="ml-10px" @click="save">添加到备课</a-button>
 				</a-badge>
 			</div>
 		</footer>

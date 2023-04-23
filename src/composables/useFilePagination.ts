@@ -10,14 +10,14 @@ export const useFilePagination = () => {
 	const pagination = reactive({
 		current: 1,
 		pages: 1,
-		size: 20
+		size: 40
 	})
 	/** 文件列表 */
 	const fileList = reactive<Array<any>>([])
 
 	/** 获取文件列表 */
 	const getFileList = async () => {
-		console.log('请求成功', pagination.current, pagination.pages)
+		console.log('发起请求进入判断', pagination.current, pagination.pages)
 		/** 如果当前页大于总页数,则直接返回不请求 */
 		if (pagination.current > pagination.pages) return
 
@@ -31,16 +31,15 @@ export const useFilePagination = () => {
 		}
 	}
 
-	/** 点击面包屑 */
+	/**
+	 * 点击面包屑
+	 * @param id 点击的面包屑的id
+	 */
 	const clickBreadcrumb = (id: number) => {
 		const index = breadcrumbList.findIndex((item) => item.fid === id)
-		if (index !== -1) {
-			breadcrumbList.splice(index + 1, breadcrumbList.length - index - 1)
-		}
-		console.log('点击成功')
+		if (index !== -1) breadcrumbList.splice(index + 1)
 		fileList.length = 0
-		pagination.pages = 1
-		pagination.current = 1
+		pagination.pages = pagination.current = 1
 		getFileList()
 	}
 
@@ -55,10 +54,20 @@ export const useFilePagination = () => {
 
 	/** 重置状态 */
 	const resetFlieState = () => {
-		setReactive(pagination, { current: 1, pages: 1, size: 20 })
+		setReactive(pagination, { current: 1, pages: 1, size: 40 })
+		fileList.length = 0
 		breadcrumbList.length = 1
 	}
 
+	/** 给fileList重新赋值 */
+	const setFileList = (arr: Array<any>) => {
+		fileList.length = 0
+		fileList.push(...arr)
+	}
+
+	onUnmounted(() => {
+		resetFlieState()
+	})
 	return {
 		pagination,
 		fileList,
@@ -66,6 +75,7 @@ export const useFilePagination = () => {
 		breadcrumbLastId,
 		clickBreadcrumb,
 		resetFlieState,
-		getFileList
+		getFileList,
+		setFileList
 	}
 }

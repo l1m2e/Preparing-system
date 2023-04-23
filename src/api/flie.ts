@@ -8,4 +8,4 @@ export const markUseImage = (data: Array<number>) => axios.post('/file/saveImage
 //批量删除文件夹
 export const batchDeleteFolders = (data: Array<number>) => axios.delete('/teacherWeb/questionBank/deletePath', { data })
 //批量删除问题
-export const batchDeleteFlie = (data: Array<number>) => axios.delete('/teacherWeb/questionBank/deletePath', { data })
+export const batchDeleteFlie = (data: Array<number>) => axios.delete('/teacherWeb/questionBank/del', { data })

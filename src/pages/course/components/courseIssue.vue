@@ -1,11 +1,11 @@
 <script lang="ts" setup>
+import dayjs from 'dayjs'
 import topicModal from '~/components/topic-modal/topic-modal.vue'
+import selectedTopicModal from './selected-topic-modal.vue'
 import { courseInfoStore } from '~/store/courseStore'
 import { TableRowSelection } from '@arco-design/web-vue'
 import { getRichTextImageIds } from '~/utils'
 import { Modal } from '@arco-design/web-vue'
-
-import dayjs from 'dayjs'
 import { baseUrl } from '~/config/baseUrl'
 import { richTextFilterText } from '~/utils'
 
@@ -13,7 +13,7 @@ const topicModalRef = ref()
 
 // 打开模态框
 const openTopicModal = (type: '单选题' | '多选题' | '判断题' | '简答题' | '填空题' | string, id?: number) => {
-	topicModalRef.value.toggleModal(type, true, id)
+	topicModalRef.value.toggleModal(type, true, { id })
 }
 
 //表格
@@ -57,6 +57,7 @@ const topicTypeSelectValue = ref(0)
 const topicTypeSelectChange = () => {
 	queryIssueList()
 }
+
 const rowSelection = reactive<TableRowSelection>({
 	type: 'checkbox',
 	showCheckedAll: true,
@@ -147,7 +148,7 @@ const deleteIssue = async (idList: Array<number>) => {
 	}
 }
 
-const moveFileModalRef = ref() // 题库选择器弹窗
+const selectedTopicModalRef = ref() // 题库选择器弹窗
 //题库选择器点击保存
 const moveFileModalSave = async (arr: number[]) => {
 	const res = await api.importQuestion(courseInfoStore.value.id, arr)
@@ -201,7 +202,7 @@ const moveFileModalSave = async (arr: number[]) => {
 						</a-doption>
 					</template>
 				</a-dropdown>
-				<a-button class="ml-10px" size="large" shape="round" @click="moveFileModalRef.open('select')">
+				<a-button class="ml-10px" size="large" shape="round" @click="selectedTopicModalRef.open()">
 					<template #icon>
 						<icon-import />
 					</template>
@@ -305,7 +306,7 @@ const moveFileModalSave = async (arr: number[]) => {
 		</main>
 	</div>
 	<topicModal @change="queryIssueList" ref="topicModalRef"></topicModal>
-	<move-file-modal ref="moveFileModalRef" @ok="moveFileModalSave"></move-file-modal>
+	<selected-topic-modal ref="selectedTopicModalRef" @ok="moveFileModalSave"></selected-topic-modal>
 </template>
 
 <style scoped></style>

@@ -3,42 +3,26 @@ import dayjs from 'dayjs'
 import folderSvg from '~/assets/svg/folder.svg'
 import fileSvg from '~/assets/svg/file.svg'
 import { useRegion } from '~/composables'
-import {
-	checkedIdList,
-	fileTable,
-	fileListSelectedStateState,
-	getFileList,
-	fileTableReset,
-	batchDelete,
-	updateFileList,
-	singleDelete,
-	onFileClick,
-	breadcrumbList,
-	onClickBreadcrumb
-} from './stroe'
+import MoveFileModal from './move-file-modal.vue'
 
-//请求列表数据
-getFileList()
 // 布局模式
 const uiModel = useStorage<'grid' | 'list'>('fileUiModel', 'grid')
 
 //框选逻辑
 const regionRef = ref()
+const checkedIdList = ref<Array<any>>([]) //被选中的id
 
 onMounted(() => {
+	getFileList()
 	useRegion(regionRef.value, 'data-file-id', (data) => {
 		checkedIdList.value = data
 	})
-
 	fill()
 })
 
-onUnmounted(() => {
-	fileTableReset()
-})
-
-// 顺序对应后端返回的数组下标
+//题目icon样式
 const fileIconTextList = [
+	{ text: '文件夹', icon: 'i-ri-check-line', color: 'cyan' },
 	{
 		text: '单选题',
 		icon: 'i-ri-check-line',
@@ -66,18 +50,104 @@ const fileIconTextList = [
 	}
 ]
 
+//请求列表数据
+const { pagination, fileList, breadcrumbList, breadcrumbLastId, clickBreadcrumb, resetFlieState, getFileList, setFileList } = useFilePagination()
+
+//文件列表带是否被选中状态
+const fileListSelectedStateState = computed(() =>
+	fileList.map((item) => {
+		return checkedIdList.value.includes(item.id) ? { ...item, checked: true } : { ...item, checked: false }
+	})
+)
+
+//单个删除
+const singleDelete = async (item: { type: number; id: number }) => {
+	//删除
+	const isDelete = (id: number) => {
+		const index = fileList.findIndex((item) => item.id === id)
+		if (index !== -1) {
+			fileList.splice(index, 1)
+			Message.success('删除成功')
+		}
+	}
+
+	if (item.type === 0) {
+		const res = await api.batchDeleteFolders([item.id])
+		if (res.status === 200) {
+			isDelete(item.id)
+		} else {
+			Message.error('删除失败')
+		}
+	} else {
+		const res = await api.batchDeleteFlie([item.id])
+		if (res.status === 200) {
+			setFileList(fileList.filter((item) => item.id !== item.id))
+			Message.success('删除成功')
+		} else {
+			Message.error('删除失败')
+		}
+	}
+}
+
+//用户会批量选中文件夹和文件 批量删除文件和批量删除文件夹是两个接口 对选中的项进行分类 再分别批量删除
+const batchDelete = async () => {
+	// 根据被选中的id进行分类
+	const fileInfoList = fileList.filter((item) => checkedIdList.value.includes(item.id)) // 文件带文件信息方便根据信息进行分类
+	const folderIdList = fileInfoList.filter((item) => item.type === 0).map((item) => item.id) // 被选中的文件夹id数组
+	const fileIdList = fileInfoList.filter((item) => item.type !== 0).map((item) => item.id) // 被选中的文件id数组
+
+	// 批量删除文件
+	if (fileIdList.length) {
+		const deleteFlieRes = await api.batchDeleteFlie(fileIdList)
+		if (deleteFlieRes.status === 200) {
+			setFileList(fileList.filter((item) => !fileIdList.includes(item.id)))
+			Message.success(`成功删除${fileIdList.length}个文件`)
+		}
+	}
+
+	// 批量删除文件夹
+	if (folderIdList.length) {
+		const deleteFolderRes = await api.batchDeleteFolders(folderIdList)
+		if (deleteFolderRes.status === 200) {
+			console.log(fileList.filter((item) => !fileIdList.includes(item.id)))
+			setFileList(fileList.filter((item) => !folderIdList.includes(item.id)))
+			Message.success(`成功删除${folderIdList.length}个文件夹`)
+		}
+	}
+
+	//清空选中的数组
+	checkedIdList.value.length = 0
+}
+
+//点击文件
+const onFileClick = async (item: any) => {
+	if (item.type === 0) {
+		resetFlieState()
+		breadcrumbList.push({ title: item.keyword, fid: item.id })
+		getFileList()
+	}
+}
+
+//刷新
+const updateFileList = () => {
+	fileList.length = 0
+	getFileList()
+}
+
+//填充盒子
 const gridboxRef = ref()
 const { width: bigBoxWidth } = useElementSize(gridboxRef)
 watch(bigBoxWidth, () => {
 	fill()
 })
-watch(fileTable.list, () => {
+watch(fileList, () => {
 	fill()
 })
 
 const fill = () => {
+	if (uiModel.value === 'list') return //如果是列表则不需要填盒子
 	const boxSize = 150 + 10 // 小盒子宽度
-	const boxCount = fileTable.list.length // 盒子的数量
+	const boxCount = fileList.length // 盒子的数量
 	const row = Math.floor(bigBoxWidth.value / boxSize) // 一行有多少个盒子
 	const lastRow = boxCount - Math.ceil(boxCount / row - 1) * row // 最后一行
 	const count = row - lastRow // 我应该填多少个盒子
@@ -108,13 +178,21 @@ const moveFileModalRef = ref() // 移动文件夹Ref
 const createdFolderRef = ref() // 创建文件夹Ref
 
 //移动文件或者文件夹
-const moveFile = async (arr: number[]) => {
-	const fid = arr[0]
-	const res = await api.moveFolder({ fid, ids: checkedIdList.value })
+const moveFile = async (fid: number, ids: Array<any>) => {
+	const res = await api.moveFolder({ fid, ids })
 	if (res.status === 200) {
-		fileTable.list.length = 0
+		fileList.length = 0
 		getFileList()
 	}
+}
+
+const pullLoad = () => pagination.current++
+
+const topicModalRef = ref()
+// 打开模态框
+const openTopicModal = (type: '单选题' | '多选题' | '判断题' | '简答题' | '填空题' | string) => {
+	topicModalRef.value.toggleModal(type, true, { fid: breadcrumbLastId.value })
+	console.log(type, true, { fid: breadcrumbLastId.value })
 }
 </script>
 
@@ -122,7 +200,57 @@ const moveFile = async (arr: number[]) => {
 	<a-dropdown trigger="contextMenu" alignPoint class="block">
 		<div class="relative" ref="regionRef">
 			<header class="center justify-between items-center bg-[var(--color-bg-2)] h-50px">
-				<a-button size="large" type="primary" shape="round" @click="createdFolderRef.open()">新建文件夹</a-button>
+				<div class="flex items-center">
+					<a-dropdown trigger="hover">
+						<a-button type="primary" size="large" shape="circle">
+							<template #icon>
+								<icon-plus />
+							</template>
+						</a-button>
+						<template #content>
+							<a-doption @click="createdFolderRef.open()">
+								<template #icon><IconFolderAdd /></template>
+								<div class="center pr-10px">
+									<span>新建文件夹</span>
+								</div>
+							</a-doption>
+							<a-doption @click="openTopicModal('单选题')">
+								<div class="center pr-10px">
+									<div class="i-ri-check-line mr-10px"></div>
+									<span>单 选 题</span>
+								</div>
+							</a-doption>
+							<a-doption @click="openTopicModal('多选题')">
+								<div class="center pr-10px">
+									<div class="i-ri-check-double-line mr-10px"></div>
+									<span>多 选 题</span>
+								</div>
+							</a-doption>
+							<a-doption @click="openTopicModal('判断题')">
+								<div class="center pr-10px">
+									<div class="i-ri-question-mark mr-10px"></div>
+									<span>判 断 题</span>
+								</div>
+							</a-doption>
+							<a-doption @click="openTopicModal('填空题')">
+								<div class="center pr-10px">
+									<div class="i-ri-quill-pen-line mr-10px"></div>
+									<span>填 空 题</span>
+								</div>
+							</a-doption>
+							<a-doption @click="openTopicModal('简答题')">
+								<div class="center pr-10px">
+									<div class="i-ri-draft-line mr-10px"></div>
+									<span>简 答 题</span>
+								</div>
+							</a-doption>
+						</template>
+					</a-dropdown>
+					<a-breadcrumb separator=">" :max-count="3" class="ml-10px">
+						<a-breadcrumb-item v-for="item in breadcrumbList" @click="clickBreadcrumb(item.fid)">{{ item.title }}</a-breadcrumb-item>
+					</a-breadcrumb>
+				</div>
+
 				<a-radio-group type="button" size="large" v-model="uiModel">
 					<a-radio value="grid">
 						<div class="center">
@@ -138,10 +266,8 @@ const moveFile = async (arr: number[]) => {
 					</a-radio>
 				</a-radio-group>
 			</header>
-			<a-breadcrumb>
-				<a-breadcrumb-item v-for="item in breadcrumbList" @click="onClickBreadcrumb(item.fid)">{{ item.title }}</a-breadcrumb-item>
-			</a-breadcrumb>
-			<main class="w-100% h-76vh overflow-y-auto scroll-bar" v-on-reach-bottom="getFileList">
+
+			<main class="w-100% h-76vh overflow-y-auto scroll-bar" v-on-reach-bottom="pullLoad">
 				<div v-if="uiModel === 'grid'" class="w-100% grid-centen" ref="gridboxRef">
 					<a-checkbox-group v-model="checkedIdList">
 						<template v-for="item in fileListSelectedStateState" :key="item.id">
@@ -162,8 +288,8 @@ const moveFile = async (arr: number[]) => {
 								<img :src="folderSvg" v-if="item.type === 0" class="w-120px h-120px mt-10px" />
 								<div v-if="[1, 2, 3, 4, 5].includes(item.type)" class="relative">
 									<img :src="fileSvg" class="w-100px h-100px mt-20px mb-10px" />
-									<div :class="`w-20px h-20px absolute left-[calc(50%-10px)] top-40% text-white ${fileIconTextList[item.type + 1].icon}`"></div>
-									<div :class="`absolute left-30% top-65% text-white `">{{ fileIconTextList[item.type + 1].text }}</div>
+									<div :class="`w-20px h-20px absolute left-[calc(50%-10px)] top-40% text-white ${fileIconTextList[item.type].icon}`"></div>
+									<div :class="`absolute left-30% top-65% text-white `">{{ fileIconTextList[item.type].text }}</div>
 								</div>
 								<div class="truncate max-w-130px">{{ item.type === 0 ? item.keyword : item.title }}</div>
 								<div class="text-12px mt-5px text-[var(--color-text-3)]">
@@ -178,7 +304,7 @@ const moveFile = async (arr: number[]) => {
 											<template #icon><icon-edit /></template>
 											重命名
 										</a-doption>
-										<a-doption @click="moveFileModalRef.open('move', checkedIdList)">
+										<a-doption @click="moveFileModalRef.open([item.id])">
 											<template #icon><icon-to-right /></template>
 											移动
 										</a-doption>
@@ -251,7 +377,7 @@ const moveFile = async (arr: number[]) => {
 						<a-tooltip content="删除" position="top" mini>
 							<div class="action-bar" @click="batchDelete"><div class="i-ri-delete-bin-6-line"></div></div>
 						</a-tooltip>
-						<a-tooltip content="移动" position="top" mini @click="moveFileModalRef.open('move', checkedIdList)">
+						<a-tooltip content="移动" position="top" mini @click="moveFileModalRef.open(checkedIdList)">
 							<div class="action-bar"><div class="i-ri-share-forward-line"></div></div>
 						</a-tooltip>
 						<a-tooltip content="取消选中" position="top" mini>
@@ -274,8 +400,9 @@ const moveFile = async (arr: number[]) => {
 		</template>
 	</a-dropdown>
 
-	<createdFolder ref="createdFolderRef" :fid="breadcrumbList.slice().pop()?.fid || 0" @ok="updateFileList()"></createdFolder>
-	<move-file-modal ref="moveFileModalRef" @ok="moveFile"></move-file-modal>
+	<CreatedFolder ref="createdFolderRef" :fid="breadcrumbLastId" @ok="updateFileList()"></CreatedFolder>
+	<MoveFileModal ref="moveFileModalRef" @ok="moveFile"></MoveFileModal>
+	<TopicModal @change="updateFileList" ref="topicModalRef"></TopicModal>
 </template>
 
 <style scoped>
