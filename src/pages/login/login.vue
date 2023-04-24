@@ -145,7 +145,7 @@ const scanQRcodesLogin = () => {
 
 <style scoped>
 .button {
-  --at-apply: w-280px h-50px bg-#6777ef mt-5 rounded center color-#ffffff hover:bg-#4e59ad;
+  --uno: w-280px h-50px bg-#6777ef mt-5 rounded center color-#ffffff hover:bg-#4e59ad;
   box-shadow: 0 0 20px #6777ef56;
   transition: all 0.6s;
 	cursor:pointer;

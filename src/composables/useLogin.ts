@@ -1,17 +1,27 @@
 import { getUuid } from '~/utils'
 import { baseUrl } from '~/config/baseUrl'
+
 export const useToken = useStorage('token', '')
 export const useUserInfo = useStorage('userInfo', {
+	/** 用户id */
 	userId: 0,
+	/** 头像地址 */
 	avatarUrl: '',
 	schoolUser: {
-		schoolName: '', // 学校名称
-		studentName: '', //老师名称
-		studentId: '', //老师id
-		cardId: '', //工号
-		className: '', // 班级名称
-		type: '', // 身份
-		gender: '' //性别
+		/** 学校名称 */
+		schoolName: '',
+		/** 老师名称 */
+		studentName: '',
+		/** 老师id */
+		studentId: '',
+		/** 工号 */
+		cardId: '',
+		/** 班级名称 */
+		className: '',
+		/** 身份 */
+		type: '',
+		/** 性别 */
+		gender: ''
 	}
 })
 

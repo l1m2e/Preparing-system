@@ -1,11 +1,12 @@
-import path from 'path'
-import { defineConfig } from 'vite'
 import Vue from '@vitejs/plugin-vue'
 import Components from 'unplugin-vue-components/vite'
 import AutoImport from 'unplugin-auto-import/vite'
-import { ArcoResolver } from 'unplugin-vue-components/resolvers'
 import Unocss from 'unocss/vite'
 import requireTransform from 'vite-plugin-require-transform'
+import path from 'path'
+
+import { ArcoResolver } from 'unplugin-vue-components/resolvers'
+import { defineConfig } from 'vite'
 
 export default defineConfig({
 	resolve: {

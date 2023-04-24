@@ -154,6 +154,9 @@ const moveFileModalSave = async (arr: number[]) => {
 	const res = await api.importQuestion(courseInfoStore.value.id, arr)
 	if (res.status === 200) {
 		queryIssueList()
+	} else {
+		if (res.status === 400) return Message.error(res.data.error)
+		Message.error('未知错误')
 	}
 }
 </script>

@@ -63,7 +63,7 @@ const onClickMenuItem = (key: string) => {
 	border-right: 1px solid var(--color-neutral-3);
 }
 .content {
-	--at-apply: pt-95px pr-20px pb-20px min-h-100vh w-100% box-border;
+	--uno: pt-95px pr-20px pb-20px min-h-100vh w-100% box-border;
 	padding-left: calc(v-bind(sideWidth) + 20px);
 	transition: padding 0.3s;
 }

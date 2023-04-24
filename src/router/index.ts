@@ -49,6 +49,11 @@ const routes = [
 		path: '/scan-qr-login',
 		name: 'scan-qr-login',
 		component: () => import('~/pages/login/scan-qr-codes.vue')
+	},
+	{
+		path: '/test',
+		name: 'test',
+		component: () => import('~/pages/test/test.vue')
 	}
 ]
 

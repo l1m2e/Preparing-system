@@ -7,26 +7,27 @@ import { getRichTextImageIds } from '~/utils'
 
 const show = ref(false)
 const topicType = ref<string>('')
-let topicId = 0
-let topicFid = -1
+
+const openParam = {
+	id: 0,
+	fid: -1,
+	isBank: false
+}
 /**
  * 关闭或者打开模态框
  * @param topic 题型
  * @param operations 是否打开模态框
  * @param param 参数
  */
-const toggleModal = async (topic: string, operations: boolean, param: { id?: any; fid?: number }) => {
+const toggleModal = async (topic: string, operations: boolean, param: { id?: any; fid?: number; isBank?: boolean }) => {
 	topicType.value = topic
-
-	//如果为打开 并且存在id请求则为编辑提问请求 请求 以前的数据
-	if (operations && param.id) {
-		topicId = param.id
+	//重置
+	setReactive(openParam, { id: 0, fid: -1, isBank: false })
+	//设置
+	setReactive(openParam, param)
+	console.log(param)
+	if (param.id) {
 		await getTopic(param.id)
-	}
-
-	//如果为打开 并且存在父id
-	if (operations && param.fid !== -1) {
-		topicFid = param.fid as number
 	}
 
 	show.value = operations
@@ -34,7 +35,7 @@ const toggleModal = async (topic: string, operations: boolean, param: { id?: any
 
 /** 获取题目信息 */
 const getTopic = async (id: number) => {
-	const res = await api.getTopicInfoById(id)
+	const res = openParam.isBank ? await api.getBankQuestionInfoById(id) : await api.getTopicInfoById(id)
 	if (res.status === 200) {
 		const obj = pick(res.data, ['analysis', 'title', 'difficulty'])
 		setReactive(topicStore, obj)
@@ -50,7 +51,7 @@ const getTopic = async (id: number) => {
 				break
 
 			case '判断题':
-				topicStore.judgementOptionsAnswer = res.data.answer
+				topicStore.judgementOptionsAnswer = res.data.answer[0]
 				break
 
 			case '简答题':
@@ -155,14 +156,16 @@ const saveTopic = async () => {
 	loading.value = true
 	let res
 
-	if (topicFid !== -1) {
-		res = await api.addBankIssue({ ...params, fid: topicFid })
+	if (openParam.fid !== -1 && openParam.id === 0) {
+		res = await api.addBankIssue({ ...params, fid: openParam.fid })
 		loading.value = false
 		return res.status === 200
 	}
 
-	if (topicId) {
-		res = await api.editIssue(topicId, params)
+	//如果问题id为0 则为添加 否则 为修改
+
+	if (openParam.id) {
+		res = openParam.isBank ? await api.editBankQuestion(openParam.id, { ...params, fid: openParam.fid }) : await api.editIssue(openParam.id, params)
 	} else {
 		res = await api.addIssue(courseInfoStore.value.id, params)
 	}

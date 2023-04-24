@@ -4,6 +4,7 @@ import folderSvg from '~/assets/svg/folder.svg'
 import fileSvg from '~/assets/svg/file.svg'
 import { useRegion } from '~/composables'
 import MoveFileModal from './move-file-modal.vue'
+import { richTextFilterText } from '~/utils'
 
 // 布局模式
 const uiModel = useStorage<'grid' | 'list'>('fileUiModel', 'grid')
@@ -23,31 +24,11 @@ onMounted(() => {
 //题目icon样式
 const fileIconTextList = [
 	{ text: '文件夹', icon: 'i-ri-check-line', color: 'cyan' },
-	{
-		text: '单选题',
-		icon: 'i-ri-check-line',
-		color: 'cyan'
-	},
-	{
-		text: '填空题',
-		icon: 'i-ri-quill-pen-line',
-		color: 'blue'
-	},
-	{
-		text: '简答题',
-		icon: 'i-ri-draft-line',
-		color: 'arcoblue'
-	},
-	{
-		text: '判断题',
-		icon: 'i-ri-question-mark',
-		color: 'purple'
-	},
-	{
-		text: '多选题',
-		icon: 'i-ri-check-double-line',
-		color: 'green'
-	}
+	{ text: '单选题', icon: 'i-ri-check-line', color: 'cyan' },
+	{ text: '填空题', icon: 'i-ri-quill-pen-line', color: 'blue' },
+	{ text: '简答题', icon: 'i-ri-draft-line', color: 'arcoblue' },
+	{ text: '判断题', icon: 'i-ri-question-mark', color: 'purple' },
+	{ text: '多选题', icon: 'i-ri-check-double-line', color: 'green' }
 ]
 
 //请求列表数据
@@ -125,6 +106,21 @@ const onFileClick = async (item: any) => {
 		resetFlieState()
 		breadcrumbList.push({ title: item.keyword, fid: item.id })
 		getFileList()
+	} else {
+		topicModalRef.value.toggleModal(['单选题', '填空题', '简答题', '判断题', '多选题'][item.type - 1], true, {
+			fid: breadcrumbLastId.value,
+			id: item.id,
+			isBank: true
+		})
+	}
+}
+
+// 单击选中 取消选中
+const clickSelected = (id: number) => {
+	if (!checkedIdList.value.includes(id)) {
+		checkedIdList.value.push(id)
+	} else {
+		checkedIdList.value.splice(checkedIdList.value.indexOf(id), 1)
 	}
 }
 
@@ -145,7 +141,8 @@ watch(fileList, () => {
 })
 
 const fill = () => {
-	if (uiModel.value === 'list') return //如果是列表则不需要填盒子
+	//如果是列表则不需要填盒子
+	if (uiModel.value === 'list') return
 	const boxSize = 150 + 10 // 小盒子宽度
 	const boxCount = fileList.length // 盒子的数量
 	const row = Math.floor(bigBoxWidth.value / boxSize) // 一行有多少个盒子
@@ -165,15 +162,6 @@ const fill = () => {
 	}
 }
 
-// 单击选中 取消选中
-const clickSelected = (id: number) => {
-	if (!checkedIdList.value.includes(id)) {
-		checkedIdList.value.push(id)
-	} else {
-		checkedIdList.value.splice(checkedIdList.value.indexOf(id), 1)
-	}
-}
-
 const moveFileModalRef = ref() // 移动文件夹Ref
 const createdFolderRef = ref() // 创建文件夹Ref
 
@@ -186,13 +174,14 @@ const moveFile = async (fid: number, ids: Array<any>) => {
 	}
 }
 
+//下拉加载
 const pullLoad = () => pagination.current++
 
 const topicModalRef = ref()
+
 // 打开模态框
 const openTopicModal = (type: '单选题' | '多选题' | '判断题' | '简答题' | '填空题' | string) => {
 	topicModalRef.value.toggleModal(type, true, { fid: breadcrumbLastId.value })
-	console.log(type, true, { fid: breadcrumbLastId.value })
 }
 </script>
 
@@ -200,13 +189,13 @@ const openTopicModal = (type: '单选题' | '多选题' | '判断题' | '简答�
 	<a-dropdown trigger="contextMenu" alignPoint class="block">
 		<div class="relative" ref="regionRef">
 			<header class="center justify-between items-center bg-[var(--color-bg-2)] h-50px">
+				<a-breadcrumb separator=">" :max-count="3" class="ml-10px">
+					<a-breadcrumb-item v-for="item in breadcrumbList" @click="clickBreadcrumb(item.fid)">{{ item.title }}</a-breadcrumb-item>
+				</a-breadcrumb>
+
 				<div class="flex items-center">
 					<a-dropdown trigger="hover">
-						<a-button type="primary" size="large" shape="circle">
-							<template #icon>
-								<icon-plus />
-							</template>
-						</a-button>
+						<div class="btn p-y-10px rounded-xl bg-blue-5 hover:bg-blue-4">新建</div>
 						<template #content>
 							<a-doption @click="createdFolderRef.open()">
 								<template #icon><IconFolderAdd /></template>
@@ -246,25 +235,22 @@ const openTopicModal = (type: '单选题' | '多选题' | '判断题' | '简答�
 							</a-doption>
 						</template>
 					</a-dropdown>
-					<a-breadcrumb separator=">" :max-count="3" class="ml-10px">
-						<a-breadcrumb-item v-for="item in breadcrumbList" @click="clickBreadcrumb(item.fid)">{{ item.title }}</a-breadcrumb-item>
-					</a-breadcrumb>
-				</div>
 
-				<a-radio-group type="button" size="large" v-model="uiModel">
-					<a-radio value="grid">
-						<div class="center">
-							<div class="i-carbon:grid mr-5px"></div>
-							<span>宫格</span>
-						</div>
-					</a-radio>
-					<a-radio value="list">
-						<div class="center">
-							<div class="i-carbon:list mr-5px"></div>
-							<span>列表</span>
-						</div>
-					</a-radio>
-				</a-radio-group>
+					<a-radio-group type="button" size="large" v-model="uiModel" class="ml-10px">
+						<a-radio value="grid">
+							<div class="center">
+								<div class="i-carbon:grid mr-5px"></div>
+								<span>宫格</span>
+							</div>
+						</a-radio>
+						<a-radio value="list">
+							<div class="center">
+								<div class="i-carbon:list mr-5px"></div>
+								<span>列表</span>
+							</div>
+						</a-radio>
+					</a-radio-group>
+				</div>
 			</header>
 
 			<main class="w-100% h-76vh overflow-y-auto scroll-bar" v-on-reach-bottom="pullLoad">
@@ -291,7 +277,7 @@ const openTopicModal = (type: '单选题' | '多选题' | '判断题' | '简答�
 									<div :class="`w-20px h-20px absolute left-[calc(50%-10px)] top-40% text-white ${fileIconTextList[item.type].icon}`"></div>
 									<div :class="`absolute left-30% top-65% text-white `">{{ fileIconTextList[item.type].text }}</div>
 								</div>
-								<div class="truncate max-w-130px">{{ item.type === 0 ? item.keyword : item.title }}</div>
+								<div class="truncate max-w-130px">{{ item.type === 0 ? item.keyword : richTextFilterText(item.title) }}</div>
 								<div class="text-12px mt-5px text-[var(--color-text-3)]">
 									{{ dayjs(item.createdTimestamp).format('YYYY-MM-DD HH:mm') }}
 								</div>
@@ -337,7 +323,7 @@ const openTopicModal = (type: '单选题' | '多选题' | '判断题' | '简答�
 								<div v-else class="w-20px h-20px">
 									<img :src="fileSvg" />
 								</div>
-								<div class="ml-20px">{{ item.type === 0 ? item.keyword : item.title }}</div>
+								<div class="ml-20px">{{ item.type === 0 ? item.keyword : richTextFilterText(item.title) }}</div>
 							</a-col>
 							<a-col class="list-col" :span="6">{{ dayjs(item.createdTimestamp).format('YYYY-MM-DD HH:mm') }}</a-col>
 							<a-col class="list-col" :span="6">
@@ -399,7 +385,6 @@ const openTopicModal = (type: '单选题' | '多选题' | '判断题' | '简答�
 			</a-doption>
 		</template>
 	</a-dropdown>
-
 	<CreatedFolder ref="createdFolderRef" :fid="breadcrumbLastId" @ok="updateFileList()"></CreatedFolder>
 	<MoveFileModal ref="moveFileModalRef" @ok="moveFile"></MoveFileModal>
 	<TopicModal @change="updateFileList" ref="topicModalRef"></TopicModal>

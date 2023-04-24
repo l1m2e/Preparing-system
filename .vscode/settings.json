@@ -3,5 +3,6 @@
 	"typescript.tsdk": "node_modules/typescript/lib",
 	"commentTranslate.targetLanguage": "zh-CN",
 	"commentTranslate.hover.enabled": true,
-	"commentTranslate.source": "Bing"
+	"commentTranslate.source": "Bing",
+	"vue.features.codeActions.enable": false
 }
