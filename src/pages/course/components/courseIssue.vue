@@ -13,7 +13,7 @@ const topicModalRef = ref()
 
 // 打开模态框
 const openTopicModal = (type: '单选题' | '多选题' | '判断题' | '简答题' | '填空题' | string, id?: number) => {
-	topicModalRef.value.toggleModal(type, true, { id })
+	topicModalRef.value.toggleModal(type, { id })
 }
 
 //表格

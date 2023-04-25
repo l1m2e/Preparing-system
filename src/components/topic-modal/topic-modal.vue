@@ -3,6 +3,7 @@ import { Modal } from '@arco-design/web-vue'
 import { pick, setReactive } from '~/utils'
 import { topicStore, resetTopicStore } from './store'
 import { courseInfoStore } from '~/store/courseStore'
+
 import { getRichTextImageIds } from '~/utils'
 
 const show = ref(false)
@@ -19,18 +20,18 @@ const openParam = {
  * @param operations 是否打开模态框
  * @param param 参数
  */
-const toggleModal = async (topic: string, operations: boolean, param: { id?: any; fid?: number; isBank?: boolean }) => {
+const toggleModal = async (topic: string, param: { id?: number; fid?: number; isBank?: boolean }) => {
 	topicType.value = topic
 	//重置
 	setReactive(openParam, { id: 0, fid: -1, isBank: false })
 	//设置
 	setReactive(openParam, param)
-	console.log(param)
+
 	if (param.id) {
 		await getTopic(param.id)
 	}
 
-	show.value = operations
+	show.value = true
 }
 
 /** 获取题目信息 */

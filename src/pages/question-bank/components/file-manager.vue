@@ -107,7 +107,7 @@ const onFileClick = async (item: any) => {
 		breadcrumbList.push({ title: item.keyword, fid: item.id })
 		getFileList()
 	} else {
-		topicModalRef.value.toggleModal(['单选题', '填空题', '简答题', '判断题', '多选题'][item.type - 1], true, {
+		topicModalRef.value.toggleModal(['单选题', '填空题', '简答题', '判断题', '多选题'][item.type - 1], {
 			fid: breadcrumbLastId.value,
 			id: item.id,
 			isBank: true
@@ -181,7 +181,7 @@ const topicModalRef = ref()
 
 // 打开模态框
 const openTopicModal = (type: '单选题' | '多选题' | '判断题' | '简答题' | '填空题' | string) => {
-	topicModalRef.value.toggleModal(type, true, { fid: breadcrumbLastId.value })
+	topicModalRef.value.toggleModal(type, { fid: breadcrumbLastId.value })
 }
 </script>
 
