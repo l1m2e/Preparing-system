@@ -1,10 +1,4 @@
-<p align='center'>
-  <img src='https://user-images.githubusercontent.com/11247099/111864893-a457fd00-899e-11eb-9f05-f4b88987541d.png' alt='Vitesse - Opinionated Vite Starter Template' width='600'/>
-</p>
-<h5 align='center'>
-<b>轻量化的启动模板 </b>
-</h5>
-<br>
+
 
 ## 项目特性
 
@@ -14,3 +8,9 @@
 - 😃 [各种图标集为你所用](https://github.com/antfu/unocss/tree/main/packages/preset-icons)
 - 🔥 使用 [新的 `<script setup>` 语法](https://github.com/vuejs/rfcs/pull/227)
 - 🦾 TypeScript, 当然
+- 🎉 自动引入组件 和 内置hooks  自动生成请求接口 -解放双手
+
+
+
+> 如果后端更新了swagger 文档 请运行  `pnpm api` 获取最新的请求接口和类型
+

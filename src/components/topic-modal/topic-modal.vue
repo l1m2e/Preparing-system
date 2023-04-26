@@ -36,7 +36,7 @@ const toggleModal = async (topic: string, param: { id?: number; fid?: number; is
 
 /** 获取题目信息 */
 const getTopic = async (id: number) => {
-	const res = openParam.isBank ? await api.getQuestionInfoById1(id) : await api.getQuestionInfoById(id)
+	const res = openParam.isBank ? await api.getQuestionInfoById(id) : await api.getQuestionInfoById1(id)
 	if (res.status === 200) {
 		const obj = pick(res.data, ['analysis', 'title', 'difficulty'])
 		setReactive(topicStore, obj)

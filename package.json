@@ -7,7 +7,7 @@
 		"typecheck": "vue-tsc --noEmit",
 		"preview": "vite preview",
 		"up": "taze major -I",
-		"api": "npx swagger-typescript-api -p http://192.168.88.123:8081/v3/api-docs/teacherWeb -o ./src/api --axios --modular --default-as-success"
+		"api": "npx swagger-typescript-api -p http://192.168.88.123:8081/v3/api-docs/teacherWeb -o ./src/api --axios --modular"
 	},
 	"dependencies": {
 		"@iconify-json/ri": "^1.1.3",

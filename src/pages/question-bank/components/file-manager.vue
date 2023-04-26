@@ -5,6 +5,7 @@ import fileSvg from '~/assets/svg/file.svg'
 import { useRegion } from '~/composables'
 import MoveFileModal from './move-file-modal.vue'
 import { richTextFilterText } from '~/utils'
+import ResetFolderName from './reset-folder-name.vue'
 
 // 布局模式
 const uiModel = useStorage<'grid' | 'list'>('fileUiModel', 'grid')
@@ -181,6 +182,7 @@ const moveFile = async (fid: number, ids: Array<any>) => {
 const pullLoad = () => pagination.current++
 
 const topicModalRef = ref()
+const resetFolderNameRef = ref()
 
 // 打开模态框
 const openTopicModal = (type: '单选题' | '多选题' | '判断题' | '简答题' | '填空题' | string) => {
@@ -289,7 +291,7 @@ const openTopicModal = (type: '单选题' | '多选题' | '判断题' | '简答�
 										@click.stop=""
 										class="absolute right-5px top-5px i-ri-more-line text-[var(--color-border-3)] hover:text-[rgb(var(--primary-6))] text-20px operation"></div>
 									<template #content>
-										<a-doption v-if="item.type === 0">
+										<a-doption v-if="item.type === 0" @click="resetFolderNameRef.open(item.id)">
 											<template #icon><icon-edit /></template>
 											重命名
 										</a-doption>
@@ -391,6 +393,7 @@ const openTopicModal = (type: '单选题' | '多选题' | '判断题' | '简答�
 	<CreatedFolder ref="createdFolderRef" :fid="breadcrumbLastId" @ok="updateFileList()"></CreatedFolder>
 	<MoveFileModal ref="moveFileModalRef" @ok="moveFile"></MoveFileModal>
 	<TopicModal @change="updateFileList" ref="topicModalRef"></TopicModal>
+	<ResetFolderName ref="resetFolderNameRef" @ok="updateFileList()"></ResetFolderName>
 </template>
 
 <style scoped>

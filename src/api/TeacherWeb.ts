@@ -86,6 +86,28 @@ export class TeacherWeb<SecurityDataType = unknown> extends HttpClient<SecurityD
 	 * No description
 	 *
 	 * @tags 82-问题题库模块
+	 * @name UpdatePath
+	 * @summary 10-文件夹重命名
+	 * @request PUT:/teacherWeb/questionBank/putPath/{id}
+	 */
+	updatePath = (
+		id: number,
+		query: {
+			/** 重命名 */
+			name: string
+		},
+		params: RequestParams = {}
+	) =>
+		this.request<Message, any>({
+			path: `/teacherWeb/questionBank/putPath/${id}`,
+			method: 'PUT',
+			query: query,
+			...params
+		})
+	/**
+	 * No description
+	 *
+	 * @tags 82-问题题库模块
 	 * @name MoveQuestion
 	 * @summary 8-移动问题或目录
 	 * @request PUT:/teacherWeb/questionBank/moveQuestion

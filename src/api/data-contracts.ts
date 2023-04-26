@@ -436,31 +436,31 @@ export interface FileSrcVo {
 /** 分页对象 */
 export interface MyPageQuestionVo {
 	/** 数据 */
-	records?: QuestionVo[]
+	records: QuestionVo[]
 	/**
 	 * 总数
 	 * @format int64
 	 */
-	total?: number
+	total: number
 	/**
 	 * 每页总长度
 	 * @format int64
 	 */
-	size?: number
+	size: number
 	/**
 	 * 当前页数
 	 * @format int64
 	 */
-	current?: number
+	current: number
 	/** 排序字段信息 */
 	orders?: OrderItem[]
 	/** 是否查询总数 */
-	searchCount?: boolean
+	searchCount: boolean
 	/**
 	 * 总页数
 	 * @format int64
 	 */
-	pages?: number
+	pages: number
 }
 
 /** 排序字段信息 */
@@ -562,31 +562,31 @@ export interface QuestionLogVo {
 /** 分页对象 */
 export interface MyPagePreparing {
 	/** 数据 */
-	records?: Preparing[]
+	records: Preparing[]
 	/**
 	 * 总数
 	 * @format int64
 	 */
-	total?: number
+	total: number
 	/**
 	 * 每页总长度
 	 * @format int64
 	 */
-	size?: number
+	size: number
 	/**
 	 * 当前页数
 	 * @format int64
 	 */
-	current?: number
+	current: number
 	/** 排序字段信息 */
 	orders?: OrderItem[]
 	/** 是否查询总数 */
-	searchCount?: boolean
+	searchCount: boolean
 	/**
 	 * 总页数
 	 * @format int64
 	 */
-	pages?: number
+	pages: number
 }
 
 /** 数据 */
@@ -761,91 +761,91 @@ export interface ExaminationTaskSimVo {
 /** 分页对象 */
 export interface MyPageExaminationTaskSimVo {
 	/** 数据 */
-	records?: ExaminationTaskSimVo[]
+	records: ExaminationTaskSimVo[]
 	/**
 	 * 总数
 	 * @format int64
 	 */
-	total?: number
+	total: number
 	/**
 	 * 每页总长度
 	 * @format int64
 	 */
-	size?: number
+	size: number
 	/**
 	 * 当前页数
 	 * @format int64
 	 */
-	current?: number
+	current: number
 	/** 排序字段信息 */
 	orders?: OrderItem[]
 	/** 是否查询总数 */
-	searchCount?: boolean
+	searchCount: boolean
 	/**
 	 * 总页数
 	 * @format int64
 	 */
-	pages?: number
+	pages: number
 }
 
 /** 分页对象 */
 export interface MyPageExaminationVo {
 	/** 数据 */
-	records?: ExaminationVo[]
+	records: ExaminationVo[]
 	/**
 	 * 总数
 	 * @format int64
 	 */
-	total?: number
+	total: number
 	/**
 	 * 每页总长度
 	 * @format int64
 	 */
-	size?: number
+	size: number
 	/**
 	 * 当前页数
 	 * @format int64
 	 */
-	current?: number
+	current: number
 	/** 排序字段信息 */
 	orders?: OrderItem[]
 	/** 是否查询总数 */
-	searchCount?: boolean
+	searchCount: boolean
 	/**
 	 * 总页数
 	 * @format int64
 	 */
-	pages?: number
+	pages: number
 }
 
 /** 分页对象 */
 export interface MyPageExaminationLogVo {
 	/** 数据 */
-	records?: ExaminationLogVo[]
+	records: ExaminationLogVo[]
 	/**
 	 * 总数
 	 * @format int64
 	 */
-	total?: number
+	total: number
 	/**
 	 * 每页总长度
 	 * @format int64
 	 */
-	size?: number
+	size: number
 	/**
 	 * 当前页数
 	 * @format int64
 	 */
-	current?: number
+	current: number
 	/** 排序字段信息 */
 	orders?: OrderItem[]
 	/** 是否查询总数 */
-	searchCount?: boolean
+	searchCount: boolean
 	/**
 	 * 总页数
 	 * @format int64
 	 */
-	pages?: number
+	pages: number
 }
 
 /** 测验详细信息2 */
@@ -968,31 +968,31 @@ export interface ExaminationLogInfoVo {
 /** 分页对象 */
 export interface MyPageCoursewareVo {
 	/** 数据 */
-	records?: CoursewareVo[]
+	records: CoursewareVo[]
 	/**
 	 * 总数
 	 * @format int64
 	 */
-	total?: number
+	total: number
 	/**
 	 * 每页总长度
 	 * @format int64
 	 */
-	size?: number
+	size: number
 	/**
 	 * 当前页数
 	 * @format int64
 	 */
-	current?: number
+	current: number
 	/** 排序字段信息 */
 	orders?: OrderItem[]
 	/** 是否查询总数 */
-	searchCount?: boolean
+	searchCount: boolean
 	/**
 	 * 总页数
 	 * @format int64
 	 */
-	pages?: number
+	pages: number
 }
 
 /** 单个课程表信息 */

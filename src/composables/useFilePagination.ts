@@ -17,7 +17,6 @@ export const useFilePagination = () => {
 
 	/** 获取文件列表 */
 	const getFileList = async () => {
-		console.log('发起请求进入判断', pagination.current, pagination.pages)
 		/** 如果当前页大于总页数,则直接返回不请求 */
 		if (pagination.current > pagination.pages) return
 
@@ -26,8 +25,8 @@ export const useFilePagination = () => {
 		const res = await api.queryQuestionSim({ ...parms, fid: breadcrumbLastId.value })
 
 		if (res.status === 200) {
-			res.data.records!.forEach((item: any) => fileList.push(item))
-			pagination.pages = res.data.pages!
+			res.data.records.forEach((item: any) => fileList.push(item))
+			pagination.pages = res.data.pages
 		}
 	}
 
@@ -69,13 +68,21 @@ export const useFilePagination = () => {
 		resetFlieState()
 	})
 	return {
+		/** 分页配置 */
 		pagination,
+		/** 文件列表 */
 		fileList,
+		/** 面包屑数组 */
 		breadcrumbList,
+		/** 面包屑最后一个id */
 		breadcrumbLastId,
+		/** 点击面包屑 */
 		clickBreadcrumb,
+		/** 重置状态 */
 		resetFlieState,
+		/** 获取文件列表 */
 		getFileList,
+		/** 设置文件列表 */
 		setFileList
 	}
 }

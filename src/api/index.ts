@@ -4,7 +4,7 @@ import { File } from './File'
 import { Common } from './Common'
 import { omit } from 'lodash-es'
 
-// common.instance common.request
+// 有多个模块统一使用统一的拦截器
 const api = { ...new TeacherWeb(), ...omit(new File(), 'instance', 'request'), ...omit(new Common(), 'instance', 'request') }
 
 //配置请求拦截器

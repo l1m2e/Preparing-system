@@ -3,7 +3,7 @@ import dayjs from 'dayjs'
 import classRoomJpg from '~/assets/img/classroom.png'
 import weekCourse from './components/week-course.vue'
 import prepareLessonsModal from './components/prepare-lessons-modal.vue'
-import work from './components/courseIssue.vue'
+import courseIssue from './components/course-issue.vue'
 import noDataSvg from '~/assets/svg/noData.svg'
 import { changeTextToCN, pick, setReactive } from '~/utils'
 import { courseInfoStore, semesterStore } from '~/store/courseStore'
@@ -120,7 +120,9 @@ const classChange: any = async (className: string) => {
 	<!-- 内容展示 -->
 	<a-card :bordered="false" class="mt-30px" v-if="courseInfoStore.preparingFlag">
 		<a-tabs default-active-key="1">
-			<a-tab-pane key="1" title="课堂问题"><work></work></a-tab-pane>
+			<a-tab-pane key="1" title="课堂问题">
+				<courseIssue></courseIssue>
+			</a-tab-pane>
 			<a-tab-pane key="2" title="课堂测验">Content of Tab Panel 2</a-tab-pane>
 			<a-tab-pane key="3" title="课件"></a-tab-pane>
 		</a-tabs>
