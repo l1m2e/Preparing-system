@@ -53,14 +53,14 @@ const singleDelete = async (item: { type: number; id: number }) => {
 	}
 
 	if (item.type === 0) {
-		const res = await api.batchDeleteFolders([item.id])
+		const res = await api.movePathById([item.id])
 		if (res.status === 200) {
 			isDelete(item.id)
 		} else {
 			Message.error('删除失败')
 		}
 	} else {
-		const res = await api.batchDeleteFlie([item.id])
+		const res = await api.delQuestion([item.id])
 		if (res.status === 200) {
 			setFileList(fileList.filter((item) => item.id !== item.id))
 			Message.success('删除成功')
@@ -79,7 +79,7 @@ const batchDelete = async () => {
 
 	// 批量删除文件
 	if (fileIdList.length) {
-		const deleteFlieRes = await api.batchDeleteFlie(fileIdList)
+		const deleteFlieRes = await api.delQuestion(fileIdList)
 		if (deleteFlieRes.status === 200) {
 			setFileList(fileList.filter((item) => !fileIdList.includes(item.id)))
 			Message.success(`成功删除${fileIdList.length}个文件`)
@@ -88,7 +88,7 @@ const batchDelete = async () => {
 
 	// 批量删除文件夹
 	if (folderIdList.length) {
-		const deleteFolderRes = await api.batchDeleteFolders(folderIdList)
+		const deleteFolderRes = await api.movePathById(folderIdList)
 		if (deleteFolderRes.status === 200) {
 			console.log(fileList.filter((item) => !fileIdList.includes(item.id)))
 			setFileList(fileList.filter((item) => !folderIdList.includes(item.id)))
@@ -167,10 +167,13 @@ const createdFolderRef = ref() // 创建文件夹Ref
 
 //移动文件或者文件夹
 const moveFile = async (fid: number, ids: Array<any>) => {
-	const res = await api.moveFolder({ fid, ids })
+	const res = await api.moveQuestion({ fid, ids })
 	if (res.status === 200) {
 		fileList.length = 0
 		getFileList()
+	}
+	if (res.status === 400) {
+		res.data.error && Message.error(res.data.error)
 	}
 }
 

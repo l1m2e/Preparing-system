@@ -23,11 +23,11 @@ export const useFilePagination = () => {
 
 		const { pages, ...parms } = pagination
 
-		const res = await api.queryQuestionBankList({ ...parms, fid: breadcrumbLastId.value })
+		const res = await api.queryQuestionSim({ ...parms, fid: breadcrumbLastId.value })
 
 		if (res.status === 200) {
-			res.data.records.forEach((item: any) => fileList.push(item))
-			pagination.pages = res.data.pages
+			res.data.records!.forEach((item: any) => fileList.push(item))
+			pagination.pages = res.data.pages!
 		}
 	}
 

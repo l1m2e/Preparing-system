@@ -41,7 +41,7 @@ const columns = [
 ]
 
 const paginationConfig = reactive({ pageSize: 8, total: 0, current: 1 })
-const data = ref([])
+const data = ref<Array<any>>([])
 const selectedKeys = ref<Array<number>>([]) //批量操作
 const fuzzySearch = ref('') // 模糊搜索
 const topicTypeOptions = reactive([
@@ -78,11 +78,11 @@ const queryIssueList = async (current?: number) => {
 		type: topicTypeSelectValue.value as any
 	}
 	!topicTypeSelectValue.value && delete param.type
-	const res = await api.queryIssueListFromId(param)
+	const res = await api.queryQuestionByPid(param)
 	if (res.status === 200) {
-		paginationConfig.current = res.data.current
-		paginationConfig.total = res.data.total
-		data.value = res.data.records
+		paginationConfig.current = res.data.current!
+		paginationConfig.total = res.data.total!
+		data.value = res.data.records!
 	}
 }
 
@@ -134,7 +134,7 @@ const batchDeleteIssue = () => {
 //删除问题 api
 const deleteIssue = async (idList: Array<number>) => {
 	if (!courseInfoStore.value.id) return
-	const res = await api.deleteIssueById(idList, courseInfoStore.value.id)
+	const res = await api.delQuestion1(courseInfoStore.value.id, idList)
 	if (res.status === 200) {
 		Message.success('删除问题成功')
 		return true
@@ -151,11 +151,11 @@ const deleteIssue = async (idList: Array<number>) => {
 const selectedTopicModalRef = ref() // 题库选择器弹窗
 //题库选择器点击保存
 const moveFileModalSave = async (arr: number[]) => {
-	const res = await api.importQuestion(courseInfoStore.value.id, arr)
+	const res = await api.bindQuestionBank(courseInfoStore.value.id, arr)
 	if (res.status === 200) {
 		queryIssueList()
 	} else {
-		if (res.status === 400) return Message.error(res.data.error)
+		if (res.status === 400) return Message.error(res.data.error!)
 		Message.error('未知错误')
 	}
 }

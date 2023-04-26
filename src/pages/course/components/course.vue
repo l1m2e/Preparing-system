@@ -7,10 +7,10 @@ import { courseInfoStore } from '~/store/courseStore'
 
 const courseInfoList = ref()
 const getCourseInfo = async () => {
-	const res = await api.getSemesterCourse(dayjs().valueOf())
+	const res = await api.getCourseSemester({ time: dayjs().valueOf() })
 	if (res.status === 200) {
-		addColors(res.data.list, 'className') // 添加颜色
-		courseInfoList.value = formatData(res.data.list) // 格式化数据结构s
+		addColors(res.data.list!, 'className') // 添加颜色
+		courseInfoList.value = formatData(res.data.list!) // 格式化数据结构s
 	} else {
 		Message.error('获取课程列表失败')
 	}

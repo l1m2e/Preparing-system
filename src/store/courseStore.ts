@@ -31,5 +31,5 @@ export const semesterStore = useStorage('semester', {
 	/** 学年度 */
 	year: '',
 	/** 学期 */
-	semester: ''
+	semester: 0
 })

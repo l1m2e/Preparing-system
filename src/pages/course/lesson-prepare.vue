@@ -11,13 +11,14 @@ import { courseInfoStore, semesterStore } from '~/store/courseStore'
 // 查询是否备课 200 已备课 400 未备课
 const queryLessonPrepare = async () => {
 	console.log('备课请求 ')
-	const res = await api.isLessonPreparation({
+
+	const res = await api.getPreparingOneByCourse({
 		...pick(courseInfoStore.value, ['className', 'courseHour', 'courseName']),
 		...semesterStore.value
 	})
 	if (res.status === 200) {
 		courseInfoStore.value.preparingFlag = true
-		courseInfoStore.value.id = res.data.id
+		courseInfoStore.value.id = res.data.id!
 	}
 	if (res.status === 400) {
 		courseInfoStore.value.preparingFlag = false
@@ -35,10 +36,10 @@ const openPreparesLesson = async () => {
 	prepareLessonsModalRef.value.open()
 }
 const weekCourseRef = ref()
-const classOptions = ref('')
+const classOptions = ref()
 //通过课程名称查询班级名称
 const getClassList = async () => {
-	const res = await api.getClassList({ time: dayjs().valueOf(), courseName: courseInfoStore.value.courseName })
+	const res = await api.getClassByCourseName({ time: dayjs().valueOf(), courseName: courseInfoStore.value.courseName })
 	if (res.status !== 200) return Message.error('获取班级名称失败')
 	classOptions.value = res.data
 }
@@ -46,14 +47,14 @@ getClassList()
 
 //班级改变
 const classChange: any = async (className: string) => {
-	const res = await api.getNextCourseInfo({
+	const res = await api.getCourseByClassAndCourseName({
 		className,
 		courseName: courseInfoStore.value.courseName,
 		time: dayjs().valueOf()
 	})
 	if (res.status !== 200) return Message.error('获取班级详细信息失败')
 	weekCourseRef.value.getWeekCourseList()
-	setReactive(courseInfoStore.value, res.data)
+	setReactive(courseInfoStore.value, res.data!)
 	console.log(res.data)
 }
 </script>

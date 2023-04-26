@@ -1,5 +1,6 @@
 import { getUuid } from '~/utils'
 import { baseUrl } from '~/config/baseUrl'
+import { io } from '~/service'
 
 export const useToken = useStorage('token', '')
 export const useUserInfo = useStorage('userInfo', {
@@ -30,7 +31,7 @@ export const useLoginQrCode = ref()
 export const useGetLoginQrCode = async () => {
 	useLoginQrCode.value = ''
 	const UUIDCode = getUuid().replace(/-/g, '')
-	const res = await api.getLoginQRcode(UUIDCode)
+	const res = await api.getAppletErWeiCode({ scene: UUIDCode })
 	if (res.status === 200) {
 		useLoginQrCode.value = res.data.message
 		reconnection(UUIDCode)
@@ -42,7 +43,7 @@ export let useloginIo: any
 // 重连ws
 const reconnection = async (uuid: string) => {
 	await getWSUrl()
-	useloginIo = api.onLoginIo(uuid)
+	useloginIo = io(`${baseUrl.websocketUrl}/teacherWeb`, { query: { scene: uuid }, transports: ['websocket'] })
 
 	//监听登录事件
 	useloginIo.on('onAccredit', onLogin)
@@ -59,15 +60,15 @@ const onLogin = (res: any) => {
 }
 
 export const getWSUrl = async () => {
-	const res = await api.getWSUrl()
+	const res = await api.getAddress()
 	if (res.status === 200) {
-		baseUrl.websocketUrl = res.data.websocketUrl
+		baseUrl.websocketUrl = res.data.websocketUrl!
 	} else {
 		Message.error('获取ws链接失败')
 	}
 }
 
 export const useGetUserInfo = async () => {
-	const res = await api.getUserInfo()
-	useUserInfo.value = res.data
+	const res = await api.userInfo()
+	useUserInfo.value = res.data as any
 }

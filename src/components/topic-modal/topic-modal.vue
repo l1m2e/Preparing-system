@@ -36,7 +36,7 @@ const toggleModal = async (topic: string, param: { id?: number; fid?: number; is
 
 /** 获取题目信息 */
 const getTopic = async (id: number) => {
-	const res = openParam.isBank ? await api.getBankQuestionInfoById(id) : await api.getTopicInfoById(id)
+	const res = openParam.isBank ? await api.getQuestionInfoById1(id) : await api.getQuestionInfoById(id)
 	if (res.status === 200) {
 		const obj = pick(res.data, ['analysis', 'title', 'difficulty'])
 		setReactive(topicStore, obj)
@@ -44,23 +44,23 @@ const getTopic = async (id: number) => {
 		switch (topicType.value) {
 			case '单选题':
 			case '多选题':
-				res.data.choices.forEach((item: any) => {
-					item.isAnswer = res.data.answer.includes(item.unique)
+				const arr = res.data.choices!.map((item: any) => {
+					item.isAnswer = res.data.answer!.includes(item.unique)
+					return item
 				})
-				topicStore.optionList = res.data.choices
-				console.log(topicStore.optionList)
+				topicStore.optionList = arr
 				break
 
 			case '判断题':
-				topicStore.judgementOptionsAnswer = res.data.answer[0]
+				topicStore.judgementOptionsAnswer = res.data.answer![0]
 				break
 
 			case '简答题':
-				topicStore.shortQuestionAnswer = res.data.answer[0]
+				topicStore.shortQuestionAnswer = res.data.answer![0]
 				break
 
 			case '填空题':
-				topicStore.clozeQuestionList = res.data.answer.map((item: any) => {
+				topicStore.clozeQuestionList = res.data.answer!.map((item: any) => {
 					return {
 						text: item
 					}
@@ -119,7 +119,7 @@ const saveImage = async () => {
 	if (imageIdList.length === 0) return true
 
 	loading.value = true
-	const res = await api.markUseImage(imageIdList)
+	const res = await api.saveImage(imageIdList)
 	loading.value = false
 
 	// 返回结果
@@ -158,7 +158,7 @@ const saveTopic = async () => {
 	let res
 
 	if (openParam.fid !== -1 && openParam.id === 0) {
-		res = await api.addBankIssue({ ...params, fid: openParam.fid })
+		res = await api.addQuestion({ ...params, fid: openParam.fid })
 		loading.value = false
 		return res.status === 200
 	}
@@ -166,9 +166,11 @@ const saveTopic = async () => {
 	//如果问题id为0 则为添加 否则 为修改
 
 	if (openParam.id) {
-		res = openParam.isBank ? await api.editBankQuestion(openParam.id, { ...params, fid: openParam.fid }) : await api.editIssue(openParam.id, params)
+		res = openParam.isBank
+			? await api.updateQuestionById(openParam.id, { ...params, fid: openParam.fid })
+			: await api.updateQuestionById1(openParam.id, params)
 	} else {
-		res = await api.addIssue(courseInfoStore.value.id, params)
+		res = await api.addQuestion1(courseInfoStore.value.id, params)
 	}
 	loading.value = false
 

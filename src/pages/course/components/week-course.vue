@@ -7,15 +7,15 @@ let selectionTime: number | string = courseInfoStore.value.startTime
 const weekCourseList = ref()
 // 获取周课表
 const getWeekCourseList = async () => {
-	const res = await api.weekCourseFormat({
+	const res = await api.getCourseSimplify({
 		className: courseInfoStore.value.className,
 		courseName: courseInfoStore.value.courseName,
 		time: dayjs(selectionTime).format('YYYY-MM-DD')
 	})
 	if (res.status !== 200) return Message.error('获取课程列表失败')
 	setReactive(semesterStore.value, res.data)
-	weekCourseList.value = weekCourseListFormat(res.data.weekCourseSim)
-	weekInfo.weekNum = res.data.weekNum
+	weekCourseList.value = weekCourseListFormat(res.data.weekCourseSim!)
+	weekInfo.weekNum = parseInt(res.data.weekNum!)
 
 	//给选中的课程标记颜色
 	weekCourseList.value.forEach((item: any) => {
@@ -50,7 +50,7 @@ const weekInfo = reactive({
 const weekNumCN = computed(() => `第${changeTextToCN(weekInfo.weekNum)}周`)
 // 获取周开始的时间
 const getWeekStartTime = async (first = false) => {
-	const res = await api.getWeekTime(weekInfo.weekNum)
+	const res = await api.timeCourse({ weekNum: weekInfo.weekNum.toString() })
 	if (res.status !== 200) return Message.error('获取周时间失败')
 	setReactive(weekInfo, res.data)
 	if (first) {

@@ -11,7 +11,7 @@ const form = reactive({
 
 const login = async () => {
 	if (form.jobNum && form.password) {
-		const res = await api.loggin(form)
+		const res = await api.login(form)
 		if (res.status === 200) {
 			Message.success('登录成功')
 			useToken.value = res.data.message
@@ -36,24 +36,28 @@ const register = async () => {
 	if (!registerForm.studentName) return Message.error('昵称不能为空')
 	if (!registerForm.password) return Message.error('密码不能为空')
 	if (!registerForm.repassword) return Message.error('请输入确认密码')
-	if (registerForm.password === registerForm.repassword) {
-		const res = await api.register(pick(registerForm, ['studentId', 'studentName', 'password']))
-		if (res.status === 200) {
-			Message.success('注册成功，请前往登录')
-			empty(registerForm)
-		} else {
-			Message.error(`注册失败 ${res.data.message}`)
-		}
-	} else {
-		Message.error('两次输入的秘密不一致')
+	if (registerForm.password !== registerForm.repassword) return Message.error('两次输入的密码不一致')
+
+	const res = await api.registerSchoolUser(pick(registerForm, ['studentId', 'studentName', 'password']))
+
+	if (res.status === 200) {
+		Message.success('注册成功，请前往登录')
+		clearForm(registerForm)
+	}
+
+	if (res.status === 400) {
+		const { message } = res.data as any
+		Message.error(`注册失败 ${message}`)
 	}
 }
-// 清空
-const empty = (obj: object) => {
+
+// 清空表单
+const clearForm = (obj: object) => {
 	Object.keys(obj).forEach((item) => {
 		obj[item] = ''
 	})
 }
+
 const scanQRcodesLogin = () => {
 	router.push('/scan-qr-login')
 }

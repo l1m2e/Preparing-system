@@ -14,9 +14,3 @@
 - 😃 [各种图标集为你所用](https://github.com/antfu/unocss/tree/main/packages/preset-icons)
 - 🔥 使用 [新的 `<script setup>` 语法](https://github.com/vuejs/rfcs/pull/227)
 - 🦾 TypeScript, 当然
-
-
-
-## 需要修复的问题
-
-- 周课表存在接口冗余请求的问题 待解决

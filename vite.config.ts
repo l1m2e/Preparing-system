@@ -25,7 +25,7 @@ export default defineConfig({
 				'@vueuse/core',
 				{
 					'@arco-design/web-vue': ['Message'],
-					'~/api': [['*', 'api']]
+					'~/api': [['default', 'api']]
 				}
 			],
 			dts: './src/types/auto-import.d.ts',
