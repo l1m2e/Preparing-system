@@ -7,7 +7,7 @@
 		"typecheck": "vue-tsc --noEmit",
 		"preview": "vite preview",
 		"up": "taze major -I",
-		"api": "npx swagger-typescript-api -p http://192.168.88.123:8081/v3/api-docs/teacherWeb -o ./src/api --axios --modular"
+		"api": "swagger-typescript-api -p http://192.168.88.123:8081/v3/api-docs/teacherWeb -o ./src/api -n api --axios --module-name-first-tag"
 	},
 	"dependencies": {
 		"@iconify-json/ri": "^1.1.3",
@@ -23,9 +23,11 @@
 		"pinia": "^2.0.22",
 		"pinia-plugin-persistedstate": "^2.2.0",
 		"socket.io-client": "2.5.0",
+		"swagger-typescript-api": "^12.0.4",
 		"unocss-preset-extra": "^0.5.2",
 		"uuid": "^9.0.0",
 		"vite-plugin-require-transform": "^1.0.4",
+		"vite-plugin-swagger-typescript-api": "^1.0.0",
 		"vue": "^3.2.39",
 		"vue-router": "^4.1.5"
 	},

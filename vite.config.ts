@@ -5,8 +5,8 @@ import Unocss from 'unocss/vite'
 import requireTransform from 'vite-plugin-require-transform'
 import path from 'path'
 
-import { ArcoResolver } from 'unplugin-vue-components/resolvers'
 import { defineConfig } from 'vite'
+import { ArcoResolver } from 'unplugin-vue-components/resolvers'
 
 export default defineConfig({
 	resolve: {

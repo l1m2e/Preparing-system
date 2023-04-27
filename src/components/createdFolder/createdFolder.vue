@@ -11,7 +11,7 @@ const emits = defineEmits(['ok'])
 
 const addFolder = async () => {
 	if (params.keyword === '') return Message.error('文件夹昵称不能为空')
-	const res = await api.addKeyword({ ...params, fid: props.fid })
+	const res = await api.issueBank.addKeyword({ ...params, fid: props.fid })
 	if (res.status === 200) {
 		show.value = false
 		params.keyword = ''

@@ -31,7 +31,7 @@ export const useLoginQrCode = ref()
 export const useGetLoginQrCode = async () => {
 	useLoginQrCode.value = ''
 	const UUIDCode = getUuid().replace(/-/g, '')
-	const res = await api.getAppletErWeiCode({ scene: UUIDCode })
+	const res = await api.login.getAppletErWeiCode({ scene: UUIDCode })
 	if (res.status === 200) {
 		useLoginQrCode.value = res.data.message
 		reconnection(UUIDCode)
@@ -60,7 +60,7 @@ const onLogin = (res: any) => {
 }
 
 export const getWSUrl = async () => {
-	const res = await api.getAddress()
+	const res = await api.general.getAddress()
 	if (res.status === 200) {
 		baseUrl.websocketUrl = res.data.websocketUrl!
 	} else {
@@ -69,6 +69,6 @@ export const getWSUrl = async () => {
 }
 
 export const useGetUserInfo = async () => {
-	const res = await api.userInfo()
+	const res = await api.login.userInfo()
 	useUserInfo.value = res.data as any
 }

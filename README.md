@@ -12,5 +12,20 @@
 
 
 
-> 如果后端更新了swagger 文档 请运行  `pnpm api` 获取最新的请求接口和类型
+### 项目根据 openapi 自动生成接口 和请求类类型
 
+如果后端更新了swagger 文档 请运行  `pnpm api` 获取最新的请求接口和类型
+
+如果后端添加了新的模块 请在 `./src/api/index` 中的 `formatApi` 对象 添加新的模块的映射
+
+```ts
+const formatApi = {
+	/** 文件模块 */
+	login: omitApi['v80登录模块'],
+	/** 问题库模块 */
+	issueBank: omitApi['v82问题题库模块']
+    // ...其他模块  你可以通过 omitApi 获取到有那些模块
+}
+```
+
+主要是后端 `swagger tags name`  是中文的 如果你并不介意 你可以直接将 api 导出 使用 例如 `api['v80登录模块'].xxx`

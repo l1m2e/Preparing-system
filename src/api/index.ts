@@ -1,11 +1,8 @@
 import router from '~/router'
-import { TeacherWeb } from './TeacherWeb'
-import { File } from './File'
-import { Common } from './Common'
+import { Api } from './api'
 import { omit } from 'lodash-es'
 
-// 有多个模块统一使用统一的拦截器
-const api = { ...new TeacherWeb(), ...omit(new File(), 'instance', 'request'), ...omit(new Common(), 'instance', 'request') }
+const api = new Api()
 
 //配置请求拦截器
 api.instance.interceptors.request.use(
@@ -40,4 +37,28 @@ api.instance.interceptors.response.use(
 	}
 )
 
-export default api
+const omitApi = omit(api, 'instance', 'setSecurityData', 'request')
+
+//配置映射关系 后端如果更新了新模块 需要在下面定义一下才能使用
+const formatApi = {
+	/** 文件模块 */
+	login: omitApi['v80登录模块'],
+	/** 问题库模块 */
+	issueBank: omitApi['v82问题题库模块'],
+	/** 问题模块 */
+	issue: omitApi['v81问题模块'],
+	/** 测验模块 */
+	test: omitApi['v84测验模块'],
+	/** 备课模块 */
+	prepare: omitApi['v85备课主题'],
+	/** 课件模块 */
+	courseware: omitApi['v83课件模块'],
+	/** 文件模块 */
+	file: omitApi['v55文件模块'],
+	/** 课程表模块 */
+	courseTable: omitApi['v86课程表'],
+	/** 通用模块 */
+	general: omitApi['v70通用模块']
+}
+
+export default formatApi

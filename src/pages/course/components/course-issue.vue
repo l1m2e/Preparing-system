@@ -78,7 +78,7 @@ const queryIssueList = async (current?: number) => {
 		type: topicTypeSelectValue.value as any
 	}
 	!topicTypeSelectValue.value && delete param.type
-	const res = await api.queryQuestionByPid(param)
+	const res = await api.issue.queryQuestionByPid(param)
 	if (res.status === 200) {
 		paginationConfig.current = res.data.current!
 		paginationConfig.total = res.data.total!
@@ -134,7 +134,7 @@ const batchDeleteIssue = () => {
 //删除问题 api
 const deleteIssue = async (idList: Array<number>) => {
 	if (!courseInfoStore.value.id) return
-	const res = await api.delQuestion1(courseInfoStore.value.id, idList)
+	const res = await api.issue.delQuestion(courseInfoStore.value.id, idList)
 	if (res.status === 200) {
 		Message.success('删除问题成功')
 		return true
@@ -151,7 +151,7 @@ const deleteIssue = async (idList: Array<number>) => {
 const selectedTopicModalRef = ref() // 题库选择器弹窗
 //题库选择器点击保存
 const moveFileModalSave = async (arr: number[]) => {
-	const res = await api.bindQuestionBank(courseInfoStore.value.id, arr)
+	const res = await api.issue.bindQuestionBank(courseInfoStore.value.id, arr)
 	if (res.status === 200) {
 		queryIssueList()
 	} else {
@@ -299,7 +299,7 @@ const moveFileModalSave = async (arr: number[]) => {
 						shape="circle"
 						size="medium"
 						class="mr-20px"
-						@click="openTopicModal(topicTypeOptions.find((item) => item.value === record.type)!.label, record.id)">
+						@click="openTopicModal(topicTypeOptions.find((item: any) => item.value === record.type)!.label, record.id)">
 						<icon-edit />
 					</a-button>
 					<a-button shape="circle" status="danger" size="medium" @click="deleteOneIssueConfirm(record.id)"><icon-delete /></a-button>

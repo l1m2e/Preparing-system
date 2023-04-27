@@ -11,7 +11,7 @@ const form = reactive({
 
 const login = async () => {
 	if (form.jobNum && form.password) {
-		const res = await api.login(form)
+		const res = await api.login.login(form)
 		if (res.status === 200) {
 			Message.success('登录成功')
 			useToken.value = res.data.message
@@ -38,7 +38,7 @@ const register = async () => {
 	if (!registerForm.repassword) return Message.error('请输入确认密码')
 	if (registerForm.password !== registerForm.repassword) return Message.error('两次输入的密码不一致')
 
-	const res = await api.registerSchoolUser(pick(registerForm, ['studentId', 'studentName', 'password']))
+	const res = await api.login.registerSchoolUser(pick(registerForm, ['studentId', 'studentName', 'password']))
 
 	if (res.status === 200) {
 		Message.success('注册成功，请前往登录')

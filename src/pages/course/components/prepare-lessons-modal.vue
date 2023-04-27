@@ -22,7 +22,7 @@ const ok = async () => {
 		'endTime',
 		'startTime'
 	])
-	const res = await api.addPreparing({ ...param, ...form, ...semesterStore.value })
+	const res = await api.prepare.addPreparing({ ...param, ...form, ...semesterStore.value })
 	if (res.status === 200) {
 		courseInfoStore.value.preparingFlag = true
 		courseInfoStore.value.id = parseInt(res.data.message!)

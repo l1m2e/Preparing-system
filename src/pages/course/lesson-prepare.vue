@@ -12,7 +12,7 @@ import { courseInfoStore, semesterStore } from '~/store/courseStore'
 const queryLessonPrepare = async () => {
 	console.log('备课请求 ')
 
-	const res = await api.getPreparingOneByCourse({
+	const res = await api.prepare.getPreparingOneByCourse({
 		...pick(courseInfoStore.value, ['className', 'courseHour', 'courseName']),
 		...semesterStore.value
 	})
@@ -39,7 +39,7 @@ const weekCourseRef = ref()
 const classOptions = ref()
 //通过课程名称查询班级名称
 const getClassList = async () => {
-	const res = await api.getClassByCourseName({ time: dayjs().valueOf(), courseName: courseInfoStore.value.courseName })
+	const res = await api.courseTable.getClassByCourseName({ time: dayjs().valueOf(), courseName: courseInfoStore.value.courseName })
 	if (res.status !== 200) return Message.error('获取班级名称失败')
 	classOptions.value = res.data
 }
@@ -47,7 +47,7 @@ getClassList()
 
 //班级改变
 const classChange: any = async (className: string) => {
-	const res = await api.getCourseByClassAndCourseName({
+	const res = await api.courseTable.getCourseByClassAndCourseName({
 		className,
 		courseName: courseInfoStore.value.courseName,
 		time: dayjs().valueOf()

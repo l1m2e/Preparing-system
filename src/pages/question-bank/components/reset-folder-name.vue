@@ -30,7 +30,7 @@ const emits = defineEmits(['ok'])
 
 // 文件重命名
 const restFolderName = async () => {
-	const res = await api.updatePath(id.value, { name: name.value })
+	const res = await api.issueBank.updatePath(id.value, { name: name.value })
 	if (res.status === 200) {
 		Message.success('重命名成功')
 		emits('ok')

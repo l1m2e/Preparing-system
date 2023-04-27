@@ -36,7 +36,7 @@ const toggleModal = async (topic: string, param: { id?: number; fid?: number; is
 
 /** 获取题目信息 */
 const getTopic = async (id: number) => {
-	const res = openParam.isBank ? await api.getQuestionInfoById(id) : await api.getQuestionInfoById1(id)
+	const res = openParam.isBank ? await api.issueBank.getQuestionBankInfoById(id) : await api.issue.getQuestionInfoById(id)
 	if (res.status === 200) {
 		const obj = pick(res.data, ['analysis', 'title', 'difficulty'])
 		setReactive(topicStore, obj)
@@ -119,7 +119,7 @@ const saveImage = async () => {
 	if (imageIdList.length === 0) return true
 
 	loading.value = true
-	const res = await api.saveImage(imageIdList)
+	const res = await api.file.saveImage(imageIdList)
 	loading.value = false
 
 	// 返回结果
@@ -158,19 +158,18 @@ const saveTopic = async () => {
 	let res
 
 	if (openParam.fid !== -1 && openParam.id === 0) {
-		res = await api.addQuestion({ ...params, fid: openParam.fid })
+		res = await api.issueBank.addQuestionBank({ ...params, fid: openParam.fid })
 		loading.value = false
 		return res.status === 200
 	}
 
 	//如果问题id为0 则为添加 否则 为修改
-
 	if (openParam.id) {
 		res = openParam.isBank
-			? await api.updateQuestionById(openParam.id, { ...params, fid: openParam.fid })
-			: await api.updateQuestionById1(openParam.id, params)
+			? await api.issueBank.updateQuestionBankById(openParam.id, { ...params, fid: openParam.fid })
+			: await api.issue.updateQuestionById(openParam.id, params)
 	} else {
-		res = await api.addQuestion1(courseInfoStore.value.id, params)
+		res = await api.issue.addQuestion(courseInfoStore.value.id, params)
 	}
 	loading.value = false
 
