@@ -22,7 +22,6 @@ onMounted(() => {
 	fill()
 })
 
-
 //题目icon样式
 const fileIconTextList = [
 	{ text: '文件夹', icon: 'i-ri-check-line', color: 'cyan' },
@@ -334,7 +333,7 @@ const openTopicModal = (type: '单选题' | '多选题' | '判断题' | '简答�
 							<a-col class="list-col" :span="6">{{ dayjs(item.createdTimestamp).format('YYYY-MM-DD HH:mm') }}</a-col>
 							<a-col class="list-col" :span="6">
 								<a-tag v-if="item.type === 0" color="orange">文件夹</a-tag>
-								<a-tag v-else :color="fileIconTextList[item.type + 1].color">{{ fileIconTextList[item.type + 1].text }}</a-tag>
+								<a-tag v-else :color="fileIconTextList[item.type].color">{{ fileIconTextList[item.type].text }}</a-tag>
 							</a-col>
 							<a-col :span="5" class="list-col text-[var(--color-text-2)] text-15px list-col-tag">
 								<a-tooltip content="重命名" position="top" mini>

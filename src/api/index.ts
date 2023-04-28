@@ -1,8 +1,9 @@
 import router from '~/router'
 import { Api } from './api'
 import { omit } from 'lodash-es'
+import { baseUrl } from '~/config/baseUrl'
 
-const api = new Api()
+const api = new Api({ baseURL: baseUrl.httpUrl })
 
 //配置请求拦截器
 api.instance.interceptors.request.use(

@@ -49,5 +49,8 @@ export default defineConfig({
 		}),
 		Unocss()
 	],
-	base: '/webapp'
+	base: '/webapp',
+	server: {
+		host: '0.0.0.0'
+	}
 })

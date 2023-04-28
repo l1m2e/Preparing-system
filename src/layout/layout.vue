@@ -14,7 +14,8 @@ const menuList = ref([
 	{ text: '日常', icon: 'i-ri-star-line', routerLink: '/1' },
 	{ text: '课程', icon: 'i-ri-book-mark-line', routerLink: '/course/list' },
 	{ text: '课表', icon: 'i-ri-calendar-2-line', routerLink: '/3' },
-	{ text: '问题库', icon: 'i-ri-database-line', routerLink: '/question-bank/list' }
+	{ text: '问题库', icon: 'i-ri-todo-fill', routerLink: '/question-bank/list' },
+	{ text: '课件库', icon: 'i-ri-folder-5-fill', routerLink: '/folder/list' }
 ])
 const route = useRoute()
 //路由跳转
@@ -63,7 +64,7 @@ const onClickMenuItem = (key: string) => {
 	border-right: 1px solid var(--color-neutral-3);
 }
 .content {
-	--uno: pt-95px pr-20px pb-20px min-h-100vh w-100% box-border bg-[var(--color-neutral-2)];
+	--uno: pt-95px pr-20px pb-20px min-h-100vh w-100% box-border bg-[var(--color-neutral-2) ];
 	padding-left: calc(v-bind(sideWidth) + 20px);
 	transition: padding 0.3s;
 }

@@ -4,7 +4,6 @@ import classRoomJpg from '~/assets/img/classroom.png'
 import weekCourse from './components/week-course.vue'
 import prepareLessonsModal from './components/prepare-lessons-modal.vue'
 import courseIssue from './components/course-issue.vue'
-import noDataSvg from '~/assets/svg/noData.svg'
 import { changeTextToCN, pick, setReactive } from '~/utils'
 import { courseInfoStore, semesterStore } from '~/store/courseStore'
 
@@ -26,6 +25,7 @@ const queryLessonPrepare = async () => {
 	}
 }
 queryLessonPrepare()
+
 // 课时改变重新查询是否备课
 const courseHourChange = () => {
 	queryLessonPrepare()
@@ -35,8 +35,10 @@ const prepareLessonsModalRef = ref()
 const openPreparesLesson = async () => {
 	prepareLessonsModalRef.value.open()
 }
+
 const weekCourseRef = ref()
 const classOptions = ref()
+
 //通过课程名称查询班级名称
 const getClassList = async () => {
 	const res = await api.courseTable.getClassByCourseName({ time: dayjs().valueOf(), courseName: courseInfoStore.value.courseName })
@@ -62,9 +64,9 @@ const classChange: any = async (className: string) => {
 <template>
 	<!-- 头部操作栏 -->
 	<a-card :bordered="false">
-		<div class="flex justify-between">
-			<div class="flex">
-				<div class="min-w-250px relative mr-20px rounded-md overflow-hidden">
+		<div class="flex flex-col 2xl:flex-row 2xl:justify-between">
+			<div class="flex w-100% 2xl:w-auto justify-center 2xl:justify-center">
+				<div class="min-w-250px relative mr-150px 2xl:mr-20px rounded-md overflow-hidden">
 					<img class="w-100% h-100%" :src="classRoomJpg" alt="" />
 					<div class="absolute left-0 right-0 top-0 bottom-0 bg-[#00000042] center color-white text-19px">{{ courseInfoStore.courseName }}</div>
 				</div>
@@ -100,11 +102,11 @@ const classChange: any = async (className: string) => {
 						<div class="ml-10px">当前课时 {{ courseInfoStore.courseHour }} 总课时 {{ courseInfoStore.courseHourAll }}</div>
 					</div>
 					<div class="icon-box mt-20px flex items-center text-12px">
-						<div class="w-20px h-20px rounded-sm bg-[rgb(var(--primary-3))] mr-10px ml-5px"></div>
+						<div class="w-20px h-20px rounded-sm bg-indigo-4 dark:bg-indigo-5 mr-10px ml-5px"></div>
 						<span>当前选中</span>
-						<div class="w-20px h-20px rounded-sm bg-[rgb(var(--cyan-2))] mx-10px"></div>
+						<div class="w-20px h-20px rounded-sm bg-blue-4 dark:bg-blue-5 mx-10px"></div>
 						<span>未备课</span>
-						<div class="w-20px h-20px rounded-sm bg-[rgb(var(--green-2))] mx-10px"></div>
+						<div class="w-20px h-20px rounded-sm bg-green-4 dark:bg--5 mx-10px"></div>
 						<span>已备课</span>
 						<div class="w-20px h-20px rounded-sm bg-[var(--color-fill-2)] mx-10px"></div>
 						<span>无课程</span>
@@ -112,7 +114,7 @@ const classChange: any = async (className: string) => {
 				</div>
 			</div>
 
-			<div class="w-900px h-260px">
+			<div class="w-900px h-260px mt-50px m-auto 2xl:mt-0">
 				<weekCourse @onChange="courseHourChange" ref="weekCourseRef"></weekCourse>
 			</div>
 		</div>
@@ -128,13 +130,12 @@ const classChange: any = async (className: string) => {
 		</a-tabs>
 	</a-card>
 	<!-- 未开启备课遮罩层 -->
-	<a-card :bordered="false" class="mt-30px h-550px overflow-hidden relative" v-else>
+	<a-card :bordered="false" class="mt-30px h-550px overflow-hidden relative center" v-else>
 		<!-- backdrop-blur-xl -->
-		<div class="absolute top-0 left-0 right-0 bottom-0 z-1 backdrop-blur-xl center flex-col">
+		<div class="absolute top-0 left-0 right-0 bottom-0 z-1 center flex-col">
 			<h1>当前课时暂未开启备课，是否开启备课</h1>
 			<a-button shape="round" size="large" type="primary" class="ml-20px" @click="openPreparesLesson">开启备课</a-button>
 		</div>
-		<img :src="noDataSvg" class="min-w-100% h-550px object-cover" />
 	</a-card>
 	<prepareLessonsModal ref="prepareLessonsModalRef" @change="weekCourseRef.getWeekCourseList()"></prepareLessonsModal>
 </template>

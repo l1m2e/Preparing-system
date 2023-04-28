@@ -5,6 +5,7 @@ import { courseInfoStore, semesterStore } from '~/store/courseStore'
 
 let selectionTime: number | string = courseInfoStore.value.startTime
 const weekCourseList = ref()
+
 // 获取周课表
 const getWeekCourseList = async () => {
 	const res = await api.courseTable.getCourseSimplify({
@@ -48,25 +49,33 @@ const weekInfo = reactive({
 	weekNum: 1 // 当前周数
 })
 const weekNumCN = computed(() => `第${changeTextToCN(weekInfo.weekNum)}周`)
+
 // 获取周开始的时间
 const getWeekStartTime = async (first = false) => {
 	const res = await api.courseTable.timeCourse({ weekNum: weekInfo.weekNum.toString() })
+
 	if (res.status !== 200) return Message.error('获取周时间失败')
+
 	setReactive(weekInfo, res.data)
+
 	if (first) {
 		selectionTime = courseInfoStore.value.startTime
 	} else {
 		selectionTime = weekInfo.startDate
 		console.log(weekInfo.startDate)
 	}
+
 	getWeekCourseList()
+
 	//每次获取周开始时间重新计算 当前周日期列表
 	getSelectedWeekList(weekInfo.startDate)
 }
+
 getWeekStartTime(true)
 
 //上一周和下一周按钮
 type UpDownButtonType = 'add' | 'reduce'
+
 const upDownButton = (type: UpDownButtonType) => {
 	switch (type) {
 		case 'add':
@@ -89,12 +98,14 @@ const getSelectedWeekList = (date: string) => {
 //选中课时 修改store里面的数据
 const electedCourseHour = (info: any) => {
 	setReactive(courseInfoStore.value, info)
+
 	//排他算法 清除其他选中的颜色
 	weekCourseList.value.forEach((item: any) => {
 		item.courseInfo.forEach((course: any) => {
 			course.selected = false
 		})
 	})
+
 	info.selected = true
 }
 // 开启备课的时候重新查询周课表
@@ -125,7 +136,7 @@ defineExpose({ getWeekCourseList })
 			<div class="w-100% h-100% overflow-auto relative scroll-bar">
 				<div class="w-100%">
 					<!-- 头部星期几 -->
-					<div class="center h-40px backdrop-blur-xl w-100% sticky top-0 text-center">
+					<div class="center h-40px bg-white dark:bg-[var(--color-bg-2)] w-100% sticky top-0 text-center">
 						<div class="flex-1 mr-5px max-w-100px">#</div>
 						<div class="flex-1 mr-5px max-w-100px" v-for="item in weekDateArr">
 							<p class="">{{ item.week }}</p>
@@ -145,9 +156,10 @@ defineExpose({ getWeekCourseList })
 								<div
 									v-else-if="v.startTime"
 									@click="electedCourseHour(v), $emit('onChange')"
-									:class="`w-100% h-50px cursor-pointer center
-									${v.preparingFlag ? 'bg-[rgb(var(--green-2))] hover:bg-[rgb(var(--green-4))]' : 'bg-[rgb(var(--cyan-2))] hover:bg-[rgb(var(--cyan-4))]'} 
-									${v.selected ? 'bg-[rgb(var(--primary-3))] hover:bg-[rgb(var(--primary-4))]' : ''} 
+									class="w-100% h-50px cursor-pointer center text-white"
+									:class="`
+									${v.preparingFlag ? 'bg-green-4 dark:bg-green-5 hover:bg-green-6' : 'bg-blue-4 dark:bg-blue-5 hover:bg-blue-6'} 
+									${v.selected ? 'bg-indigo-4 dark:bg-indigo-5 hover:bg-indigo-6' : ''} 
 									`">
 									{{ v.preparingFlag ? '已备课' : '未备课' }}
 								</div>
