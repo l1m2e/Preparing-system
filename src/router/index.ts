@@ -12,6 +12,11 @@ const routes = [
 		component: () => import('~/pages/login/login.vue')
 	},
 	{
+		path: '/scan-qr-login',
+		name: 'scan-qr-login',
+		component: () => import('~/pages/login/scan-qr-codes.vue')
+	},
+	{
 		path: '/layout',
 		name: 'layout',
 		component: layout
@@ -34,21 +39,28 @@ const routes = [
 		]
 	},
 	{
-		path: '/question-bank',
-		name: 'question-bank',
+		path: '/question-library',
+		name: 'question-library',
 		component: layout,
 		children: [
 			{
 				path: 'list',
-				name: 'question-bank-list',
-				component: () => import('~/pages/question-bank/index.vue')
+				name: 'question-library-list',
+				component: () => import('~/pages/question-library/question-library.vue')
 			}
 		]
 	},
 	{
-		path: '/scan-qr-login',
-		name: 'scan-qr-login',
-		component: () => import('~/pages/login/scan-qr-codes.vue')
+		path: '/courseware-library',
+		name: 'courseware-library',
+		component: layout,
+		children: [
+			{
+				path: 'list',
+				name: 'courseware-library-list',
+				component: () => import('~/pages/courseware-library/courseware-library.vue')
+			}
+		]
 	},
 	{
 		path: '/test',

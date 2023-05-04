@@ -40,6 +40,7 @@ declare module '@vue/runtime-core' {
     ATabs: typeof import('@arco-design/web-vue')['Tabs']
     ATag: typeof import('@arco-design/web-vue')['Tag']
     ATooltip: typeof import('@arco-design/web-vue')['Tooltip']
+    AUpload: typeof import('@arco-design/web-vue')['Upload']
     ClozeQuestions: typeof import('./../components/topic-modal/components/cloze-questions.vue')['default']
     CreatedFolder: typeof import('./../components/createdFolder/createdFolder.vue')['default']
     Difficulty: typeof import('./../components/topic-modal/components/difficulty.vue')['default']

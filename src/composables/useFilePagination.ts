@@ -10,8 +10,12 @@ export const useFilePagination = () => {
 	const pagination = reactive({
 		current: 1,
 		pages: 1,
-		size: 40
+		size: 20
 	})
+
+	// 分页重置
+	const paginationReset = () => setReactive(pagination, { current: 1, pages: 1, size: 40 })
+
 	/** 文件列表 */
 	const fileList = reactive<Array<any>>([])
 
@@ -26,7 +30,7 @@ export const useFilePagination = () => {
 
 		if (res.status === 200) {
 			res.data.records.forEach((item: any) => fileList.push(item))
-			pagination.pages = res.data.pages
+			pagination.pages = res.data.pages || 1
 		}
 	}
 
@@ -53,7 +57,7 @@ export const useFilePagination = () => {
 
 	/** 重置状态 */
 	const resetFlieState = () => {
-		setReactive(pagination, { current: 1, pages: 1, size: 40 })
+		paginationReset()
 		fileList.length = 0
 		breadcrumbList.length = 1
 	}
@@ -83,6 +87,8 @@ export const useFilePagination = () => {
 		/** 获取文件列表 */
 		getFileList,
 		/** 设置文件列表 */
-		setFileList
+		setFileList,
+		/** 分页重置 */
+		paginationReset
 	}
 }

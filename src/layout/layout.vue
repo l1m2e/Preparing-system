@@ -14,8 +14,8 @@ const menuList = ref([
 	{ text: '日常', icon: 'i-ri-star-line', routerLink: '/1' },
 	{ text: '课程', icon: 'i-ri-book-mark-line', routerLink: '/course/list' },
 	{ text: '课表', icon: 'i-ri-calendar-2-line', routerLink: '/3' },
-	{ text: '问题库', icon: 'i-ri-todo-fill', routerLink: '/question-bank/list' },
-	{ text: '课件库', icon: 'i-ri-folder-5-fill', routerLink: '/folder/list' }
+	{ text: '问题库', icon: 'i-ri-todo-fill', routerLink: '/question-library/list' },
+	{ text: '课件库', icon: 'i-ri-folder-5-fill', routerLink: '/courseware-library/list' }
 ])
 const route = useRoute()
 //路由跳转
