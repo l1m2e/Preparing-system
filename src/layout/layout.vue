@@ -50,7 +50,12 @@ const onClickMenuItem = (key: string) => {
 	</div>
 	<!-- 内容 -->
 	<div class="content">
-		<router-view />
+		<!-- <router-view /> -->
+		<router-view v-slot="{ Component }">
+			<Transition enter-active-class="animated-fade-in" leave-active-class="animated-fade-out" class="animated animated-duration-150ms" mode="out-in">
+				<component :is="Component" />
+			</Transition>
+		</router-view>
 	</div>
 </template>
 <style scoped>

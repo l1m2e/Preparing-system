@@ -6,6 +6,7 @@ const routes = [
 		path: '/',
 		redirect: '/login'
 	},
+
 	{
 		path: '/login',
 		name: 'login',
@@ -20,6 +21,11 @@ const routes = [
 		path: '/layout',
 		name: 'layout',
 		component: layout
+	},
+	{
+		path: '/test',
+		name: 'test',
+		component: () => import('~/pages/test/test.vue')
 	},
 	{
 		path: '/course',
@@ -61,11 +67,6 @@ const routes = [
 				component: () => import('~/pages/courseware-library/courseware-library.vue')
 			}
 		]
-	},
-	{
-		path: '/test',
-		name: 'test',
-		component: () => import('~/pages/test/test.vue')
 	}
 ]
 

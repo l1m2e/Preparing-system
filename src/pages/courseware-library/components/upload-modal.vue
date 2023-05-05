@@ -27,6 +27,11 @@ const ok = () => {
 	show.value = false
 }
 
+const cancel = () => {
+	fileIdList.length = 0
+	show.value = false
+}
+
 const beforeRemove = (file: FileItem): Promise<boolean> => {
 	return new Promise((resolve, reject) => {
 		Modal.confirm({
@@ -54,7 +59,7 @@ const beforeRemove = (file: FileItem): Promise<boolean> => {
 			multiple />
 		<!-- 底部 -->
 		<footer class="w-100% flex justify-end mt-10px">
-			<a-button class="mr-10px" @click="show = false">取消</a-button>
+			<a-button class="mr-10px" @click="cancel">取消</a-button>
 			<a-button type="primary" @click="ok">确定</a-button>
 		</footer>
 	</a-modal>

@@ -4,7 +4,7 @@ import folderSvg from '~/assets/svg/folder.svg'
 import fileSvg from '~/assets/svg/file.svg'
 import MoveFileModal from './components/move-file-modal.vue'
 import ResetFolderName from './components/reset-folder-name.vue'
-import { useRegion } from '~/composables'
+import { useRegion, useAutoChangGridLayout } from '~/composables'
 import { richTextFilterText } from '~/utils'
 
 onMounted(() => {
@@ -12,7 +12,7 @@ onMounted(() => {
 	useRegion(regionRef.value, 'data-file-id', (data) => {
 		checkedIdList.value = data
 	})
-	fill()
+	useAutoChangGridLayout(gridboxRef, 160, fileList.length, '.arco-checkbox-group')
 })
 
 //框选逻辑
@@ -136,32 +136,29 @@ const updateFileList = () => {
 //填充盒子
 const gridboxRef = ref()
 const { width: bigBoxWidth } = useElementSize(gridboxRef)
-watch(bigBoxWidth, () => {
-	fill()
-})
-watch(fileList, () => {
-	fill()
-})
 
-const fill = () => {
-	const boxSize = 150 + 10 // 小盒子宽度
-	const boxCount = fileList.length // 盒子的数量
-	const row = Math.floor(bigBoxWidth.value / boxSize) // 一行有多少个盒子
-	const lastRow = boxCount - Math.ceil(boxCount / row - 1) * row // 最后一行
-	const count = row - lastRow // 我应该填多少个盒子
+watch(bigBoxWidth, () => useAutoChangGridLayout(gridboxRef, 160, fileList.length, '.arco-checkbox-group'))
+watch(fileList, () => useAutoChangGridLayout(gridboxRef, 160, fileList.length, '.arco-checkbox-group'))
 
-	// 清空
-	const fileNullbox = gridboxRef.value.querySelectorAll('.data-file-null')
-	fileNullbox.forEach((item: HTMLElement) => item.remove())
+// const fill = () => {
+// 	const boxSize = 150 + 10 // 小盒子宽度
+// 	const boxCount = fileList.length // 盒子的数量
+// 	const row = Math.floor(bigBoxWidth.value / boxSize) // 一行有多少个盒子
+// 	const lastRow = boxCount - Math.ceil(boxCount / row - 1) * row // 最后一行
+// 	const count = row - lastRow // 我应该填多少个盒子
 
-	// 添加盒子
-	for (let i = 0; i < count; i++) {
-		let box = document.createElement('div')
-		box.style.cssText = 'width: 150px; height: 180px;'
-		box.classList.add('data-file-null')
-		gridboxRef.value.querySelector('.arco-checkbox-group').appendChild(box)
-	}
-}
+// 	// 清空
+// 	const fileNullbox = gridboxRef.value.querySelectorAll('.data-file-null')
+// 	fileNullbox.forEach((item: HTMLElement) => item.remove())
+
+// 	// 添加盒子
+// 	for (let i = 0; i < count; i++) {
+// 		let box = document.createElement('div')
+// 		box.style.cssText = 'width: 150px; height: 180px;'
+// 		box.classList.add('data-file-null')
+// 		gridboxRef.value.querySelector('.arco-checkbox-group').appendChild(box)
+// 	}
+// }
 
 const moveFileModalRef = ref() // 移动文件夹Ref
 const createdFolderRef = ref() // 创建文件夹Ref
@@ -247,7 +244,7 @@ const openTopicModal = (type: '单选题' | '多选题' | '判断题' | '简答�
 					</a-breadcrumb>
 				</header>
 
-				<main class="w-100% h-76vh overflow-y-auto scroll-bar" v-on-reach-bottom="pullLoad">
+				<main class="w-100% h-80vh overflow-y-auto scroll-bar" v-on-reach-bottom="pullLoad">
 					<div class="w-100% grid-centen" ref="gridboxRef">
 						<a-checkbox-group v-model="checkedIdList">
 							<template v-for="item in fileListSelectedStateState" :key="item.id">
@@ -370,7 +367,7 @@ const openTopicModal = (type: '单选题' | '多选题' | '判断题' | '简答�
 }
 .grid-centen :deep(.arco-checkbox-group) {
 	display: grid;
-	grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+	grid-template-columns: repeat(auto-fit, minmax(150px, max-content));
 	gap: 10px;
 }
 .action-bar {

@@ -219,6 +219,22 @@ export interface ExaminationLogVo {
 	totalScores: number
 }
 
+/** 课件移动参数类 */
+export interface CoursewareMoveParam {
+	/**
+	 * 课件id列表
+	 * @uniqueItems true
+	 */
+	ids: number[]
+	/**
+	 * 要移动到的位置id
+	 * @format int64
+	 */
+	fid: number
+	/** 科目名(导入分享课件专用) */
+	courseName?: string
+}
+
 /** 注册老师端 */
 export interface SchoolTeaUserParam {
 	/** 姓名 */
@@ -232,19 +248,19 @@ export interface SchoolTeaUserParam {
 /** 绑定的个人信息 */
 export interface SchoolUserVo {
 	/** 学校名称 */
-	schoolName?: string
+	schoolName: string
 	/** 姓名 */
-	studentName?: string
+	studentName: string
 	/** 学号 */
-	studentId?: string
+	studentId: string
 	/** 卡号 */
-	cardId?: string
+	cardId: string
 	/** 班级名称 */
-	className?: string
+	className: string
 	/** 类型 老师或学生 */
-	type?: string
+	type: string
 	/** 性别 */
-	gender?: string
+	gender: string
 	jobNum?: string
 	teachName?: string
 }
@@ -331,12 +347,12 @@ export interface PreparingParam {
 	classDevicePosition: string
 }
 
-/** 问题id和对应分数数组 */
+/** 题库id和对应分数数组 */
 export interface QuestionExa {
 	/** @format int64 */
-	questionId?: number
+	questionBankId: number
 	/** @format int32 */
-	score?: number
+	score: number
 }
 
 /** 绑定问题到测验类 */
@@ -346,10 +362,7 @@ export interface QuestionExaBind {
 	 * @format int64
 	 */
 	eid: number
-	/**
-	 * 问题id和对应分数数组
-	 * @uniqueItems true
-	 */
+	/** 题库id和对应分数数组 */
 	qidList: QuestionExa[]
 }
 
@@ -380,38 +393,6 @@ export interface ExaminationParam {
 	passLine: number
 }
 
-/** 绑定课件类 */
-export interface CoursewareBind {
-	/**
-	 * 备课id
-	 * @format int64
-	 */
-	pid: number
-	/**
-	 * 课件id数组
-	 * @uniqueItems true
-	 */
-	cidList: number[]
-}
-
-/** 添加课件模型 */
-export interface CoursewareParam {
-	/** 课件名 */
-	coursewareName: string
-	/** 类别 标识 */
-	keyword?: string
-	/**
-	 * 文件id
-	 * @format int64
-	 */
-	srcId: number
-}
-
-export interface LinkedMap {
-	empty?: boolean
-	[key: string]: any
-}
-
 /** 文件批量返回类 */
 export interface FileSrcListVo {
 	/** 上传成功的文件数组 */
@@ -431,6 +412,47 @@ export interface FileSrcVo {
 	name: string
 	/** 文件url */
 	url: string
+}
+
+/** 绑定课件类 */
+export interface CoursewareBind {
+	/**
+	 * 备课id
+	 * @format int64
+	 */
+	pid: number
+	/**
+	 * 课件id数组
+	 * @uniqueItems true
+	 */
+	cidList: number[]
+}
+
+/** 添加课件模型 */
+export interface CoursewareParam {
+	/** 课件名 */
+	coursewareName: string
+	/** 父id 0为顶层 */
+	fid?: string
+	/**
+	 * 分享类型 0不分享 1科目分享 2全局分享，默认0
+	 * @format int32
+	 */
+	shareType?: number
+	/** 是否文件夹，默认否 */
+	folderFlag?: boolean
+	/** 课程名 */
+	courseName: string
+	/**
+	 * 文件id
+	 * @format int64
+	 */
+	srcId?: number
+}
+
+export interface LinkedMap {
+	empty?: boolean
+	[key: string]: any
 }
 
 /** 分页对象 */
@@ -617,15 +639,24 @@ export interface Preparing {
 export type CoursewareVo = {
 	/** @format int64 */
 	id: number
+	/** @format int64 */
+	fid: number
 	/** 课件名 */
 	coursewareName: string
-	/** 类别 标识 */
-	keyword?: string
+	/** 课程名 */
+	courseName: string
 	/**
 	 * 文件id
 	 * @format int64
 	 */
-	srcId: number
+	srcId?: number
+	/** 是否文件夹 */
+	folderFlag?: boolean
+	/**
+	 * 分享类型 0不分享 1科目分享 2全局分享
+	 * @format int32
+	 */
+	shareType?: number
 	/**
 	 * 更新时间戳
 	 * @format int64
@@ -969,6 +1000,36 @@ export interface ExaminationLogInfoVo {
 export interface MyPageCoursewareVo {
 	/** 数据 */
 	records: CoursewareVo[]
+	/**
+	 * 总数
+	 * @format int64
+	 */
+	total: number
+	/**
+	 * 每页总长度
+	 * @format int64
+	 */
+	size: number
+	/**
+	 * 当前页数
+	 * @format int64
+	 */
+	current: number
+	/** 排序字段信息 */
+	orders?: OrderItem[]
+	/** 是否查询总数 */
+	searchCount: boolean
+	/**
+	 * 总页数
+	 * @format int64
+	 */
+	pages: number
+}
+
+/** 分页对象 */
+export interface MyPageSchoolUserVo {
+	/** 数据 */
+	records: SchoolUserVo[]
 	/**
 	 * 总数
 	 * @format int64
@@ -1969,7 +2030,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 		 *
 		 * @tags 84-测验模块
 		 * @name BindQuestionForExa
-		 * @summary 5-绑定问题到测验
+		 * @summary 5-导入题库问题到测验
 		 * @request POST:/teacherWeb/examination/bindQuestionForExa
 		 */
 		bindQuestionForExa: (data: QuestionExaBind, params: RequestParams = {}) =>
@@ -2282,6 +2343,279 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 				...params
 			})
 	}
+	v83课件模块 = {
+		/**
+		 * No description
+		 *
+		 * @tags 83-课件模块
+		 * @name MoveCourseware
+		 * @summary 9-移动文件
+		 * @request PUT:/teacherWeb/courseware/moveCourseware
+		 */
+		moveCourseware: (data: CoursewareMoveParam, params: RequestParams = {}) =>
+			this.request<Message, any>({
+				path: `/teacherWeb/courseware/moveCourseware`,
+				method: 'PUT',
+				body: data,
+				type: ContentType.Json,
+				...params
+			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags 83-课件模块
+		 * @name CopyShareCourseware
+		 * @summary 10-将分享课件导入自己的库
+		 * @request PUT:/teacherWeb/courseware/copyShareCourseware
+		 */
+		copyShareCourseware: (data: CoursewareMoveParam, params: RequestParams = {}) =>
+			this.request<Message, any>({
+				path: `/teacherWeb/courseware/copyShareCourseware`,
+				method: 'PUT',
+				body: data,
+				type: ContentType.Json,
+				...params
+			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags 83-课件模块
+		 * @name UploadExamination
+		 * @summary 11-上传课件
+		 * @request POST:/teacherWeb/courseware/upload
+		 */
+		uploadExamination: (
+			query: {
+				/** 科目 */
+				courseName: string
+				/**
+				 * 文件夹id
+				 * @format int64
+				 * @default 0
+				 */
+				fid?: number
+			},
+			data: {
+				files: File[]
+			},
+			params: RequestParams = {}
+		) =>
+			this.request<FileSrcListVo, any>({
+				path: `/teacherWeb/courseware/upload`,
+				method: 'POST',
+				query: query,
+				body: data,
+				type: ContentType.Json,
+				...params
+			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags 83-课件模块
+		 * @name BindCourseware
+		 * @summary 4-绑定课件到备课
+		 * @request POST:/teacherWeb/courseware/bindCourseware
+		 */
+		bindCourseware: (data: CoursewareBind, params: RequestParams = {}) =>
+			this.request<Message, any>({
+				path: `/teacherWeb/courseware/bindCourseware`,
+				method: 'POST',
+				body: data,
+				type: ContentType.Json,
+				...params
+			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags 83-课件模块
+		 * @name AddExamination1
+		 * @summary 1-添加课件
+		 * @request POST:/teacherWeb/courseware/add
+		 */
+		addExamination1: (data: CoursewareParam, params: RequestParams = {}) =>
+			this.request<Message, any>({
+				path: `/teacherWeb/courseware/add`,
+				method: 'POST',
+				body: data,
+				type: ContentType.Json,
+				...params
+			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags 83-课件模块
+		 * @name QueryCoursewareByPid
+		 * @summary 6-根据备课id查询课件
+		 * @request GET:/teacherWeb/courseware/queryCoursewareByPid
+		 */
+		queryCoursewareByPid: (
+			query: {
+				/**
+				 * 备课id
+				 * @format int64
+				 */
+				pid: number
+				/**
+				 * 第几页
+				 * @format int64
+				 * @default 1
+				 * @example 1
+				 */
+				current?: number
+				/**
+				 * 每页几条
+				 * @format int64
+				 * @default 5
+				 * @example 5
+				 */
+				size?: number
+				/** 课件名 模糊搜索 */
+				coursewareName: string
+			},
+			params: RequestParams = {}
+		) =>
+			this.request<MyPageCoursewareVo, any>({
+				path: `/teacherWeb/courseware/queryCoursewareByPid`,
+				method: 'GET',
+				query: query,
+				...params
+			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags 83-课件模块
+		 * @name QueryCourseware
+		 * @summary 3-查询课件
+		 * @request GET:/teacherWeb/courseware/list
+		 */
+		queryCourseware: (
+			query: {
+				/**
+				 * 第几页
+				 * @format int64
+				 * @default 1
+				 * @example 1
+				 */
+				current?: number
+				/**
+				 * 每页几条
+				 * @format int64
+				 * @default 5
+				 * @example 5
+				 */
+				size?: number
+				/**
+				 * 文件夹id
+				 * @format int64
+				 * @default 0
+				 */
+				id?: number
+				/** 课件名 模糊搜索 */
+				coursewareName: string
+				/** 科目名 */
+				courseName?: string
+				/**
+				 * 类型 0不共享 1科目共享 2全部共享
+				 * @format int32
+				 * @default 0
+				 */
+				shareType?: number
+			},
+			params: RequestParams = {}
+		) =>
+			this.request<MyPageCoursewareVo, any>({
+				path: `/teacherWeb/courseware/list`,
+				method: 'GET',
+				query: query,
+				...params
+			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags 83-课件模块
+		 * @name GetShareCourseName
+		 * @summary 7-查询分享的课件科目
+		 * @request GET:/teacherWeb/courseware/getShareCourseName
+		 */
+		getShareCourseName: (params: RequestParams = {}) =>
+			this.request<string[], any>({
+				path: `/teacherWeb/courseware/getShareCourseName`,
+				method: 'GET',
+				...params
+			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags 83-课件模块
+		 * @name GetJobNameByCourseName
+		 * @summary 8-查询分享课件科目下的分享老师
+		 * @request GET:/teacherWeb/courseware/getJobNameByCourseName
+		 */
+		getJobNameByCourseName: (
+			query: {
+				/**
+				 * @format int64
+				 * @default 1
+				 */
+				current?: number
+				/**
+				 * @format int64
+				 * @default 5
+				 */
+				size?: number
+				courseName: string
+			},
+			params: RequestParams = {}
+		) =>
+			this.request<MyPageSchoolUserVo, any>({
+				path: `/teacherWeb/courseware/getJobNameByCourseName`,
+				method: 'GET',
+				query: query,
+				...params
+			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags 83-课件模块
+		 * @name UnBindCourseware
+		 * @summary 5-解绑课件
+		 * @request DELETE:/teacherWeb/courseware/unBindCourseware
+		 */
+		unBindCourseware: (data: CoursewareBind, params: RequestParams = {}) =>
+			this.request<Message, any>({
+				path: `/teacherWeb/courseware/unBindCourseware`,
+				method: 'DELETE',
+				body: data,
+				type: ContentType.Json,
+				...params
+			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags 83-课件模块
+		 * @name DelExamination1
+		 * @summary 2-删除课件
+		 * @request DELETE:/teacherWeb/courseware/del
+		 */
+		delExamination1: (data: Array, params: RequestParams = {}) =>
+			this.request<Message, any>({
+				path: `/teacherWeb/courseware/del`,
+				method: 'DELETE',
+				body: data,
+				type: ContentType.Json,
+				...params
+			})
+	}
 	v85备课主题 = {
 		/**
 		 * No description
@@ -2467,156 +2801,6 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 				...params
 			})
 	}
-	v83课件模块 = {
-		/**
-		 * No description
-		 *
-		 * @tags 83-课件模块
-		 * @name BindCourseware
-		 * @summary 4-绑定课件到备课
-		 * @request POST:/teacherWeb/courseware/bindCourseware
-		 */
-		bindCourseware: (data: CoursewareBind, params: RequestParams = {}) =>
-			this.request<Message, any>({
-				path: `/teacherWeb/courseware/bindCourseware`,
-				method: 'POST',
-				body: data,
-				type: ContentType.Json,
-				...params
-			}),
-
-		/**
-		 * No description
-		 *
-		 * @tags 83-课件模块
-		 * @name AddExamination1
-		 * @summary 1-添加课件
-		 * @request POST:/teacherWeb/courseware/add
-		 */
-		addExamination1: (data: CoursewareParam, params: RequestParams = {}) =>
-			this.request<Message, any>({
-				path: `/teacherWeb/courseware/add`,
-				method: 'POST',
-				body: data,
-				type: ContentType.Json,
-				...params
-			}),
-
-		/**
-		 * No description
-		 *
-		 * @tags 83-课件模块
-		 * @name QueryCoursewareByPid
-		 * @summary 6-根据备课id查询课件
-		 * @request GET:/teacherWeb/courseware/queryCoursewareByPid
-		 */
-		queryCoursewareByPid: (
-			query: {
-				/**
-				 * 备课id
-				 * @format int64
-				 */
-				pid: number
-				/**
-				 * 第几页
-				 * @format int64
-				 * @default 1
-				 * @example 1
-				 */
-				current?: number
-				/**
-				 * 每页几条
-				 * @format int64
-				 * @default 5
-				 * @example 5
-				 */
-				size?: number
-				/** 课件名 模糊搜索 */
-				coursewareName: string
-				/** 类别标识 */
-				keyword: string
-			},
-			params: RequestParams = {}
-		) =>
-			this.request<MyPageCoursewareVo, any>({
-				path: `/teacherWeb/courseware/queryCoursewareByPid`,
-				method: 'GET',
-				query: query,
-				...params
-			}),
-
-		/**
-		 * No description
-		 *
-		 * @tags 83-课件模块
-		 * @name QueryCourseware
-		 * @summary 3-查询课件
-		 * @request GET:/teacherWeb/courseware/list
-		 */
-		queryCourseware: (
-			query: {
-				/**
-				 * 第几页
-				 * @format int64
-				 * @default 1
-				 * @example 1
-				 */
-				current?: number
-				/**
-				 * 每页几条
-				 * @format int64
-				 * @default 5
-				 * @example 5
-				 */
-				size?: number
-				/** 课件名 模糊搜索 */
-				coursewareName: string
-				/** 类别标识 */
-				keyword: string
-			},
-			params: RequestParams = {}
-		) =>
-			this.request<MyPageCoursewareVo, any>({
-				path: `/teacherWeb/courseware/list`,
-				method: 'GET',
-				query: query,
-				...params
-			}),
-
-		/**
-		 * No description
-		 *
-		 * @tags 83-课件模块
-		 * @name UnBindCourseware
-		 * @summary 5-解绑课件
-		 * @request DELETE:/teacherWeb/courseware/unBindCourseware
-		 */
-		unBindCourseware: (data: CoursewareBind, params: RequestParams = {}) =>
-			this.request<Message, any>({
-				path: `/teacherWeb/courseware/unBindCourseware`,
-				method: 'DELETE',
-				body: data,
-				type: ContentType.Json,
-				...params
-			}),
-
-		/**
-		 * No description
-		 *
-		 * @tags 83-课件模块
-		 * @name DelExamination1
-		 * @summary 2-删除课件
-		 * @request DELETE:/teacherWeb/courseware/del
-		 */
-		delExamination1: (data: Array, params: RequestParams = {}) =>
-			this.request<Message, any>({
-				path: `/teacherWeb/courseware/del`,
-				method: 'DELETE',
-				body: data,
-				type: ContentType.Json,
-				...params
-			})
-	}
 	v55文件模块 = {
 		/**
 		 * No description
@@ -2670,14 +2854,9 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 		 * @tags 55-文件模块
 		 * @name UpdateFile
 		 * @summary 1-上传文件
-		 * @request POST:/file/updateFile/{type}
+		 * @request POST:/file/updateFile
 		 */
 		updateFile: (
-			type: number,
-			query: {
-				/** 课件标识 */
-				keyword: string
-			},
 			data: {
 				/** @format binary */
 				file?: File
@@ -2685,9 +2864,8 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 			params: RequestParams = {}
 		) =>
 			this.request<FileSrcVo, any>({
-				path: `/file/updateFile/${type}`,
+				path: `/file/updateFile`,
 				method: 'POST',
-				query: query,
 				body: data,
 				type: ContentType.FormData,
 				...params
@@ -2912,6 +3090,36 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 		) =>
 			this.request<CourseSemesterOne, any>({
 				path: `/teacherWeb/course/getCourse`,
+				method: 'GET',
+				query: query,
+				...params
+			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags 86-课程表
+		 * @name GetCourseNameBySemester
+		 * @summary 8-获取本学期教的科目列表
+		 * @request GET:/teacherWeb/course/getCourseNameBySemester
+		 */
+		getCourseNameBySemester: (
+			query?: {
+				/**
+				 * 学年
+				 * @default ""
+				 */
+				year?: string
+				/**
+				 * 学期
+				 * @format int32
+				 */
+				semester?: number
+			},
+			params: RequestParams = {}
+		) =>
+			this.request<string[], any>({
+				path: `/teacherWeb/course/getCourseNameBySemester`,
 				method: 'GET',
 				query: query,
 				...params
