@@ -56,5 +56,3 @@ const watchEnter = (event: KeyboardEvent) => {
 		</div>
 	</a-modal>
 </template>
-
-<style lang="scss"></style>

@@ -133,32 +133,12 @@ const updateFileList = () => {
 	getFileList()
 }
 
-//填充盒子
+//修改布局
 const gridboxRef = ref()
 const { width: bigBoxWidth } = useElementSize(gridboxRef)
 
 watch(bigBoxWidth, () => useAutoChangGridLayout(gridboxRef, 160, fileList.length, '.arco-checkbox-group'))
 watch(fileList, () => useAutoChangGridLayout(gridboxRef, 160, fileList.length, '.arco-checkbox-group'))
-
-// const fill = () => {
-// 	const boxSize = 150 + 10 // 小盒子宽度
-// 	const boxCount = fileList.length // 盒子的数量
-// 	const row = Math.floor(bigBoxWidth.value / boxSize) // 一行有多少个盒子
-// 	const lastRow = boxCount - Math.ceil(boxCount / row - 1) * row // 最后一行
-// 	const count = row - lastRow // 我应该填多少个盒子
-
-// 	// 清空
-// 	const fileNullbox = gridboxRef.value.querySelectorAll('.data-file-null')
-// 	fileNullbox.forEach((item: HTMLElement) => item.remove())
-
-// 	// 添加盒子
-// 	for (let i = 0; i < count; i++) {
-// 		let box = document.createElement('div')
-// 		box.style.cssText = 'width: 150px; height: 180px;'
-// 		box.classList.add('data-file-null')
-// 		gridboxRef.value.querySelector('.arco-checkbox-group').appendChild(box)
-// 	}
-// }
 
 const moveFileModalRef = ref() // 移动文件夹Ref
 const createdFolderRef = ref() // 创建文件夹Ref

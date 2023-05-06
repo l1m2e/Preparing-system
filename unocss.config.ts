@@ -35,7 +35,7 @@ export default defineConfig({
 	],
 	transformers: [
 		transformerDirectives({
-			applyVariable: ['--uno', '--uno-apply', '--uno']
+			applyVariable: ['--uno', '--uno-apply']
 		}),
 		transformerVariantGroup()
 	]

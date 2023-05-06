@@ -44,6 +44,7 @@ declare module '@vue/runtime-core' {
     ClozeQuestions: typeof import('./../components/topic-modal/components/cloze-questions.vue')['default']
     CreatedFolder: typeof import('./../components/createdFolder/createdFolder.vue')['default']
     Difficulty: typeof import('./../components/topic-modal/components/difficulty.vue')['default']
+    FileManger: typeof import('./../components/file-manager/file-manger.vue')['default']
     JudgementQuestions: typeof import('./../components/topic-modal/components/judgement-questions.vue')['default']
     MultipleChoiceQuestion: typeof import('./../components/topic-modal/components/multiple-choice-question.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']

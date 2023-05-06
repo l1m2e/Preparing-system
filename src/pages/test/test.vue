@@ -1,19 +1,30 @@
 <script lang="ts" setup>
-import { useAutoChangGridLayout } from '~/composables'
-const gridboxRef = ref()
-onMounted(() => {
-	useAutoChangGridLayout(gridboxRef, 150, 30)
-})
+import dayjs from 'dayjs'
+
+const fileList = reactive<any>([])
+
+for (let i = 0; i <= 2; i++) {
+	const obj = {
+		fileName: `文件${i}`,
+		id: i,
+		fid: 0,
+		type: true,
+		createdTimestamp: dayjs().valueOf()
+	}
+	fileList.push(obj)
+}
+
+const fn = (data) => {
+	console.log(data)
+}
 </script>
 
 <template>
-	<div class="grid w-100% grid-cols-[repeat(auto-fit,minmax(150px,max-content))] gap-10px" ref="gridboxRef">
-		<div class="bg-red w-100px h-100px" v-for="item in 30">{{ item }}</div>
+	<div mt-100px w-80vw m-auto>
+		<a-card>
+			<div h-80vh>
+				<FileManger :file-list="fileList" @open="fn"></FileManger>
+			</div>
+		</a-card>
 	</div>
 </template>
-
-<style>
-.uno {
-	-uno: w-100px h-100px bg-red;
-}
-</style>

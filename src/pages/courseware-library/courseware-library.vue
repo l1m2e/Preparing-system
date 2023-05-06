@@ -1,14 +1,5 @@
 <script lang="ts" setup>
 import UploadModal from './components/upload-modal.vue'
-import { useAutoChangGridLayout } from '~/composables'
-
-const coursewareRef = ref()
-
-onMounted(() => {
-	useRegion(coursewareRef.value, 'data-file-id', (data) => {
-		// checkedIdList.value = data
-	})
-})
 
 // 上传文件
 const uploadModalRef = ref()
@@ -23,6 +14,8 @@ const getCourse = async () => {
 	console.log(res.data)
 }
 getCourse()
+
+const isMe = ref(true)
 </script>
 
 <template>
@@ -31,9 +24,9 @@ getCourse()
 			<header class="flex justify-between items-center">
 				<div class="btn p-y-10px rounded-xl bg-blue-5 hover:bg-blue-4" @click="uploadModalRef.open()">上传文件</div>
 				<div>
-					<a-radio-group type="button" size="large">
-						<a-radio value="Beijing">我的课件库</a-radio>
-						<a-radio value="Shanghai">共享课件库</a-radio>
+					<a-radio-group type="button" size="large" v-model="isMe">
+						<a-radio :value="true">我的课件库</a-radio>
+						<a-radio :value="false">共享课件库</a-radio>
 					</a-radio-group>
 				</div>
 			</header>
