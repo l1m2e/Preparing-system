@@ -276,6 +276,7 @@ const openTopicModal = (type: '单选题' | '多选题' | '判断题' | '简答�
 						</a-checkbox-group>
 					</div>
 				</main>
+
 				<footer class="flex w-100% h-100px absolute bottom-0 left-0 right-0 center overflow-hidden" @mousedown.stop="">
 					<Transition enter-active-class="animated-fade-in-up" leave-active-class="animated-fade-out-down" class="animated animated-faster">
 						<div

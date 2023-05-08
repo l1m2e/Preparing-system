@@ -1,4 +1,5 @@
 import { setReactive } from '~/utils'
+import type { QuestionVo } from '~/api/api'
 
 /** 使用文件分页 */
 export const useFilePagination = () => {
@@ -17,7 +18,7 @@ export const useFilePagination = () => {
 	const paginationReset = () => setReactive(pagination, { current: 1, pages: 1, size: 40 })
 
 	/** 文件列表 */
-	const fileList = reactive<Array<any>>([])
+	const fileList = reactive<Array<QuestionVo>>([])
 
 	/** 获取文件列表 */
 	const getFileList = async () => {
@@ -29,7 +30,7 @@ export const useFilePagination = () => {
 		const res = await api.issueBank.queryQuestionBankSim({ ...parms, fid: breadcrumbLastId.value })
 
 		if (res.status === 200) {
-			res.data.records.forEach((item: any) => fileList.push(item))
+			res.data.records.forEach((item) => fileList.push(item))
 			pagination.pages = res.data.pages || 1
 		}
 	}

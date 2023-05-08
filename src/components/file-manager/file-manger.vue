@@ -4,6 +4,7 @@ import folderSvg from '~/assets/svg/folder.svg'
 import fileSvg from '~/assets/svg/file.svg'
 import { useAutoChangGridLayout } from '~/composables'
 import { richTextFilterText } from '~/utils'
+import ResetFolderName from './components/reset-folder-name.vue'
 
 interface File {
 	fileName: string
@@ -11,10 +12,11 @@ interface File {
 	fid: number
 	createdTimestamp: number
 	// true 是文件 false 是文件夹
-	type: boolean
+	type: number
 }
 
 const props = defineProps<{
+	modelValue: Array<number>
 	fileList: Array<File>
 }>()
 
@@ -31,6 +33,7 @@ onMounted(() => {
 	//使用框选
 	useRegion(fileBoxRef.value, 'data-file-id', (data) => {
 		checkedIdList.value = data
+		emit('update:modelValue', data)
 	})
 })
 
@@ -41,16 +44,22 @@ const fileListSelectedStateState = computed(() =>
 	})
 )
 
-// 单击选中 取消选中
-const clickSelected = (id: number) => {
-	if (!checkedIdList.value.includes(id)) {
-		checkedIdList.value.push(id)
-	} else {
-		checkedIdList.value.splice(checkedIdList.value.indexOf(id), 1)
-	}
-}
+const emit = defineEmits([
+	/** 打开文件 */
+	'open',
+	/** 更新被选中的列表 */
+	'update:modelValue',
+	/** 重命名文件事件 */
+	'resetFolderName',
+	/** 移动事件 */
+	'move',
+	/** 删除事件 */
+	'delete',
+	/** 创建事件 */
+	'created'
+])
 
-defineEmits(['open'])
+const resetFolderNameRef = ref()
 </script>
 
 <template>
@@ -60,8 +69,7 @@ defineEmits(['open'])
 				<div
 					:class="`${item.checked ? 'checkbox-card-checked' : 'checkbox-card'}`"
 					:data-file-id="item.id"
-					@click="clickSelected(item.id)"
-					@dblclick="$emit('openFile', item)"
+					@click="$emit('open', item)"
 					ref="gridItemsRef">
 					<a-checkbox :value="item.id" class="absolute top-6px left-1px" @click.stop="">
 						<template #checkbox="row">
@@ -71,13 +79,13 @@ defineEmits(['open'])
 								}`"></div>
 						</template>
 					</a-checkbox>
-					<img :src="folderSvg" v-if="item.type" class="w-120px h-120px mt-10px" />
+					<img :src="folderSvg" v-if="item.type === 0" class="w-120px h-120px mt-10px" />
 					<div v-else class="relative">
 						<img :src="fileSvg" class="w-100px h-100px mt-20px mb-10px" />
 						<!-- <div :class="`w-20px h-20px absolute left-[calc(50%-10px)] top-40% text-white ${fileIconTextList[item.type].icon}`"></div> -->
 						<!-- <div :class="`absolute left-30% top-65% text-white `">{{ fileIconTextList[item.type].text }}</div> -->
 					</div>
-					<div class="truncate max-w-130px">{{ item.type ? item.fileName : richTextFilterText(item.fileName) }}</div>
+					<div class="truncate max-w-130px">{{ item.type === 0 ? item.fileName : richTextFilterText(item.fileName) }}</div>
 					<div class="text-12px mt-5px text-[var(--color-text-3)]">
 						{{ dayjs(item.createdTimestamp).format('YYYY-MM-DD HH:mm') }}
 					</div>
@@ -86,15 +94,15 @@ defineEmits(['open'])
 							@click.stop=""
 							class="absolute right-5px top-5px i-ri-more-line text-[var(--color-border-3)] hover:text-[rgb(var(--primary-6))] text-20px operation"></div>
 						<template #content>
-							<a-doption v-if="item.type" @click="">
+							<a-doption v-if="item.type === 0" @click="$emit('resetFolderName', item.id)">
 								<template #icon><icon-edit /></template>
 								重命名
 							</a-doption>
-							<a-doption @click="">
+							<a-doption @click="$emit('move', item.id)">
 								<template #icon><icon-to-right /></template>
 								移动
 							</a-doption>
-							<a-doption @click="">
+							<a-doption @click="$emit('delete', item.id)">
 								<template #icon><icon-delete /></template>
 								删除
 							</a-doption>
@@ -109,9 +117,9 @@ defineEmits(['open'])
 					class="py-10px px-20px border border-1px border-[var(--color-border-1)] shadow-lg rounded-xl center overflow-hidden"
 					v-if="checkedIdList.length !== 0">
 					<a-tooltip content="删除" position="top" mini>
-						<div class="action-bar" @click=""><div class="i-ri-delete-bin-6-line"></div></div>
+						<div class="action-bar" @click="$emit('delete', checkedIdList)"><div class="i-ri-delete-bin-6-line"></div></div>
 					</a-tooltip>
-					<a-tooltip content="移动" position="top" mini @click="">
+					<a-tooltip content="移动" position="top" mini @click="$emit('move', checkedIdList)">
 						<div class="action-bar"><div class="i-ri-share-forward-line"></div></div>
 					</a-tooltip>
 					<a-tooltip content="取消选中" position="top" mini>
@@ -120,6 +128,7 @@ defineEmits(['open'])
 				</div>
 			</Transition>
 		</footer>
+		<ResetFolderName ref="resetFolderNameRef" @ok=""></ResetFolderName>
 	</div>
 </template>
 
