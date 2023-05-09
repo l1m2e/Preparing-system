@@ -48,7 +48,7 @@ declare module '@vue/runtime-core' {
     FileManger: typeof import('./../components/file-manager/file-manger.vue')['default']
     JudgementQuestions: typeof import('./../components/topic-modal/components/judgement-questions.vue')['default']
     MultipleChoiceQuestion: typeof import('./../components/topic-modal/components/multiple-choice-question.vue')['default']
-    ResetFolderName: typeof import('./../components/file-manager/components/reset-folder-name.vue')['default']
+    ResetFolderName: typeof import('./../components/reset-folder-name/reset-folder-name.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     ShortAnswerQuestion: typeof import('./../components/topic-modal/components/short-answer-question.vue')['default']

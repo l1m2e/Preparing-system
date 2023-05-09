@@ -1,6 +1,5 @@
 <script lang="ts" setup>
-import { type } from 'os'
-
+import MoveFileModal from './components/move-file-modal.vue'
 const { pagination, fileList, breadcrumbList, breadcrumbLastId, clickBreadcrumb, getFileList, setFileList, paginationReset } = useFilePagination()
 getFileList()
 
@@ -12,52 +11,46 @@ const formatFileList = computed(() =>
 	})
 )
 
-const open = (data: any) => {
+const open = (data: string) => {
 	console.log(data)
 }
 
 //重命名文件夹
-const resetFolderNameRef = ref()
+const resetFolderNameShow = ref(false)
+let folderId = 0
 
 const resetFolderNameButton = (id: number) => {
-	resetFolderNameRef.value.open(id) // 打开文件夹
+	resetFolderNameShow.value = true
+	folderId = id
 }
 
-// 请求接口
-const restFolderNameApi = async (params: { id: number; name: string }) => {
-	const { name, id } = params
-	const res = await api.issueBank.updatePath(id, { name })
-	return res.status === 200
-}
+const restFolderName = async (name: string) => {
+	const res = await api.issueBank.updatePath(folderId, { name })
 
-//成功修改本地数据
-const resetFolderNameSuccess = (data: { id: number; name: string }) => {
+	if (res.status !== 200) return Message.error('文件夹重命名失败')
+
 	fileList.forEach((item) => {
-		if (item.id === data.id && item.type === 0) {
-			item.keyword = data.name
+		if (item.id === folderId && item.type === 0) {
+			item.keyword = name
 		}
 	})
+	Message.success('重命名文件夹成功')
+	resetFolderNameShow.value = false
 }
 
-// // 重命名
-// const resetFolderNameSuccess = (data: { id: number; name: string }) => {
-// 	const newValue = cloneDeep(props.fileList).map((item) => {
-// 		if (item.id === data.id) {
-// 			item.fileName = data.name
-// 		}
-// 		return item
-// 	})
-// }
+//移动文件
+const moveFileModal = ref(false)
 
-const move = (data: any) => {
+const move = (data) => {
+	console.log(data)
+	moveFileModal.value = true
+}
+
+const deleteFile = (data) => {
 	console.log(data)
 }
 
-const deleteFile = (data: any) => {
-	console.log(data)
-}
-
-const created = (data: any) => {
+const created = (data) => {
 	console.log(data)
 }
 
@@ -79,6 +72,7 @@ const selectFile = ref<Array<number>>([])
 					@reset-folder-name="resetFolderNameButton"></FileManger>
 			</div>
 		</a-card>
-		<ResetFolderName :request="restFolderNameApi" @ok="resetFolderNameSuccess" ref="resetFolderNameRef"></ResetFolderName>
+		<ResetFolderName v-model="resetFolderNameShow" @ok="restFolderName"></ResetFolderName>
+		<MoveFileModal v-model="moveFileModal" :file-list="formatFileList"></MoveFileModal>
 	</div>
 </template>

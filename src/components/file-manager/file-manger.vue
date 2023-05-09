@@ -4,7 +4,7 @@ import folderSvg from '~/assets/svg/folder.svg'
 import fileSvg from '~/assets/svg/file.svg'
 import { useAutoChangGridLayout } from '~/composables'
 import { richTextFilterText } from '~/utils'
-import ResetFolderName from './components/reset-folder-name.vue'
+// import ResetFolderName from './components/reset-folder-name.vue'
 
 interface File {
 	fileName: string
@@ -44,22 +44,31 @@ const fileListSelectedStateState = computed(() =>
 	})
 )
 
-const emit = defineEmits([
-	/** 打开文件 */
-	'open',
-	/** 更新被选中的列表 */
-	'update:modelValue',
-	/** 重命名文件事件 */
-	'resetFolderName',
-	/** 移动事件 */
-	'move',
-	/** 删除事件 */
-	'delete',
-	/** 创建事件 */
-	'created'
-])
+// const emit = defineEmits([
+// 	/** 打开文件 */
+// 	'open',
+// 	/** 更新被选中的列表 */
+// 	'update:modelValue',
+// 	/** 重命名文件事件 */
+// 	'resetFolderName',
+// 	/** 移动事件 */
+// 	'move',
+// 	/** 删除事件 */
+// 	'delete',
+// 	/** 创建事件 */
+// 	'created'
+// ])
 
-const resetFolderNameRef = ref()
+const emit = defineEmits<{
+	(e: 'open', item: File): void
+	(e: 'update:modelValue', item: Array<number>): void
+	(e: 'resetFolderName', id: number): void
+	(e: 'move', data: number | Array<number>): void
+	(e: 'delete', data: number | Array<number>): void
+	(e: 'created', item: File): void
+}>()
+
+// 重命名文件
 </script>
 
 <template>
@@ -128,7 +137,7 @@ const resetFolderNameRef = ref()
 				</div>
 			</Transition>
 		</footer>
-		<ResetFolderName ref="resetFolderNameRef" @ok=""></ResetFolderName>
+		<!-- <ResetFolderName></ResetFolderName> -->
 	</div>
 </template>
 

@@ -27,7 +27,7 @@
 		"uuid": "^9.0.0",
 		"vite-plugin-require-transform": "^1.0.12",
 		"vite-plugin-swagger-typescript-api": "^1.0.0",
-		"vue": "^3.2.47",
+		"vue": "3.3.0-beta.5",
 		"vue-router": "^4.1.6"
 	},
 	"devDependencies": {
