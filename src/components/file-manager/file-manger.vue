@@ -3,78 +3,45 @@ import dayjs from 'dayjs'
 import folderSvg from '~/assets/svg/folder.svg'
 import fileSvg from '~/assets/svg/file.svg'
 import { useAutoChangGridLayout } from '~/composables'
-import { richTextFilterText } from '~/utils'
-// import ResetFolderName from './components/reset-folder-name.vue'
+import type { Props, Emit } from './interface.d'
 
-interface File {
-	fileName: string
-	id: number
-	fid: number
-	createdTimestamp: number
-	// true 是文件 false 是文件夹
-	type: number
-}
-
-const props = defineProps<{
-	modelValue: Array<number>
-	fileList: Array<File>
-}>()
-
-const fileBoxRef = ref()
-const { width: boxWidth } = useElementSize(fileBoxRef)
-
-watch(boxWidth, () => useAutoChangGridLayout(fileBoxRef, 160, props.fileList.length, '.arco-checkbox-group'))
-watch(
-	() => props.fileList,
-	() => useAutoChangGridLayout(fileBoxRef, 160, props.fileList.length, '.arco-checkbox-group')
-)
+const props = defineProps<Props>()
+const emit = defineEmits<Emit>()
 
 onMounted(() => {
-	//使用框选
-	useRegion(fileBoxRef.value, 'data-file-id', (data) => {
+	useRegion(fileContentRef.value, 'data-file-id', (data) => {
 		checkedIdList.value = data
 		emit('update:modelValue', data)
 	})
 })
 
+const fileContentRef = ref()
+
+//修改布局样式
+const { width: fileContentWidth } = useElementSize(fileContentRef)
+
+watch(fileContentWidth, () => useAutoChangGridLayout(fileContentRef, 160, props.fileList.length, '.arco-checkbox-group'))
+watch(
+	() => props.fileList,
+	() => useAutoChangGridLayout(fileContentRef, 160, props.fileList.length, '.arco-checkbox-group')
+)
+
+//被选中的文件列表
 const checkedIdList = ref<Array<number>>([])
-const fileListSelectedStateState = computed(() =>
+const fileListUi = computed(() =>
+	//标记选中状态
 	props.fileList.map((item) => {
 		return checkedIdList.value.includes(item.id) ? { ...item, checked: true } : { ...item, checked: false }
 	})
 )
 
-// const emit = defineEmits([
-// 	/** 打开文件 */
-// 	'open',
-// 	/** 更新被选中的列表 */
-// 	'update:modelValue',
-// 	/** 重命名文件事件 */
-// 	'resetFolderName',
-// 	/** 移动事件 */
-// 	'move',
-// 	/** 删除事件 */
-// 	'delete',
-// 	/** 创建事件 */
-// 	'created'
-// ])
-
-const emit = defineEmits<{
-	(e: 'open', item: File): void
-	(e: 'update:modelValue', item: Array<number>): void
-	(e: 'resetFolderName', id: number): void
-	(e: 'move', data: number | Array<number>): void
-	(e: 'delete', data: number | Array<number>): void
-	(e: 'created', item: File): void
-}>()
-
-// 重命名文件
+// 面包屑
 </script>
 
 <template>
-	<div class="w-100% h-100% select-none overflow-y-auto scroll-bar grid-centen" ref="fileBoxRef">
+	<div class="w-100% h-100% select-none overflow-y-auto scroll-bar grid-centen" ref="fileContentRef">
 		<a-checkbox-group v-model="checkedIdList">
-			<template v-for="item in fileListSelectedStateState" :key="item.id">
+			<template v-for="item in fileListUi" :key="item.id">
 				<div
 					:class="`${item.checked ? 'checkbox-card-checked' : 'checkbox-card'}`"
 					:data-file-id="item.id"
@@ -94,7 +61,7 @@ const emit = defineEmits<{
 						<!-- <div :class="`w-20px h-20px absolute left-[calc(50%-10px)] top-40% text-white ${fileIconTextList[item.type].icon}`"></div> -->
 						<!-- <div :class="`absolute left-30% top-65% text-white `">{{ fileIconTextList[item.type].text }}</div> -->
 					</div>
-					<div class="truncate max-w-130px">{{ item.type === 0 ? item.fileName : richTextFilterText(item.fileName) }}</div>
+					<div class="truncate max-w-130px">{{ item.type === 0 ? item.fileName : item.fileName }}</div>
 					<div class="text-12px mt-5px text-[var(--color-text-3)]">
 						{{ dayjs(item.createdTimestamp).format('YYYY-MM-DD HH:mm') }}
 					</div>

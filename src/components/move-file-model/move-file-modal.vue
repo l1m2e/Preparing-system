@@ -1,24 +1,32 @@
 <script lang="ts" setup>
 import folderSvg from '~/assets/svg/folder.svg'
 import fileSvg from '~/assets/svg/file.svg'
-import { Props } from './moveFileModal.d'
-const props = defineProps<Props>()
+import { Props, Emit } from './interface.d'
 
-const emit = defineEmits<{
-	(e: 'update:modelValue', show: boolean): void
-}>()
+const props = defineProps<Props>()
+const emit = defineEmits<Emit>()
 //触底
 const pullLoad = () => {}
 
 const selectedList = ref<Array<number>>([])
 
-const clickFile = (item) => {}
+const clickFile = (item: any) => {}
 
 const cancel = () => {
 	emit('update:modelValue', false)
 }
 
-//确定
+//点击面包屑
+const clickBreadcrumb = (id: number) => {}
+
+//
+const breadcrumbList = reactive([
+	{
+		fileName: '首页',
+		fid: 0,
+		id: 0
+	}
+])
 const ok = () => {}
 </script>
 
@@ -33,11 +41,11 @@ const ok = () => {}
 		:footer="false"
 		:body-style="{ padding: 0 }">
 		<header>
-			<!-- <a-breadcrumb separator=">" :max-count="3" class="ml-10px my-10px">
+			<a-breadcrumb separator=">" :max-count="3" class="ml-10px my-10px">
 				<a-breadcrumb-item v-for="item in breadcrumbList" @click="clickBreadcrumb(item.fid)" class="max-w-120px truncate">
-					{{ item.title }}
+					{{ item.fileName }}
 				</a-breadcrumb-item>
-			</a-breadcrumb> -->
+			</a-breadcrumb>
 		</header>
 		<main class="w-100% h-500px overflow-y-auto scroll-bar overflow-x-hidden" v-on-reach-bottom="pullLoad">
 			<a-row

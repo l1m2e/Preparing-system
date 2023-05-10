@@ -3,26 +3,22 @@ import type { QuestionVo } from '~/api/api'
 
 /** 使用文件分页 */
 export const useFilePagination = () => {
-	/** 面包屑数组 */
-	const breadcrumbList = reactive([{ title: '全部', fid: 0 }])
-	/** 面包屑最后一个id */
-	const breadcrumbLastId = computed(() => breadcrumbList.slice().pop()?.fid || 0)
-	/** 分页配置 */
+	const breadcrumbList = reactive([{ title: '全部', fid: 0 }]) //面包屑数组
+	const breadcrumbLastId = computed(() => breadcrumbList.slice().pop()?.fid || 0) //面包屑最后一个id
+	//分页配置
 	const pagination = reactive({
 		current: 1,
 		pages: 1,
 		size: 20
 	})
 
-	// 分页重置
-	const paginationReset = () => setReactive(pagination, { current: 1, pages: 1, size: 40 })
+	const paginationReset = () => setReactive(pagination, { current: 1, pages: 1, size: 40 }) // 分页重置
 
-	/** 文件列表 */
-	const fileList = reactive<Array<QuestionVo>>([])
+	const fileList = reactive<Array<QuestionVo>>([]) // 文件列表
 
-	/** 获取文件列表 */
+	// 获取文件列表
 	const getFileList = async () => {
-		/** 如果当前页大于总页数,则直接返回不请求 */
+		// 如果当前页大于总页数,则直接返回不请求
 		if (pagination.current > pagination.pages) return
 
 		const { pages, ...parms } = pagination
@@ -47,7 +43,7 @@ export const useFilePagination = () => {
 		getFileList()
 	}
 
-	/** 监听分页 如果分页发生了变化则请求 但是不包括分页被重置为1的时候 */
+	// 监听分页 如果分页发生了变化则请求 但是不包括分页被重置为1的时候
 	watch(
 		() => pagination.current,
 		() => {
@@ -56,14 +52,14 @@ export const useFilePagination = () => {
 		}
 	)
 
-	/** 重置状态 */
+	// 重置状态
 	const resetFlieState = () => {
 		paginationReset()
 		fileList.length = 0
 		breadcrumbList.length = 1
 	}
 
-	/** 给fileList重新赋值 */
+	// 给fileList重新赋值
 	const setFileList = (arr: Array<any>) => {
 		fileList.length = 0
 		fileList.push(...arr)
