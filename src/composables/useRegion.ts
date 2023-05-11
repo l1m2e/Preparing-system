@@ -27,12 +27,8 @@ export const useRegion = (el: HTMLElement, customProperties: string, callback: (
 		}
 
 		// 获取所有有可能需要被框选的元素矩形
-		interface IelementRectID {
-			rect: DOMRect
-			id: number | null
-		}
 		const itemsDom = el.querySelectorAll(`${tag}[${customProperties}]`)
-		const elementRectID: Array<IelementRectID> = [] //元素矩形和id的合集
+		const elementRectID: Array<{ rect: DOMRect; id: number | null }> = [] //元素矩形和id的合集
 		itemsDom.forEach((item) => {
 			const id = item.getAttribute(customProperties) //获取id
 			item.addEventListener('mousedown', (event) => event.stopPropagation()) // 阻止点击事件冒泡

@@ -1,9 +1,8 @@
 <script lang="ts" setup>
-const emit = defineEmits(['update:modelValue', 'ok'])
+import { Props, Emit } from './interface.d'
 
-const props = defineProps<{
-	modelValue: boolean
-}>()
+const props = defineProps<Props>()
+const emit = defineEmits<Emit>()
 
 const name = ref('')
 
@@ -21,14 +20,14 @@ const ok = () => {
 <template>
 	<a-modal
 		:visible="props.modelValue"
-		title="重命名文件夹"
+		:title="props.title"
 		:width="500"
 		:closable="false"
 		:mask-closable="false"
 		:esc-to-close="false"
 		:footer="false"
 		@before-close="name = ''">
-		<a-input placeholder="请输入文件夹名称" v-model="name"></a-input>
+		<a-input v-model="name"></a-input>
 		<div class="center justify-end mt-30px">
 			<div>
 				<a-button class="mr-10px" @click="cancel">取消</a-button>

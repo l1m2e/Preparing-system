@@ -10,6 +10,13 @@ export interface Emit {
 	(e: 'move', data: number | Array<number>): void
 	(e: 'delete', data: number | Array<number>): void
 	(e: 'created', item: File): void
+
+	// 'update:modelValue': [val: Array<number>]
+	// open: [val: File]
+	// resetFolderName: [id: number]
+	// move: [val: number | Array<number>]
+	// delete: [val: number | Array<number>]
+	// created: [item: File]
 }
 
 export interface File {

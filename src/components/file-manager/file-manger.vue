@@ -34,15 +34,15 @@ const fileListUi = computed(() =>
 		return checkedIdList.value.includes(item.id) ? { ...item, checked: true } : { ...item, checked: false }
 	})
 )
-
-// 面包屑
 </script>
 
 <template>
 	<div class="w-100% h-100% select-none overflow-y-auto scroll-bar grid-centen" ref="fileContentRef">
 		<a-checkbox-group v-model="checkedIdList">
-			<template v-for="item in fileListUi" :key="item.id">
+			<transition-group name="list">
 				<div
+					v-for="item in fileListUi"
+					:key="item.id"
 					:class="`${item.checked ? 'checkbox-card-checked' : 'checkbox-card'}`"
 					:data-file-id="item.id"
 					@click="$emit('open', item)"
@@ -85,7 +85,7 @@ const fileListUi = computed(() =>
 						</template>
 					</a-dropdown>
 				</div>
-			</template>
+			</transition-group>
 		</a-checkbox-group>
 		<footer class="flex w-100% h-100px absolute bottom-0 left-0 right-0 center overflow-hidden" @mousedown.stop="">
 			<Transition enter-active-class="animated-fade-in-up" leave-active-class="animated-fade-out-down" class="animated animated-faster">
@@ -118,6 +118,24 @@ const fileListUi = computed(() =>
 }
 :deep(.arco-checkbox) {
 	--uno: absolute hidden;
+}
+
+ /* 对移动中的元素应用的过渡 */
+.list-move,
+.list-enter-active,
+.list-leave-active {
+  transition: all 0.3s ease;
+}
+
+.list-enter-from,
+.list-leave-to {
+  opacity: 0;
+}
+
+/* 确保将离开的元素从布局流中删除
+  以便能够正确地计算移动的动画。 */
+.list-leave-active {
+  position: absolute;
 }
 
 .checkbox-card {
