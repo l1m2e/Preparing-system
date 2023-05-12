@@ -37,7 +37,7 @@ const fileListUi = computed(() =>
 </script>
 
 <template>
-	<div class="w-100% h-100% select-none overflow-y-auto scroll-bar grid-centen" ref="fileContentRef">
+	<div class="w-100% h-100% select-none" ref="fileContentRef">
 		<a-checkbox-group v-model="checkedIdList">
 			<transition-group name="list">
 				<div
@@ -58,8 +58,7 @@ const fileListUi = computed(() =>
 					<img :src="folderSvg" v-if="item.type === 0" class="w-120px h-120px mt-10px" />
 					<div v-else class="relative">
 						<img :src="fileSvg" class="w-100px h-100px mt-20px mb-10px" />
-						<!-- <div :class="`w-20px h-20px absolute left-[calc(50%-10px)] top-40% text-white ${fileIconTextList[item.type].icon}`"></div> -->
-						<!-- <div :class="`absolute left-30% top-65% text-white `">{{ fileIconTextList[item.type].text }}</div> -->
+						<slot name="fileIcon" :type="item.type"></slot>
 					</div>
 					<div class="truncate max-w-130px">{{ item.type === 0 ? item.fileName : item.fileName }}</div>
 					<div class="text-12px mt-5px text-[var(--color-text-3)]">
@@ -104,7 +103,6 @@ const fileListUi = computed(() =>
 				</div>
 			</Transition>
 		</footer>
-		<!-- <ResetFolderName></ResetFolderName> -->
 	</div>
 </template>
 
@@ -134,9 +132,9 @@ const fileListUi = computed(() =>
 
 /* 确保将离开的元素从布局流中删除
   以便能够正确地计算移动的动画。 */
-.list-leave-active {
-  position: absolute;
-}
+// .list-leave-active {
+//   position: absolute;
+// }
 
 .checkbox-card {
 	@extend %card;

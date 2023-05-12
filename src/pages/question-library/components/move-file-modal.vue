@@ -1,8 +1,12 @@
 <script lang="ts" setup>
-import { richTextFilterText } from '~/utils'
 import folderSvg from '~/assets/svg/folder.svg'
 import fileSvg from '~/assets/svg/file.svg'
+import { richTextFilterText } from '~/utils'
 import { useFilePagination } from '~/composables'
+
+const emit = defineEmits<{
+	ok: []
+}>()
 
 const show = ref(false)
 const selectedList = ref<Array<any>>([])
@@ -40,11 +44,17 @@ const createdFolderSuccess = (res: any) => {
 	breadcrumbList.push({ title: res.keyword, fid: res.id })
 }
 
-const emit = defineEmits(['ok'])
-
 //保存
-const save = () => {
-	emit('ok', breadcrumbLastId.value, selectedList.value)
+const save = async () => {
+	const res = await api.issueBank.moveQuestionBank({ fid: breadcrumbLastId.value, ids: selectedList.value })
+	if (res.status === 200) {
+		fileList.length = 0
+		getFileList()
+		emit('ok')
+	}
+	if (res.status === 400) {
+		res.data.error && Message.error(res.data.error)
+	}
 	show.value = false
 }
 </script>

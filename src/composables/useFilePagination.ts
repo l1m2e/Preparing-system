@@ -72,6 +72,7 @@ export const useFilePagination = () => {
 	onUnmounted(() => {
 		resetFlieState()
 	})
+
 	return {
 		/** 分页配置 */
 		pagination,

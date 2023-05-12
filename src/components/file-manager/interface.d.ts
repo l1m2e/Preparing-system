@@ -1,22 +1,25 @@
 export type Props = {
+	/** 被选中的列表 */
 	modelValue: Array<number>
+	/** 文件列表 */
 	fileList: Array<File>
 }
 
-export interface Emit {
-	(e: 'open', item: File): void
-	(e: 'update:modelValue', item: Array<number>): void
-	(e: 'resetFolderName', id: number): void
-	(e: 'move', data: number | Array<number>): void
-	(e: 'delete', data: number | Array<number>): void
-	(e: 'created', item: File): void
-
-	// 'update:modelValue': [val: Array<number>]
-	// open: [val: File]
-	// resetFolderName: [id: number]
-	// move: [val: number | Array<number>]
-	// delete: [val: number | Array<number>]
-	// created: [item: File]
+export type Emit = {
+	/** 更新 model value */
+	'update:modelValue': [val: Array<number>]
+	/** 打开 */
+	open: [val: File]
+	/** 重命名文件事件 */
+	resetFolderName: [id: number]
+	/** 移动文件事件 */
+	move: [val: number | Array<number>]
+	/** 删除文件事件 */
+	delete: [val: number | Array<number>]
+	/** 创建事件 */
+	created: [file: File]
+	/** 滚动到底部 */
+	scrollTobottom: []
 }
 
 export interface File {

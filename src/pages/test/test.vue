@@ -19,14 +19,22 @@ const formatFileList = computed(() =>
 	})
 )
 
+//题目icon样式
+const fileIconTextList = [
+	{ text: '文件夹', icon: 'i-ri-check-line', color: 'cyan' },
+	{ text: '单选题', icon: 'i-ri-check-line', color: 'cyan' },
+	{ text: '填空题', icon: 'i-ri-quill-pen-line', color: 'blue' },
+	{ text: '简答题', icon: 'i-ri-draft-line', color: 'arcoblue' },
+	{ text: '判断题', icon: 'i-ri-question-mark', color: 'purple' },
+	{ text: '多选题', icon: 'i-ri-check-double-line', color: 'green' }
+]
+
 //重命名文件夹
-const inputModelshow = ref(false)
-const inputModelTitle = ref('')
+const resetFolderNameShow = ref(false)
 let folderId = 0
 
 const resetFolderNameButton = (id: number) => {
-	inputModelTitle.value = '重命名文件夹'
-	inputModelshow.value = true
+	resetFolderNameShow.value = true
 	folderId = id
 }
 
@@ -40,16 +48,11 @@ const restFolderName = async (name: string) => {
 	if (folder) {
 		folder.keyword = name
 		Message.success('重命名文件夹成功')
-		inputModelshow.value = false
+		resetFolderNameShow.value = false
 	}
 }
 
-// 新建文件夹
-const createdFolder = () => {
-	inputModelTitle.value = '新建文件夹'
-	inputModelshow.value = true
-}
-//移动文件
+// 移动文件
 const moveFileModalRef = ref()
 
 const move = (data: number | Array<number>) => {
@@ -95,14 +98,14 @@ const batchDelete = async (request: (data: Array<number>) => Promise<AxiosRespon
 	}
 }
 
-//刷新
+// 刷新
 const updateFileList = () => {
 	paginationReset()
 	fileList.length = 0
 	getFileList()
 }
 
-//打开文件
+// 打开文件
 const topicModalRef = ref()
 
 const open = (data: File) => {
@@ -123,8 +126,28 @@ const open = (data: File) => {
 	}
 }
 
-//被选中的列表
+// 被选中的列表
 const selectFile = ref<Array<number>>([])
+
+// 新建文件夹
+const createdFolderShow = ref(false)
+
+const createdFolderOk = async (name: string) => {
+	if (name === '') return Message.error('文件夹昵称不能为空')
+
+	const res = await api.issueBank.addKeyword({ keyword: name, fid: breadcrumbLastId.value })
+
+	if (res.status !== 200) return Message.error('添加文件夹失败')
+
+	createdFolderShow.value = false
+	Message.success('添加文件夹成功')
+	fileList.unshift(res.data)
+}
+
+// 新建题目
+const openTopicModal = (type: '单选题' | '多选题' | '判断题' | '简答题' | '填空题' | string) => {
+	topicModalRef.value.toggleModal(type, { fid: breadcrumbLastId.value })
+}
 </script>
 
 <template>
@@ -132,13 +155,13 @@ const selectFile = ref<Array<number>>([])
 		<a-dropdown trigger="hover">
 			<div class="btn p-y-10px rounded-xl bg-blue-5 hover:bg-blue-4">新建</div>
 			<template #content>
-				<a-doption @click="createdFolder">
+				<a-doption @click="createdFolderShow = true">
 					<template #icon><IconFolderAdd /></template>
 					<div class="center pr-10px">
 						<span>新建文件夹</span>
 					</div>
 				</a-doption>
-				<!-- <a-doption @click="openTopicModal('单选题')">
+				<a-doption @click="openTopicModal('单选题')">
 					<div class="center pr-10px">
 						<div class="i-ri-check-line mr-10px"></div>
 						<span>单 选 题</span>
@@ -167,7 +190,7 @@ const selectFile = ref<Array<number>>([])
 						<div class="i-ri-draft-line mr-10px"></div>
 						<span>简 答 题</span>
 					</div>
-				</a-doption> -->
+				</a-doption>
 			</template>
 		</a-dropdown>
 		<a-breadcrumb separator=">" :max-count="4" class="ml-10px">
@@ -181,10 +204,17 @@ const selectFile = ref<Array<number>>([])
 					@open="open"
 					@delete="deleteFile"
 					@move="move"
-					@reset-folder-name="resetFolderNameButton"></FileManger>
+					@reset-folder-name="resetFolderNameButton">
+					<!-- 图标样式 -->
+					<template #fileIcon="{ type }">
+						<div :class="`w-20px h-20px absolute left-[calc(50%-10px)] top-40% text-white ${fileIconTextList[type].icon}`"></div>
+						<div :class="`absolute left-30% top-65% text-white `">{{ fileIconTextList[type].text }}</div>
+					</template>
+				</FileManger>
 			</div>
 		</a-card>
-		<InputModel :title="inputModelTitle" v-model="inputModelshow" @ok="restFolderName"></InputModel>
+		<InputModel title="重命名文件夹" v-model="resetFolderNameShow" @ok="restFolderName"></InputModel>
+		<InputModel title="新建文件夹" v-model="createdFolderShow" @ok="createdFolderOk"></InputModel>
 		<MoveFileModal ref="moveFileModalRef" @ok="updateFileList"></MoveFileModal>
 		<TopicModal @change="updateFileList" ref="topicModalRef"></TopicModal>
 	</div>
