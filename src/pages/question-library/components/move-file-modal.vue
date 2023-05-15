@@ -76,7 +76,7 @@ const save = async () => {
 				</a-breadcrumb-item>
 			</a-breadcrumb>
 		</header>
-		<main class="w-100% h-500px overflow-y-auto scroll-bar overflow-x-hidden" v-on-reach-bottom="pullLoad">
+		<main class="w-100% h-500px overflow-y-auto scroll-bar overflow-x-hidden" v-on-reach-bottom="{ cb: pullLoad }">
 			<a-row
 				v-for="item in fileListUi"
 				@click="clickFile(item)"

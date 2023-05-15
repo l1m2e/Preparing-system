@@ -37,15 +37,15 @@ const fileListUi = computed(() =>
 </script>
 
 <template>
-	<div class="w-100% h-100% select-none" ref="fileContentRef">
-		<a-checkbox-group v-model="checkedIdList">
-			<transition-group name="list">
+	<a-dropdown trigger="contextMenu" alignPoint class="block">
+		<div class="w-100% min-h-99% select-none relative flex flex-col justify-between" ref="fileContentRef">
+			<a-checkbox-group v-model="checkedIdList">
 				<div
 					v-for="item in fileListUi"
 					:key="item.id"
 					:class="`${item.checked ? 'checkbox-card-checked' : 'checkbox-card'}`"
 					:data-file-id="item.id"
-					@click="$emit('open', item)"
+					@dblclick="$emit('open', item)"
 					ref="gridItemsRef">
 					<a-checkbox :value="item.id" class="absolute top-6px left-1px" @click.stop="">
 						<template #checkbox="row">
@@ -84,33 +84,49 @@ const fileListUi = computed(() =>
 						</template>
 					</a-dropdown>
 				</div>
-			</transition-group>
-		</a-checkbox-group>
-		<footer class="flex w-100% h-100px absolute bottom-0 left-0 right-0 center overflow-hidden" @mousedown.stop="">
-			<Transition enter-active-class="animated-fade-in-up" leave-active-class="animated-fade-out-down" class="animated animated-faster">
-				<div
-					class="py-10px px-20px border border-1px border-[var(--color-border-1)] shadow-lg rounded-xl center overflow-hidden"
-					v-if="checkedIdList.length !== 0">
-					<a-tooltip content="删除" position="top" mini>
-						<div class="action-bar" @click="$emit('delete', checkedIdList)"><div class="i-ri-delete-bin-6-line"></div></div>
-					</a-tooltip>
-					<a-tooltip content="移动" position="top" mini @click="$emit('move', checkedIdList)">
-						<div class="action-bar"><div class="i-ri-share-forward-line"></div></div>
-					</a-tooltip>
-					<a-tooltip content="取消选中" position="top" mini>
-						<div class="action-bar"><div class="i-ri-close-circle-line" @click="checkedIdList.length = 0"></div></div>
-					</a-tooltip>
+			</a-checkbox-group>
+
+			<div class="flex w-100% h-100px sticky bottom-0 left-0 right-0 center overflow-hidden" @mousedown.stop="">
+				<Transition enter-active-class="animated-fade-in-up" leave-active-class="animated-fade-out-down" class="animated animated-faster">
+					<div
+						class="py-10px px-20px border border-1px border-[var(--color-border-1)] bg-[var(--color-bg-1)] shadow-lg rounded-xl center overflow-hidden"
+						v-if="checkedIdList.length !== 0">
+						<a-tooltip content="删除" position="top" mini>
+							<div class="action-bar" @click="$emit('delete', checkedIdList)"><div class="i-ri-delete-bin-6-line"></div></div>
+						</a-tooltip>
+						<a-tooltip content="移动" position="top" mini @click="$emit('move', checkedIdList)">
+							<div class="action-bar"><div class="i-ri-share-forward-line"></div></div>
+						</a-tooltip>
+						<a-tooltip content="取消选中" position="top" mini>
+							<div class="action-bar"><div class="i-ri-close-circle-line" @click="checkedIdList.length = 0"></div></div>
+						</a-tooltip>
+					</div>
+				</Transition>
+			</div>
+		</div>
+		<!-- 右键菜单 -->
+		<template #content>
+			<a-doption @click="emit('created')">
+				<div class="center">
+					<div class="i-ri-folder-open-line mr-5px"></div>
+					<span>新建文件夹</span>
 				</div>
-			</Transition>
-		</footer>
-	</div>
+			</a-doption>
+			<a-doption @click="emit('refresh')">
+				<div class="center">
+					<div class="i-ri-restart-line mr-5px"></div>
+					<span>刷新</span>
+				</div>
+			</a-doption>
+		</template>
+	</a-dropdown>
 </template>
 
 <style scoped lang="scss">
 %card{
 	--uno: w-150px h-180px cursor-pointer flex flex-col relative rounded-xl mt-20px items-center select-none;
 }
-
+// prettier-ignore
 :deep(.arco-checkbox-group) {
 	--uno: grid gap-10px grid-cols-[repeat(auto-fit,minmax(150px,max-content))];
 }
@@ -118,24 +134,7 @@ const fileListUi = computed(() =>
 	--uno: absolute hidden;
 }
 
- /* 对移动中的元素应用的过渡 */
-.list-move,
-.list-enter-active,
-.list-leave-active {
-  transition: all 0.3s ease;
-}
-
-.list-enter-from,
-.list-leave-to {
-  opacity: 0;
-}
-
-/* 确保将离开的元素从布局流中删除
-  以便能够正确地计算移动的动画。 */
-// .list-leave-active {
-//   position: absolute;
-// }
-
+// prettier-ignore
 .checkbox-card {
 	@extend %card;
 	&:hover {
@@ -146,6 +145,8 @@ const fileListUi = computed(() =>
 		}
 	}
 }
+
+// prettier-ignore
 .checkbox-card-checked {
 	@extend %card;
 	--uno: bg-[var(--color-primary-light-1)];
@@ -159,10 +160,8 @@ const fileListUi = computed(() =>
 .operation {
 	--uno: opacity-0;
 }
+// prettier-ignore
 .action-bar {
-	--uno: w-30px h-30px cursor-pointer text-15px center rounded-5px color-[var(--color-text-2)] hover:bg-[var(--color-fill-1)];
-	&:last-child {
-		--uno: mr-0;
-	}
+	--uno: w-30px h-30px cursor-pointer text-15px center rounded-5px color-[var(--color-text-2)] hover:bg-[var(--color-fill-1)] last:mr-0;
 }
 </style>

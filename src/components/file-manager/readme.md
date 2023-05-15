@@ -4,7 +4,6 @@
 | -------- | --------------- | ------------ |
 | fileList | `Array<File>`   | 文件列表     |
 | v-model  | `Array<number>` | 被选中的列表 |
-|          |                 |              |
 
 
 
@@ -16,4 +15,6 @@
 | move            | `id: number | idList: Array<number>` | 移动文件 ( 返回一个id为移动一个文件 返回id数组时群体移动文件 ) |
 | delete          | `id:number | idList: Array<number>`  | 删除文件（ 返回一个id为删除一个文件 返回 id数组为群体删除文件 ） |
 | open            | `File`                               | 打开文件夹或者文件                                           |
+| created         | null                                 | 右键菜单 新建文件夹                                          |
+| refresh         | null                                 | 右键菜单 刷新                                                |
 

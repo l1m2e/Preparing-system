@@ -17,9 +17,11 @@ export type Emit = {
 	/** 删除文件事件 */
 	delete: [val: number | Array<number>]
 	/** 创建事件 */
-	created: [file: File]
+	created: []
 	/** 滚动到底部 */
 	scrollTobottom: []
+	/** 刷新 */
+	refresh: []
 }
 
 export interface File {

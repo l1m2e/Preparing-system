@@ -2,44 +2,26 @@ import type { Directive, DirectiveBinding } from 'vue'
 
 export const onReachBottom: Directive = {
 	mounted(el: HTMLElement, binding: DirectiveBinding) {
-		// el.style.overflowY = 'auto' //设置元素y轴滚动
-		// const newDiv = document.createElement('div') // 创建div
-		// newDiv.style.cssText = 'width: 100%; height: 10px;' // 给div设置样式
-		// el.appendChild(newDiv) // 添加到内容区域
-		// useIntersectionObserver(newDiv, ([{ isIntersecting }]) => {
-		// 	const { clientHeight, scrollHeight } = el as HTMLElement
-		// 	if (clientHeight === scrollHeight) return
-		// 	if (isIntersecting) binding.value()
-		// })
-		let throttle = false // 防止多次触发触底事件
-		//添加滚动监听事件
-		el.onscroll = (event) => {
-			const { scrollTop, clientHeight, scrollHeight } = event.target as HTMLElement
-			const isReachBottom = Math.ceil(scrollTop + clientHeight) === Math.ceil(scrollHeight)
-			console.log(scrollTop + clientHeight, scrollHeight)
-			if (!isReachBottom) throttle = false
-			if (isReachBottom) {
-				if (throttle) return
-				if (clientHeight === scrollHeight) return
-				binding.value()
-				throttle = true
-			}
+		const { cb, className } = binding.value
+		el.style.overflowY = 'auto' //设置元素y轴滚动
+		const newDiv = document.createElement('div') // 创建div
+		newDiv.style.cssText = 'width: 100%; height: 1px;' // 给div设置样式
+
+		if (className) {
+			el.querySelector(`.${className}`)?.appendChild(newDiv) // 添加到指定区域
+		} else {
+			el.appendChild(newDiv) // 添加到子元素
 		}
+
+		useIntersectionObserver(newDiv, ([{ isIntersecting }]) => {
+			const { clientHeight, scrollHeight } = el as HTMLElement
+			if (clientHeight === scrollHeight) return
+
+			try {
+				if (isIntersecting) cb()
+			} catch (error) {
+				console.log('onReachBottom 指令参数传递错误 没有传递回调函数')
+			}
+		})
 	}
 }
-
-// let throttle = false // 防止多次触发触底事件
-//添加滚动监听事件
-// el.onscroll = (event) => {
-// 	const { scrollTop, clientHeight, scrollHeight } = event.target as HTMLElement
-// 	const isReachBottom = Math.ceil(scrollTop + clientHeight) === Math.ceil(scrollHeight)
-// 	console.log(scrollTop + clientHeight, scrollHeight)
-// 	if (!isReachBottom) throttle = false
-
-// 	if (isReachBottom) {
-// 		if (throttle) return
-// 		if (clientHeight === scrollHeight) return
-// 		binding.value()
-// 		throttle = true
-// 	}
-// }

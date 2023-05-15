@@ -5,7 +5,7 @@ import { isArray } from 'lodash-es'
 import { richTextFilterText } from '~/utils'
 import MoveFileModal from './components/move-file-modal.vue'
 
-const { fileList, breadcrumbList, clickBreadcrumb, getFileList, paginationReset, breadcrumbLastId } = useFilePagination()
+const { pagination, fileList, breadcrumbList, breadcrumbLastId, clickBreadcrumb, getFileList, paginationReset } = useFilePagination()
 
 // 打开组件获取文件列表
 getFileList()
@@ -67,6 +67,7 @@ const deleteFile = async (data: number | Array<number>) => {
 		fileList.splice(index, 1)
 		Message.success('删除成功')
 	}
+	selectFile.value.length = 0
 }
 
 const batchDelete = async (request: (data: Array<number>) => Promise<AxiosResponse<any, any>>, list: Array<number>, msg: string) => {
@@ -122,6 +123,7 @@ const updateFileList = () => {
 const topicModalRef = ref()
 
 const open = (data: File) => {
+	selectFile.value.length = 0
 	if (data.type === 0) {
 		//打开文件夹
 		paginationReset()
@@ -142,74 +144,61 @@ const open = (data: File) => {
 // 滑动到底部加载
 const scrollTobottomLoad = () => {
 	Message.success('滑动到底部了')
+	if (pagination.current < pagination.pages) {
+		pagination.current++
+	}
 }
 
 //题目icon样式
 const fileIconTextList = [
-	{ text: '文件夹', icon: 'i-ri-check-line', color: 'cyan' },
+	{ text: '文件夹', icon: '', color: 'cyan' },
 	{ text: '单选题', icon: 'i-ri-check-line', color: 'cyan' },
 	{ text: '填空题', icon: 'i-ri-quill-pen-line', color: 'blue' },
 	{ text: '简答题', icon: 'i-ri-draft-line', color: 'arcoblue' },
 	{ text: '判断题', icon: 'i-ri-question-mark', color: 'purple' },
 	{ text: '多选题', icon: 'i-ri-check-double-line', color: 'green' }
 ]
+
+// 新建按钮
+const createdBtnMenu = [
+	{ name: '新建文件夹', icon: 'i-ri-folder-open-line', click: () => (createdFolderShow.value = true) },
+	{ name: '单选题', icon: 'i-ri-check-line ', click: () => openTopicModal('单选题') },
+	{ name: '多选题', icon: 'i-ri-check-double-line ', click: () => openTopicModal('多选题') },
+	{ name: '判断题', icon: 'i-ri-question-mark', click: () => openTopicModal('判断题') },
+	{ name: '填空题', icon: 'i-ri-quill-pen-line', click: () => openTopicModal('填空题') },
+	{ name: '简答题', icon: 'i-ri-draft-line', click: () => openTopicModal('简答题') }
+]
 </script>
 
 <template>
 	<div class="p-10px box-border rounded mt-10px bg-[var(--color-bg-2)] select-none">
-		<a-dropdown trigger="hover">
-			<div class="btn p-y-10px rounded-xl bg-blue-5 hover:bg-blue-4">新建</div>
-			<template #content>
-				<a-doption @click="createdFolderShow = true">
-					<template #icon><IconFolderAdd /></template>
-					<div class="center pr-10px">
-						<span>新建文件夹</span>
-					</div>
-				</a-doption>
-				<a-doption @click="openTopicModal('单选题')">
-					<div class="center pr-10px">
-						<div class="i-ri-check-line mr-10px"></div>
-						<span>单 选 题</span>
-					</div>
-				</a-doption>
-				<a-doption @click="openTopicModal('多选题')">
-					<div class="center pr-10px">
-						<div class="i-ri-check-double-line mr-10px"></div>
-						<span>多 选 题</span>
-					</div>
-				</a-doption>
-				<a-doption @click="openTopicModal('判断题')">
-					<div class="center pr-10px">
-						<div class="i-ri-question-mark mr-10px"></div>
-						<span>判 断 题</span>
-					</div>
-				</a-doption>
-				<a-doption @click="openTopicModal('填空题')">
-					<div class="center pr-10px">
-						<div class="i-ri-quill-pen-line mr-10px"></div>
-						<span>填 空 题</span>
-					</div>
-				</a-doption>
-				<a-doption @click="openTopicModal('简答题')">
-					<div class="center pr-10px">
-						<div class="i-ri-draft-line mr-10px"></div>
-						<span>简 答 题</span>
-					</div>
-				</a-doption>
-			</template>
-		</a-dropdown>
-		<a-breadcrumb separator=">" :max-count="4" class="ml-10px">
-			<a-breadcrumb-item v-for="item in breadcrumbList" @click="clickBreadcrumb(item.fid)">{{ item.title }}</a-breadcrumb-item>
-		</a-breadcrumb>
+		<div class="mb-10px">
+			<a-dropdown trigger="hover">
+				<div class="btn p-y-10px rounded-xl bg-blue-5 hover:bg-blue-4">新建</div>
+				<template #content>
+					<a-doption v-for="item in createdBtnMenu" @click="item.click">
+						<div class="center">
+							<div class="mr-10px" :class="item.icon"></div>
+							<span>{{ item.name }}</span>
+						</div>
+					</a-doption>
+				</template>
+			</a-dropdown>
+			<a-breadcrumb separator=">" :max-count="4" class="ml-10px">
+				<a-breadcrumb-item v-for="item in breadcrumbList" @click="clickBreadcrumb(item.fid)">{{ item.title }}</a-breadcrumb-item>
+			</a-breadcrumb>
+		</div>
 
-		<div class="h-80vh box-border overflow-y-auto scroll-bar" v-on-reach-bottom="scrollTobottomLoad">
+		<div class="h-80vh box-border overflow-y-auto scroll-bar" v-on-reach-bottom="{ cb: scrollTobottomLoad }">
 			<FileManger
 				v-model="selectFile"
 				:file-list="formatFileList"
 				@open="open"
 				@delete="deleteFile"
 				@move="move"
-				@reset-folder-name="resetFolderNameButton">
+				@created="createdFolderShow = true"
+				@reset-folder-name="resetFolderNameButton"
+				@refresh="updateFileList">
 				<!-- 图标样式 -->
 				<template #fileIcon="{ type }">
 					<div :class="`w-20px h-20px absolute left-[calc(50%-10px)] top-40% text-white ${fileIconTextList[type].icon}`"></div>
@@ -224,8 +213,3 @@ const fileIconTextList = [
 		<TopicModal @change="updateFileList" ref="topicModalRef"></TopicModal>
 	</div>
 </template>
-<style>
-a {
-	height: calc();
-}
-</style>

@@ -11,11 +11,11 @@ export const useFilePagination = () => {
 	const pagination = reactive({
 		current: 1,
 		pages: 1,
-		size: 20
+		size: 50
 	})
 
 	// 分页重置
-	const paginationReset = () => setReactive(pagination, { current: 1, pages: 1, size: 40 })
+	const paginationReset = () => setReactive(pagination, { current: 1, pages: 1, size: 50 })
 
 	/** 文件列表 */
 	const fileList = reactive<Array<QuestionVo>>([])
