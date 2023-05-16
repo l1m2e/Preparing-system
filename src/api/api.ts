@@ -219,6 +219,65 @@ export interface ExaminationLogVo {
 	totalScores: number
 }
 
+/** 修改课件模型 */
+export interface CoursewarePutParam {
+	/**
+	 * 课件id
+	 * @format int64
+	 */
+	id: number
+	/** 课件名/文件夹名 */
+	coursewareName?: string
+	/**
+	 * 分享类型 0不分享 1科目分享 2全局分享，默认0
+	 * @format int32
+	 */
+	shareType?: number
+}
+
+/** 课件返回类 */
+export interface CoursewareVo {
+	/** @format int64 */
+	id: number
+	/** @format int64 */
+	fid: number
+	/** 课件名 */
+	coursewareName: string
+	/** 课程名 */
+	courseName: string
+	/**
+	 * 文件id
+	 * @format int64
+	 */
+	srcId?: number
+	/** 是否文件夹 */
+	folderFlag?: boolean
+	/**
+	 * 分享类型 0不分享 1科目分享 2全局分享
+	 * @format int32
+	 */
+	shareType?: number
+	/**
+	 * 更新时间戳
+	 * @format int64
+	 */
+	updateTimestamp: number
+}
+
+/** 批量分享课件模型 */
+export interface CoursewareShareParam {
+	/**
+	 * 课件id
+	 * @uniqueItems true
+	 */
+	ids: number[]
+	/**
+	 * 分享类型 0不分享 1科目分享 2全局分享，默认0
+	 * @format int32
+	 */
+	shareType: number
+}
+
 /** 课件移动参数类 */
 export interface CoursewareMoveParam {
 	/**
@@ -233,6 +292,29 @@ export interface CoursewareMoveParam {
 	fid: number
 	/** 科目名(导入分享课件专用) */
 	courseName?: string
+}
+
+/** 添加课件模型 */
+export interface CoursewareParam {
+	/** 课件名 */
+	coursewareName: string
+	/**
+	 * 父id 0为顶层
+	 * @format int64
+	 */
+	fid?: number
+	/**
+	 * 分享类型 0不分享 1科目分享 2全局分享，默认0
+	 * @format int32
+	 */
+	shareType?: number
+	/** 课程名 */
+	courseName: string
+	/**
+	 * 文件id
+	 * @format int64
+	 */
+	srcId?: number
 }
 
 /** 注册老师端 */
@@ -428,28 +510,6 @@ export interface CoursewareBind {
 	cidList: number[]
 }
 
-/** 添加课件模型 */
-export interface CoursewareParam {
-	/** 课件名 */
-	coursewareName: string
-	/** 父id 0为顶层 */
-	fid?: string
-	/**
-	 * 分享类型 0不分享 1科目分享 2全局分享，默认0
-	 * @format int32
-	 */
-	shareType?: number
-	/** 是否文件夹，默认否 */
-	folderFlag?: boolean
-	/** 课程名 */
-	courseName: string
-	/**
-	 * 文件id
-	 * @format int64
-	 */
-	srcId?: number
-}
-
 export interface LinkedMap {
 	empty?: boolean
 	[key: string]: any
@@ -634,35 +694,6 @@ export interface Preparing {
 	teacherName: string
 	classDevicePosition?: string
 }
-
-/** 课件返回类 */
-export type CoursewareVo = {
-	/** @format int64 */
-	id: number
-	/** @format int64 */
-	fid: number
-	/** 课件名 */
-	coursewareName: string
-	/** 课程名 */
-	courseName: string
-	/**
-	 * 文件id
-	 * @format int64
-	 */
-	srcId?: number
-	/** 是否文件夹 */
-	folderFlag?: boolean
-	/**
-	 * 分享类型 0不分享 1科目分享 2全局分享
-	 * @format int32
-	 */
-	shareType?: number
-	/**
-	 * 更新时间戳
-	 * @format int64
-	 */
-	updateTimestamp: number
-} | null
 
 /** 测验信息 */
 export type ExaminationVo = {
@@ -2348,6 +2379,40 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 		 * No description
 		 *
 		 * @tags 83-课件模块
+		 * @name UpdateCourseware
+		 * @summary 12-修改课件
+		 * @request PUT:/teacherWeb/courseware/update
+		 */
+		updateCourseware: (data: CoursewarePutParam, params: RequestParams = {}) =>
+			this.request<CoursewareVo, any>({
+				path: `/teacherWeb/courseware/update`,
+				method: 'PUT',
+				body: data,
+				type: ContentType.Json,
+				...params
+			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags 83-课件模块
+		 * @name ShareBatch
+		 * @summary 13-批量分享
+		 * @request PUT:/teacherWeb/courseware/shareBatch
+		 */
+		shareBatch: (data: CoursewareShareParam, params: RequestParams = {}) =>
+			this.request<Message, any>({
+				path: `/teacherWeb/courseware/shareBatch`,
+				method: 'PUT',
+				body: data,
+				type: ContentType.Json,
+				...params
+			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags 83-课件模块
 		 * @name MoveCourseware
 		 * @summary 9-移动文件
 		 * @request PUT:/teacherWeb/courseware/moveCourseware
@@ -2382,11 +2447,28 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 		 * No description
 		 *
 		 * @tags 83-课件模块
-		 * @name UploadExamination
+		 * @name AddFileH
+		 * @summary 14-添加文件夹
+		 * @request PUT:/teacherWeb/courseware/addFolder
+		 */
+		addFileH: (data: CoursewareParam, params: RequestParams = {}) =>
+			this.request<CoursewareVo, any>({
+				path: `/teacherWeb/courseware/addFolder`,
+				method: 'PUT',
+				body: data,
+				type: ContentType.Json,
+				...params
+			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags 83-课件模块
+		 * @name UploadCourseware
 		 * @summary 11-上传课件
 		 * @request POST:/teacherWeb/courseware/upload
 		 */
-		uploadExamination: (
+		uploadCourseware: (
 			query: {
 				/** 科目 */
 				courseName: string
@@ -2432,11 +2514,11 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 		 * No description
 		 *
 		 * @tags 83-课件模块
-		 * @name AddExamination1
+		 * @name AddCourseware
 		 * @summary 1-添加课件
 		 * @request POST:/teacherWeb/courseware/add
 		 */
-		addExamination1: (data: CoursewareParam, params: RequestParams = {}) =>
+		addCourseware: (data: CoursewareParam, params: RequestParams = {}) =>
 			this.request<Message, any>({
 				path: `/teacherWeb/courseware/add`,
 				method: 'POST',
@@ -2495,7 +2577,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 		 * @request GET:/teacherWeb/courseware/list
 		 */
 		queryCourseware: (
-			query: {
+			query?: {
 				/**
 				 * 第几页
 				 * @format int64
@@ -2517,15 +2599,15 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 				 */
 				id?: number
 				/** 课件名 模糊搜索 */
-				coursewareName: string
+				coursewareName?: string
 				/** 科目名 */
 				courseName?: string
 				/**
-				 * 类型 0不共享 1科目共享 2全部共享
+				 * 类型 0我的 1科目共享和全部共享 2全部共享
 				 * @format int32
 				 * @default 0
 				 */
-				shareType?: number
+				type?: number
 			},
 			params: RequestParams = {}
 		) =>

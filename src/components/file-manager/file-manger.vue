@@ -10,6 +10,7 @@ const emit = defineEmits<Emit>()
 
 onMounted(() => {
 	useRegion(fileContentRef.value, 'data-file-id', (data) => {
+		if (props.disabled) return
 		checkedIdList.value = data
 		emit('update:modelValue', data)
 	})
@@ -50,6 +51,7 @@ const fileListUi = computed(() =>
 					<a-checkbox :value="item.id" class="absolute top-6px left-1px" @click.stop="">
 						<template #checkbox="row">
 							<div
+								v-if="!props.disabled"
 								:class="`w-15px h-15px  rounded-full  border-solid transition ${
 									row.checked ? 'border-5px border-[rgb(var(--primary-6))]' : 'border-1px border-[var(--color-border-3)]'
 								}`"></div>
@@ -66,6 +68,7 @@ const fileListUi = computed(() =>
 					</div>
 					<a-dropdown trigger="click">
 						<div
+							v-if="!props.disabled"
 							@click.stop=""
 							class="absolute right-5px top-5px i-ri-more-line text-[var(--color-border-3)] hover:text-[rgb(var(--primary-6))] text-20px operation"></div>
 						<template #content>

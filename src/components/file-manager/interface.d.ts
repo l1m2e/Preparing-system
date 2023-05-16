@@ -3,6 +3,8 @@ export type Props = {
 	modelValue: Array<number>
 	/** 文件列表 */
 	fileList: Array<File>
+	//** 禁用操作 */
+	disabled?: boolean
 }
 
 export type Emit = {
@@ -35,4 +37,6 @@ export interface File {
 	createdTimestamp: number
 	/** 类型 */
 	type: number
+	/** 0 不分享 1 科目分享 2 文件分享 */
+	shareType?: number
 }
