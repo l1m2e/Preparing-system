@@ -2685,11 +2685,11 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 		 * No description
 		 *
 		 * @tags 83-课件模块
-		 * @name DelExamination1
+		 * @name DelCourseware
 		 * @summary 2-删除课件
 		 * @request DELETE:/teacherWeb/courseware/del
 		 */
-		delExamination1: (data: Array, params: RequestParams = {}) =>
+		delCourseware: (data: Array, params: RequestParams = {}) =>
 			this.request<Message, any>({
 				path: `/teacherWeb/courseware/del`,
 				method: 'DELETE',

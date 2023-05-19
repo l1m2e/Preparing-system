@@ -27,7 +27,7 @@ const ok = () => {
 		:esc-to-close="false"
 		:footer="false"
 		@before-close="name = ''">
-		<a-input v-model="name"></a-input>
+		<a-input v-model="name" :placeholder="props.placeholder"></a-input>
 		<div class="center justify-end mt-30px">
 			<div>
 				<a-button class="mr-10px" @click="cancel">取消</a-button>

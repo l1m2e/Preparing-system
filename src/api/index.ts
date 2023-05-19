@@ -42,7 +42,7 @@ const omitApi = omit(api, 'instance', 'setSecurityData', 'request')
 
 //配置映射关系 后端如果更新了新模块 需要在下面定义一下才能使用
 const formatApi = {
-	/** 文件模块 */
+	/** 登录模块 */
 	login: omitApi['v80登录模块'],
 	/** 问题库模块 */
 	issueBank: omitApi['v82问题题库模块'],
