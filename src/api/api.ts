@@ -41,11 +41,6 @@ export interface QuestionBankParam {
 	/** 题目 */
 	title: string
 	/**
-	 * 附件id数组
-	 * @uniqueItems true
-	 */
-	srcId?: number[]
-	/**
 	 * 选项数组
 	 * @uniqueItems true
 	 * @example [{"unique":"A","text":"选项"}]
@@ -88,11 +83,6 @@ export interface QuestionVo {
 	title: string
 	/** 发布者名字 */
 	teacherName: string
-	/**
-	 * 附件id
-	 * @uniqueItems true
-	 */
-	srcId?: number[]
 	/**
 	 * 选项
 	 * @uniqueItems true
@@ -222,7 +212,7 @@ export interface ExaminationLogVo {
 /** 修改课件模型 */
 export interface CoursewarePutParam {
 	/**
-	 * 课件id
+	 * id
 	 * @format int64
 	 */
 	id: number
@@ -235,8 +225,7 @@ export interface CoursewarePutParam {
 	shareType?: number
 }
 
-/** 课件返回类 */
-export interface CoursewareVo {
+export interface Type课件返回类 {
 	/** @format int64 */
 	id: number
 	/** @format int64 */
@@ -245,11 +234,8 @@ export interface CoursewareVo {
 	coursewareName: string
 	/** 课程名 */
 	courseName: string
-	/**
-	 * 文件id
-	 * @format int64
-	 */
-	srcId?: number
+	/** 文件id */
+	srcId?: string
 	/** 是否文件夹 */
 	folderFlag?: boolean
 	/**
@@ -310,11 +296,8 @@ export interface CoursewareParam {
 	shareType?: number
 	/** 课程名 */
 	courseName: string
-	/**
-	 * 文件id
-	 * @format int64
-	 */
-	srcId?: number
+	/** 文件id */
+	srcId?: string
 }
 
 /** 注册老师端 */
@@ -485,11 +468,8 @@ export interface FileSrcListVo {
 
 /** 文件返回类 */
 export interface FileSrcVo {
-	/**
-	 * 文件id
-	 * @format int64
-	 */
-	id: number
+	/** 文件id */
+	id: string
 	/** 文件名 */
 	name: string
 	/** 文件url */
@@ -753,7 +733,7 @@ export interface PreparingVo {
 	 * 课件信息数组
 	 * @uniqueItems true
 	 */
-	coursewareVos?: CoursewareVo[] | null
+	coursewareVos?: Type课件返回类[] | null
 	/** 班级名称 */
 	className: string
 	/** 老师工号 */
@@ -950,11 +930,6 @@ export interface QuestionExaVo {
 	/** 题目 */
 	title: string
 	/**
-	 * 附件id
-	 * @uniqueItems true
-	 */
-	srcId?: number[]
-	/**
 	 * 选项
 	 * @uniqueItems true
 	 */
@@ -1028,9 +1003,9 @@ export interface ExaminationLogInfoVo {
 }
 
 /** 分页对象 */
-export interface MyPageCoursewareVo {
+export interface MyPage课件返回类 {
 	/** 数据 */
-	records: CoursewareVo[]
+	records: Type课件返回类[]
 	/**
 	 * 总数
 	 * @format int64
@@ -2380,11 +2355,11 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 		 *
 		 * @tags 83-课件模块
 		 * @name UpdateCourseware
-		 * @summary 12-修改课件
+		 * @summary 12-修改课件和文件夹名
 		 * @request PUT:/teacherWeb/courseware/update
 		 */
 		updateCourseware: (data: CoursewarePutParam, params: RequestParams = {}) =>
-			this.request<CoursewareVo, any>({
+			this.request<Type课件返回类, any>({
 				path: `/teacherWeb/courseware/update`,
 				method: 'PUT',
 				body: data,
@@ -2452,7 +2427,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 		 * @request PUT:/teacherWeb/courseware/addFolder
 		 */
 		addFileH: (data: CoursewareParam, params: RequestParams = {}) =>
-			this.request<CoursewareVo, any>({
+			this.request<Type课件返回类, any>({
 				path: `/teacherWeb/courseware/addFolder`,
 				method: 'PUT',
 				body: data,
@@ -2561,7 +2536,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 			},
 			params: RequestParams = {}
 		) =>
-			this.request<MyPageCoursewareVo, any>({
+			this.request<MyPage课件返回类, any>({
 				path: `/teacherWeb/courseware/queryCoursewareByPid`,
 				method: 'GET',
 				query: query,
@@ -2611,7 +2586,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 			},
 			params: RequestParams = {}
 		) =>
-			this.request<MyPageCoursewareVo, any>({
+			this.request<MyPage课件返回类, any>({
 				path: `/teacherWeb/courseware/list`,
 				method: 'GET',
 				query: query,

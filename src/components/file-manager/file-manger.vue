@@ -60,7 +60,7 @@ const fileListUi = computed(() =>
 					<img :src="folderSvg" v-if="item.type === 0" class="w-120px h-120px mt-10px" />
 					<div v-else class="relative">
 						<img :src="fileSvg" class="w-100px h-100px mt-20px mb-10px" />
-						<slot name="fileIcon" :type="item.type"></slot>
+						<slot name="fileIcon" :type="item.type" :file="item"></slot>
 					</div>
 					<div class="truncate max-w-130px">{{ item.type === 0 ? item.fileName : item.fileName }}</div>
 					<div class="text-12px mt-5px text-[var(--color-text-3)]">
