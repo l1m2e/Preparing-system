@@ -5,12 +5,18 @@ import type { File } from '~/components/file-manager/interface'
 import type { Type课件返回类 } from '~/api/api'
 import { baseUrl } from '~/config/baseUrl'
 import MoveFileModal from './components/move-file-modal.vue'
+import ShareSelect from './components/share-select.vue'
 
 const fileList = ref<Array<Type课件返回类>>([]) // 文件列表原始数据
 const fileListFormat = ref<Array<File>>([]) // 文件列表格式化
 const isMe = ref(true) // 是否是共享文件夹
 const selectFile = ref<Array<number>>([]) // 选中的列表
 let courseName = '' // 课程名
+
+watch(isMe, () => {
+	getCourse()
+	breadcrumbList.length = 1
+})
 
 // 面包屑展示文件路径
 const breadcrumbList = reactive([{ title: '我的课件库', id: -1 }])
@@ -27,9 +33,11 @@ const clickBreadcrumb = (id: number) => {
 	update()
 }
 
-// 获取本学期科目列表
+// 获取本学期科目列表 或者分享的科目列表
 const getCourse = async () => {
-	const res = await api.courseTable.getCourseNameBySemester()
+	const query = isMe.value ? api.courseTable.getCourseNameBySemester : api.courseware.getShareCourseName
+
+	const res = await query()
 
 	const formatData = res.data.map((item) => ({ fileName: item, id: 0, fid: -1, createdTimestamp: dayjs().valueOf(), type: 0 }))
 	fileListFormat.value = formatData
@@ -75,10 +83,29 @@ const formatFile = (data: Type课件返回类) => {
 }
 
 // 打开文件夹
-const openFile = (data: File) => {
+const openFile = async (data: File) => {
 	const { fileName, id, fid } = data
 	// 第一层 科目文件夹
 	if (fid === -1) courseName = fileName
+	// TODO 逻辑优化 如果是共享文件夹则根据课程名查询老师
+	// 共享文件夹： 全部文件 课程-> 老师 -> 文件
+	// 我的文件夹： 全部文件 课程-> 文件
+
+	if (!isMe.value && breadcrumbList.length === 1) {
+		breadcrumbList.push({ title: fileName, id })
+		const res = await api.courseware.getJobNameByCourseName({ courseName })
+		if (res.status === 200) {
+			fileListFormat.value = res.data.records.map((item) => ({
+				fileName: item.teachName!,
+				id: 0,
+				fid: -1,
+				createdTimestamp: dayjs().valueOf(),
+				type: 0
+			}))
+		}
+		return
+	}
+
 	if (data.type === 0) {
 		//打开文件夹
 		breadcrumbList.push({ title: fileName, id })
@@ -171,7 +198,18 @@ const singleMove = (id: number | Array<number>) => {
 	moveFileModalRef.value.open()
 }
 
-//题目icon样式
+const shareSelectRef = ref()
+//共享操作
+const shareFile = async (file: File) => {
+	if (file.shareType !== 0) {
+		const res = await api.courseware.shareBatch({ ids: [file.id], shareType: 0 })
+		return res.status === 200 ? (update(), Message.success('取消共享成功')) : Message.error('取消共享失败')
+	}
+
+	shareSelectRef.value.open(file)
+}
+
+//文件icon样式
 const fileIconTextList = [
 	{ text: 'doc', icon: 'i-ri-file-word-2-line' },
 	{ text: 'docx', icon: 'i-ri-file-word-2-line' },
@@ -240,8 +278,10 @@ const fileIconTextList = [
 					@created="createdFolderShow = true"
 					@resetFolderName="openResetFolderName"
 					@move="singleMove"
+					@onShare="shareFile"
 					v-model="selectFile"
 					:file-list="fileListFormat"
+					:share="true"
 					:disabled="isHome">
 					<template #fileIcon="{ file }">
 						<div
@@ -259,5 +299,6 @@ const fileIconTextList = [
 		<InputModel title="重命名文件夹" v-model="resetFolderNameShow" @ok="resetFolderName" placeholder="请输入新建文件夹名称"></InputModel>
 		<a-image-preview :src="imagePreviewSrc" v-model:visible="imagePreview" />
 		<MoveFileModal ref="moveFileModalRef" v-model="selectFile" @ok="update"></MoveFileModal>
+		<ShareSelect ref="shareSelectRef" @ok="update"></ShareSelect>
 	</div>
 </template>

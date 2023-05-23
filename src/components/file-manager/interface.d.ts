@@ -5,6 +5,8 @@ export type Props = {
 	fileList: Array<File>
 	//** 禁用操作 */
 	disabled?: boolean
+	//是否允许操作
+	share?: boolean
 }
 
 export type Emit = {
@@ -24,6 +26,8 @@ export type Emit = {
 	scrollTobottom: []
 	/** 刷新 */
 	refresh: []
+	// 共享操作
+	onShare: [val: File]
 }
 
 export interface File {

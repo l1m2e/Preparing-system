@@ -35,6 +35,11 @@ const fileListUi = computed(() =>
 		return checkedIdList.value.includes(item.id) ? { ...item, checked: true } : { ...item, checked: false }
 	})
 )
+
+const shareColor = {
+	1: 'text-white',
+	2: 'text-cyan'
+}
 </script>
 
 <template>
@@ -57,6 +62,14 @@ const fileListUi = computed(() =>
 								}`"></div>
 						</template>
 					</a-checkbox>
+
+					<a-tooltip :content="item.shareType === 1 ? '已共享至拥有该科目的老师' : '已共享至全校的老师'" position="top" mini>
+						<div
+							v-if="props.share && item.shareType"
+							class="absolute bottom-70px z-1 right-40px i-ri-share-line"
+							:class="`${item.shareType && shareColor[item.shareType]} ${item.type === 0 && 'right-25px!'}`"></div>
+					</a-tooltip>
+
 					<img :src="folderSvg" v-if="item.type === 0" class="w-120px h-120px mt-10px" />
 					<div v-else class="relative">
 						<img :src="fileSvg" class="w-100px h-100px mt-20px mb-10px" />
@@ -84,6 +97,17 @@ const fileListUi = computed(() =>
 								<template #icon><icon-delete /></template>
 								删除
 							</a-doption>
+							<!-- 开启了共享字段才会显示 -->
+							<template v-if="props.share">
+								<a-doption v-if="item.shareType === 0" @click="$emit('onShare', item)">
+									<template #icon><icon-share-alt /></template>
+									共享
+								</a-doption>
+								<a-doption v-else @click="$emit('onShare', item)">
+									<template #icon><icon-undo /></template>
+									取消共享
+								</a-doption>
+							</template>
 						</template>
 					</a-dropdown>
 				</div>
