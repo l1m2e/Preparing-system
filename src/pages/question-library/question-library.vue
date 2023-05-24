@@ -128,7 +128,7 @@ const open = (data: File) => {
 		//打开文件夹
 		paginationReset()
 		fileList.length = 0
-		breadcrumbList.push({ title: data.fileName, fid: data.id })
+		breadcrumbList.push({ title: data.fileName, fid: data.id as number })
 		getFileList()
 		console.log(breadcrumbList)
 	} else {

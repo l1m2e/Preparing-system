@@ -458,24 +458,6 @@ export interface ExaminationParam {
 	passLine: number
 }
 
-/** 文件批量返回类 */
-export interface FileSrcListVo {
-	/** 上传成功的文件数组 */
-	fileSrcVos: FileSrcVo[]
-	/** 上传失败的文件数组 */
-	errorFiles: FileSrcVo[]
-}
-
-/** 文件返回类 */
-export interface FileSrcVo {
-	/** 文件id */
-	id: string
-	/** 文件名 */
-	name: string
-	/** 文件url */
-	url: string
-}
-
 /** 绑定课件类 */
 export interface CoursewareBind {
 	/**
@@ -493,6 +475,24 @@ export interface CoursewareBind {
 export interface LinkedMap {
 	empty?: boolean
 	[key: string]: any
+}
+
+/** 文件批量返回类 */
+export interface FileSrcListVo {
+	/** 上传成功的文件数组 */
+	fileSrcVos: FileSrcVo[]
+	/** 上传失败的文件数组 */
+	errorFiles: FileSrcVo[]
+}
+
+/** 文件返回类 */
+export interface FileSrcVo {
+	/** 文件id */
+	id: string
+	/** 文件名 */
+	name: string
+	/** 文件url */
+	url: string
 }
 
 /** 分页对象 */
@@ -2459,7 +2459,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 			},
 			params: RequestParams = {}
 		) =>
-			this.request<FileSrcListVo, any>({
+			this.request<Type课件返回类[], any>({
 				path: `/teacherWeb/courseware/upload`,
 				method: 'POST',
 				query: query,
@@ -2552,7 +2552,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 		 * @request GET:/teacherWeb/courseware/list
 		 */
 		queryCourseware: (
-			query?: {
+			query: {
 				/**
 				 * 第几页
 				 * @format int64
@@ -2576,7 +2576,9 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 				/** 课件名 模糊搜索 */
 				coursewareName?: string
 				/** 科目名 */
-				courseName?: string
+				courseName: string
+				/** 老师工号 */
+				jobNum: string
 				/**
 				 * 类型 0我的 1科目共享和全部共享 2全部共享
 				 * @format int32

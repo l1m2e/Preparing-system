@@ -4,6 +4,7 @@ import UploadModal from './components/upload-modal.vue'
 import type { File } from '~/components/file-manager/interface'
 import type { Type课件返回类 } from '~/api/api'
 import { baseUrl } from '~/config/baseUrl'
+import { useUserInfo } from '~/composables'
 import MoveFileModal from './components/move-file-modal.vue'
 import ShareSelect from './components/share-select.vue'
 
@@ -11,25 +12,33 @@ const fileList = ref<Array<Type课件返回类>>([]) // 文件列表原始数据
 const fileListFormat = ref<Array<File>>([]) // 文件列表格式化
 const isMe = ref(true) // 是否是共享文件夹
 const selectFile = ref<Array<number>>([]) // 选中的列表
-let courseName = '' // 课程名
+const courseName = computed(() => breadcrumbList[1] && breadcrumbList[1].title) //课程名称
 
 watch(isMe, () => {
 	getCourse()
 	breadcrumbList.length = 1
 })
 
-// 面包屑展示文件路径
-const breadcrumbList = reactive([{ title: '我的课件库', id: -1 }])
-const breadcrumbLastId = computed(() => breadcrumbList.slice().pop()?.id || 0)
-const isHome = computed(() => breadcrumbList.length === 1)
+interface BreadcrumbLastList {
+	title: string
+	id: string | number
+}
 
-const clickBreadcrumb = (id: number) => {
+// 面包屑展示文件路径
+// 文件夹目录写死的层级 不参与请求 层级 -1001 全部 -1002 课程
+const breadcrumbList = reactive<Array<BreadcrumbLastList>>([{ title: '我的课件库', id: -1001 }])
+const breadcrumbLastId = computed(() => breadcrumbList.slice().pop()?.id || 0)
+const isHome = computed(() => (isMe.value ? breadcrumbList.length === 1 : breadcrumbList.length <= 2))
+
+const clickBreadcrumb = (id: number | string) => {
 	selectFile.value.length = 0
+	fileListFormat.value.length = 0
 	const index = breadcrumbList.findIndex((item) => item.id === id)
 
 	if (index !== -1) breadcrumbList.splice(index + 1)
 
-	fileListFormat.value.length = 0
+	if (!isMe.value && id === -1002) return getTeacher()
+
 	update()
 }
 
@@ -39,20 +48,36 @@ const getCourse = async () => {
 
 	const res = await query()
 
-	const formatData = res.data.map((item) => ({ fileName: item, id: 0, fid: -1, createdTimestamp: dayjs().valueOf(), type: 0 }))
+	const formatData = res.data.map((item) => ({ fileName: item, id: -1002, fid: -1002, createdTimestamp: dayjs().valueOf(), type: 0 }))
 	fileListFormat.value = formatData
 }
 getCourse()
 
 // 根据课程名称获取文件列表
-const getFileList = async (id: number) => {
-	const res = await api.courseware.queryCourseware({ courseName, id })
+const getFileList = async () => {
+	const teacherId = isMe.value ? '' : breadcrumbList[2] && (breadcrumbList[2].id as string)
+	const type = isMe.value ? 0 : 1
+	let id
+
+	if (isMe.value) {
+		id = breadcrumbList.length > 2 ? (breadcrumbLastId.value as number) : undefined
+	} else {
+		id = breadcrumbList.length > 3 ? (breadcrumbLastId.value as number) : undefined
+	}
+
+	const res = await api.courseware.queryCourseware({
+		courseName: courseName.value,
+		id,
+		jobNum: teacherId || '',
+		type
+	})
+
 	if (res.status === 200) {
 		fileList.value = res.data.records
 		fileListFormat.value = res.data.records.map((item) => formatFile(item))
-		return true
 	}
-	return false
+
+	return res.status === 200
 }
 
 // 上传文件
@@ -68,7 +93,7 @@ const createdBtnMenu = [
 ]
 
 const createdFolderOk = async (name: string) => {
-	const res = await api.courseware.addFileH({ fid: breadcrumbLastId.value, courseName, coursewareName: name })
+	const res = await api.courseware.addFileH({ fid: breadcrumbLastId.value as number, courseName: courseName.value, coursewareName: name })
 	if (res.status === 200) {
 		fileListFormat.value.unshift(formatFile(res.data))
 		createdFolderShow.value = false
@@ -83,48 +108,60 @@ const formatFile = (data: Type课件返回类) => {
 }
 
 // 打开文件夹
-const openFile = async (data: File) => {
-	const { fileName, id, fid } = data
-	// 第一层 科目文件夹
-	if (fid === -1) courseName = fileName
-	// TODO 逻辑优化 如果是共享文件夹则根据课程名查询老师
-	// 共享文件夹： 全部文件 课程-> 老师 -> 文件
-	// 我的文件夹： 全部文件 课程-> 文件
-
-	if (!isMe.value && breadcrumbList.length === 1) {
-		breadcrumbList.push({ title: fileName, id })
-		const res = await api.courseware.getJobNameByCourseName({ courseName })
-		if (res.status === 200) {
-			fileListFormat.value = res.data.records.map((item) => ({
-				fileName: item.teachName!,
-				id: 0,
-				fid: -1,
-				createdTimestamp: dayjs().valueOf(),
-				type: 0
-			}))
-		}
-		return
-	}
-
+const open = async (data: File) => {
 	if (data.type === 0) {
-		//打开文件夹
-		breadcrumbList.push({ title: fileName, id })
-		selectFile.value.length = 0
-		getFileList(data.id)
+		isMe.value ? openMeFolder(data) : openShareFolder(data)
 	} else {
-		// 打开文件
-		const fileExtension = data.fileName.split('.').pop()
-		switch (fileExtension) {
-			case 'png':
-			case 'jpg':
-			case 'svg':
-				openImagePreview(data.id)
-				break
+		openFile(data)
+	}
+}
 
-			default:
-				Message.success('暂时不支持打开该类型的文件,请下载后查看')
-				break
-		}
+// 我的文件夹： 全部文件 课程-> 文件
+const openMeFolder = (file: File) => {
+	const { fileName, id } = file
+	breadcrumbList.push({ title: fileName, id })
+	selectFile.value.length = 0
+	if (breadcrumbList.length !== 1) getFileList()
+}
+
+// 共享文件夹： 全部文件 课程-> 老师 -> 文件
+const openShareFolder = async (file: File) => {
+	breadcrumbList.push({ title: file.fileName, id: file.id })
+	if (breadcrumbList.length === 2) await getTeacher()
+	if (breadcrumbList.length >= 3) await getFileList()
+}
+
+// 打开文件
+const openFile = (file: File) => {
+	const { fileName, id } = file
+	const fileExtension = fileName.split('.').pop()
+
+	switch (fileExtension) {
+		case 'png':
+		case 'jpg':
+		case 'svg':
+			openImagePreview(id as number)
+			break
+
+		default:
+			Message.success('暂时不支持打开该类型的文件,请下载后查看')
+			break
+	}
+}
+
+// 获取分享科目下的老师
+const getTeacher = async () => {
+	const res = await api.courseware.getJobNameByCourseName({ courseName: courseName.value })
+	if (res.status === 200) {
+		//过滤掉自己共享的文件夹
+		const filterMe = res.data.records.filter((item) => item.jobNum !== useUserInfo.value.schoolUser.studentId)
+		fileListFormat.value = filterMe.map((item) => ({
+			fileName: item.teachName!,
+			id: item.jobNum! as any, // 用户的 老师的id card 存放在 面包屑上 类型为 string 需要兼容
+			fid: 0,
+			createdTimestamp: dayjs().valueOf(),
+			type: 0
+		}))
 	}
 }
 
@@ -160,7 +197,7 @@ const update = () => {
 	if (isHome.value) {
 		getCourse()
 	} else {
-		getFileList(breadcrumbLastId.value)
+		getFileList()
 	}
 }
 
@@ -202,7 +239,7 @@ const shareSelectRef = ref()
 //共享操作
 const shareFile = async (file: File) => {
 	if (file.shareType !== 0) {
-		const res = await api.courseware.shareBatch({ ids: [file.id], shareType: 0 })
+		const res = await api.courseware.shareBatch({ ids: [file.id as number], shareType: 0 })
 		return res.status === 200 ? (update(), Message.success('取消共享成功')) : Message.error('取消共享失败')
 	}
 
@@ -245,7 +282,7 @@ const fileIconTextList = [
 				<a-dropdown trigger="hover" :disabled="isHome">
 					<div
 						class="btn p-y-10px rounded-xl bg-blue-5 hover:bg-blue-4"
-						:class="isHome && ' cursor-not-allowed bg-gray1 text-gray hover:bg-gray1! dark:(bg-dark1 hover:bg-dark1!)'">
+						:class="(isHome || !isMe) && ' cursor-not-allowed bg-gray1 text-gray hover:bg-gray1! dark:(bg-dark1 hover:bg-dark1!)'">
 						新建
 					</div>
 					<template #content>
@@ -273,13 +310,15 @@ const fileIconTextList = [
 			<div class="h-80vh w-100%">
 				<FileManger
 					@delete="deleteFile"
-					@open="openFile"
+					@open="open"
 					@refresh="update"
 					@created="createdFolderShow = true"
 					@resetFolderName="openResetFolderName"
 					@move="singleMove"
 					@onShare="shareFile"
 					v-model="selectFile"
+					:disabledCreated="isHome || !isMe"
+					:disabled-file-operation="!isMe"
 					:file-list="fileListFormat"
 					:share="true"
 					:disabled="isHome">
@@ -291,6 +330,10 @@ const fileIconTextList = [
 							{{ fileIconTextList.find((item) => item.text === file.fileName.split('.').pop())?.text || '未知' }}
 						</div>
 					</template>
+					<template #footerPopup v-if="!isMe">
+						<div class="btn p-y-15px rounded-2xl elevation-3">导入到我的课件库</div>
+					</template>
+					image.png
 				</FileManger>
 			</div>
 		</div>

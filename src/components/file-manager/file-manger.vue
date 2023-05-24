@@ -3,7 +3,7 @@ import dayjs from 'dayjs'
 import folderSvg from '~/assets/svg/folder.svg'
 import fileSvg from '~/assets/svg/file.svg'
 import { useAutoChangGridLayout } from '~/composables'
-import type { Props, Emit } from './interface.d'
+import type { Props, Emit, File } from './interface.d'
 
 const props = defineProps<Props>()
 const emit = defineEmits<Emit>()
@@ -32,7 +32,7 @@ const checkedIdList = ref<Array<number>>([])
 const fileListUi = computed(() =>
 	//标记选中状态
 	props.fileList.map((item) => {
-		return checkedIdList.value.includes(item.id) ? { ...item, checked: true } : { ...item, checked: false }
+		return checkedIdList.value.includes(item.id as number) ? { ...item, checked: true } : { ...item, checked: false }
 	})
 )
 
@@ -40,6 +40,23 @@ const shareColor = {
 	1: 'text-white',
 	2: 'text-cyan'
 }
+
+const fileOperation = [
+	{ icon: 'i-ri-edit-line', text: '重命名', onClick: (file: File) => emit('resetFolderName', file.id) },
+	{ icon: 'i-ri-share-line', text: '分享', onClick: (file: File) => emit('onShare', file) },
+	{ icon: 'i-ri-link-unlink', text: '取消分享', onClick: (file: File) => emit('onShare', file) },
+	{ icon: 'i-ri-share-forward-2-line', text: '移动', onClick: (file: File) => emit('move', file.id) },
+	{ icon: 'i-ri-delete-bin-line', text: '删除', onClick: (file: File) => emit('delete', file.id) },
+	{ icon: 'i-ri-download-line', text: '下载', onClick: (file: File) => emit('download', file) }
+]
+
+const filterFileOperation = computed(
+	() =>
+		fileOperation
+			.filter((item) => !props.disabledFileOperation || item.text === '下载') // 是否禁用 用户操作
+			.filter((item) => props.share || !['分享', '取消分享'].includes(item.text)) //是否显示分享
+			.filter((item) => props.download || item.text !== '下载') // 是否显示下载
+)
 </script>
 
 <template>
@@ -66,7 +83,7 @@ const shareColor = {
 					<a-tooltip :content="item.shareType === 1 ? '已共享至拥有该科目的老师' : '已共享至全校的老师'" position="top" mini>
 						<div
 							v-if="props.share && item.shareType"
-							class="absolute bottom-70px z-1 right-40px i-ri-share-line"
+							class="absolute bottom-70px z-1 right-40px i-ri-links-line"
 							:class="`${item.shareType && shareColor[item.shareType]} ${item.type === 0 && 'right-25px!'}`"></div>
 					</a-tooltip>
 
@@ -85,27 +102,14 @@ const shareColor = {
 							@click.stop=""
 							class="absolute right-5px top-5px i-ri-more-line text-[var(--color-border-3)] hover:text-[rgb(var(--primary-6))] text-20px operation"></div>
 						<template #content>
-							<a-doption v-if="item.type === 0" @click="$emit('resetFolderName', item.id)">
-								<template #icon><icon-edit /></template>
-								重命名
-							</a-doption>
-							<a-doption @click="$emit('move', item.id)">
-								<template #icon><icon-to-right /></template>
-								移动
-							</a-doption>
-							<a-doption @click="$emit('delete', item.id)">
-								<template #icon><icon-delete /></template>
-								删除
-							</a-doption>
-							<!-- 开启了共享字段才会显示 -->
-							<template v-if="props.share">
-								<a-doption v-if="item.shareType === 0" @click="$emit('onShare', item)">
-									<template #icon><icon-share-alt /></template>
-									共享
-								</a-doption>
-								<a-doption v-else @click="$emit('onShare', item)">
-									<template #icon><icon-undo /></template>
-									取消共享
+							<template v-for="v in filterFileOperation">
+								<a-doption
+									@click="v.onClick(item)"
+									v-if="v.text === '分享' ? item.shareType === 0 : v.text === '取消分享' ? item.shareType !== 0 : true">
+									<div class="flex items-center">
+										<div :class="v.icon"></div>
+										<div class="ml-10px">{{ v.text }}</div>
+									</div>
 								</a-doption>
 							</template>
 						</template>
@@ -115,25 +119,26 @@ const shareColor = {
 
 			<div class="flex w-100% h-100px sticky bottom-0 left-0 right-0 center overflow-hidden" @mousedown.stop="">
 				<Transition enter-active-class="animated-fade-in-up" leave-active-class="animated-fade-out-down" class="animated animated-faster">
-					<div
-						class="py-10px px-20px border border-1px border-[var(--color-border-1)] bg-[var(--color-bg-1)] shadow-lg rounded-xl center overflow-hidden"
-						v-if="checkedIdList.length !== 0">
-						<a-tooltip content="删除" position="top" mini>
-							<div class="action-bar" @click="$emit('delete', checkedIdList)"><div class="i-ri-delete-bin-6-line"></div></div>
-						</a-tooltip>
-						<a-tooltip content="移动" position="top" mini @click="$emit('move', checkedIdList)">
-							<div class="action-bar"><div class="i-ri-share-forward-line"></div></div>
-						</a-tooltip>
-						<a-tooltip content="取消选中" position="top" mini>
-							<div class="action-bar"><div class="i-ri-close-circle-line" @click="checkedIdList.length = 0"></div></div>
-						</a-tooltip>
-					</div>
+					<slot name="footerPopup" v-if="checkedIdList.length !== 0">
+						<div
+							class="py-10px px-20px border border-1px border-[var(--color-border-1)] bg-[var(--color-bg-1)] shadow-lg rounded-xl center overflow-hidden">
+							<a-tooltip content="删除" position="top" mini>
+								<div class="action-bar" @click="$emit('delete', checkedIdList)"><div class="i-ri-delete-bin-6-line"></div></div>
+							</a-tooltip>
+							<a-tooltip content="移动" position="top" mini @click="$emit('move', checkedIdList)">
+								<div class="action-bar"><div class="i-ri-share-forward-line"></div></div>
+							</a-tooltip>
+							<a-tooltip content="取消选中" position="top" mini>
+								<div class="action-bar"><div class="i-ri-close-circle-line" @click="checkedIdList.length = 0"></div></div>
+							</a-tooltip>
+						</div>
+					</slot>
 				</Transition>
 			</div>
 		</div>
 		<!-- 右键菜单 -->
 		<template #content>
-			<a-doption @click="emit('created')">
+			<a-doption @click="emit('created')" v-if="!props.disabledCreated">
 				<div class="center">
 					<div class="i-ri-folder-open-line mr-5px"></div>
 					<span>新建文件夹</span>

@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import router from '~/router'
-import { useToken } from '~/composables'
+import { useToken, useGetUserInfo } from '~/composables'
 import { pick } from '~/utils'
 const flag = ref(true)
 //登陆表单
@@ -16,6 +16,7 @@ const login = async () => {
 			Message.success('登录成功')
 			useToken.value = res.data.message
 			router.push('/course/list')
+			useGetUserInfo()
 		} else if (res.status === 400) {
 			Message.error('账号或者密码错误')
 		}

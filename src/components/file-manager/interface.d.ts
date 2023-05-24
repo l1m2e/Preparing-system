@@ -3,10 +3,16 @@ export type Props = {
 	modelValue: Array<number>
 	/** 文件列表 */
 	fileList: Array<File>
-	//** 禁用操作 */
+	/** ** 禁用操作 */
 	disabled?: boolean
-	//是否允许操作
+	/** 是否显示分享按钮 */
 	share?: boolean
+	// 是否显示下载
+	download?: boolean
+	/** 是否显示新建文件夹 */
+	disabledCreated?: boolean
+	/** 是否允许单个文件操作 */
+	disabledFileOperation?: boolean
 }
 
 export type Emit = {
@@ -26,8 +32,10 @@ export type Emit = {
 	scrollTobottom: []
 	/** 刷新 */
 	refresh: []
-	// 共享操作
+	/** 共享操作 */
 	onShare: [val: File]
+	/** 下载 */
+	download: [val: File]
 }
 
 export interface File {

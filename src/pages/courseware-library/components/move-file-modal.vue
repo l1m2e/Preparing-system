@@ -52,7 +52,7 @@ const getCourse = async () => {
 
 // 根据课程名称获取文件列表
 const getFileList = async (id: number) => {
-	const res = await api.courseware.queryCourseware({ courseName: courseName.value, id })
+	const res = await api.courseware.queryCourseware({ courseName: courseName.value, id, jobNum: '' })
 
 	if (res.status === 200) {
 		fileList.value = res.data.records.map((item) => {
@@ -132,9 +132,7 @@ const clear = () => {
 			</a-row>
 		</main>
 		<footer class="w-100% flex items-center justify-between mt-15px p-15px">
-			<div>
-				<!-- <a-button type="text" @click="createdFolderRef.open()">新建文件夹</a-button> -->
-			</div>
+			<div></div>
 			<div>
 				<a-button @click="show = false">取消</a-button>
 				<a-badge :count="props.modelValue.length" :dotStyle="{ background: '#3b82f6' }">
@@ -142,6 +140,5 @@ const clear = () => {
 				</a-badge>
 			</div>
 		</footer>
-		<!-- <CreatedFolder ref="createdFolderRef" :fid="breadcrumbLastId" @ok="createdFolderSuccess"></CreatedFolder> -->
 	</a-modal>
 </template>

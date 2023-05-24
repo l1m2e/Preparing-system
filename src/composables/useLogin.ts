@@ -70,5 +70,5 @@ export const getWSUrl = async () => {
 
 export const useGetUserInfo = async () => {
 	const res = await api.login.userInfo()
-	useUserInfo.value = res.data as any
+	useUserInfo.value.schoolUser = res.data
 }
