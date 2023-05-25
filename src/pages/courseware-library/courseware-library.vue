@@ -17,6 +17,7 @@ const courseName = computed(() => breadcrumbList[1] && breadcrumbList[1].title) 
 watch(isMe, () => {
 	getCourse()
 	breadcrumbList.length = 1
+	selectFile.value.length = 0
 })
 
 interface BreadcrumbLastList {
@@ -53,6 +54,11 @@ const getCourse = async () => {
 }
 getCourse()
 
+const pagination = reactive({
+	current: 1,
+	size: 40,
+	pages: 1
+})
 // 根据课程名称获取文件列表
 const getFileList = async () => {
 	const teacherId = isMe.value ? '' : breadcrumbList[2] && (breadcrumbList[2].id as string)
@@ -69,15 +75,27 @@ const getFileList = async () => {
 		courseName: courseName.value,
 		id,
 		jobNum: teacherId || '',
-		type
+		type,
+		current: pagination.current,
+		size: pagination.size
 	})
 
 	if (res.status === 200) {
 		fileList.value = res.data.records
 		fileListFormat.value = res.data.records.map((item) => formatFile(item))
+		pagination.pages = res.data.pages || 1
 	}
 
 	return res.status === 200
+}
+
+// 下拉到底部加载更多
+const scrollTobottomLoad = () => {
+	/** 如果当前页大于总页数,则直接返回不请求 */
+	if (pagination.current > pagination.pages) return
+	Message.success('下拉到底部了')
+	if (isMe.value && breadcrumbLastId.value !== -1002) {
+	}
 }
 
 // 上传文件
@@ -93,7 +111,11 @@ const createdBtnMenu = [
 ]
 
 const createdFolderOk = async (name: string) => {
-	const res = await api.courseware.addFileH({ fid: breadcrumbLastId.value as number, courseName: courseName.value, coursewareName: name })
+	const res = await api.courseware.addFileH({
+		fid: breadcrumbLastId.value === -1002 ? 0 : (breadcrumbLastId.value as number),
+		courseName: courseName.value,
+		coursewareName: name
+	})
 	if (res.status === 200) {
 		fileListFormat.value.unshift(formatFile(res.data))
 		createdFolderShow.value = false
@@ -246,6 +268,12 @@ const shareFile = async (file: File) => {
 	shareSelectRef.value.open(file)
 }
 
+const donwloadFile = async (file: File) => {
+	const item = fileList.value.find((item) => item.id === file.id)
+	if (!item) return Message.error('没有找到文件')
+	window.location.href = `${baseUrl.httpUrl}/file/download/courseware/teacher/${item.srcId}`
+}
+
 //文件icon样式
 const fileIconTextList = [
 	{ text: 'doc', icon: 'i-ri-file-word-2-line' },
@@ -277,7 +305,7 @@ const fileIconTextList = [
 <template>
 	<div class="box-border rounded mt-10px bg-[var(--color-bg-2)] select-none p-10px">
 		<!-- 头部导航栏 -->
-		<div class="flex justify-between items-center">
+		<div class="flex justify-between items-center mb-10px">
 			<div>
 				<a-dropdown trigger="hover" :disabled="isHome">
 					<div
@@ -307,8 +335,9 @@ const fileIconTextList = [
 			</div>
 		</div>
 		<div>
-			<div class="h-80vh w-100%">
+			<div class="h-80vh w-100% overflow-y-auto scroll-bar" v-on-reach-bottom="{ cb: scrollTobottomLoad }">
 				<FileManger
+					v-model="selectFile"
 					@delete="deleteFile"
 					@open="open"
 					@refresh="update"
@@ -316,7 +345,8 @@ const fileIconTextList = [
 					@resetFolderName="openResetFolderName"
 					@move="singleMove"
 					@onShare="shareFile"
-					v-model="selectFile"
+					@download="donwloadFile"
+					:download="true"
 					:disabledCreated="isHome || !isMe"
 					:disabled-file-operation="!isMe"
 					:file-list="fileListFormat"
@@ -331,7 +361,7 @@ const fileIconTextList = [
 						</div>
 					</template>
 					<template #footerPopup v-if="!isMe">
-						<div class="btn p-y-15px rounded-2xl elevation-3">导入到我的课件库</div>
+						<div class="btn p-y-15px rounded-2xl elevation-3" @click="moveFileModalRef.open('import')">导入到我的课件库</div>
 					</template>
 					image.png
 				</FileManger>

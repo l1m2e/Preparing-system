@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import router from '~/router'
-import { useToken, useGetUserInfo } from '~/composables'
+import { useToken, useGetUserInfo, useUserInfo } from '~/composables'
 import { pick } from '~/utils'
 const flag = ref(true)
 //登陆表单
@@ -13,10 +13,10 @@ const login = async () => {
 	if (form.jobNum && form.password) {
 		const res = await api.login.login(form)
 		if (res.status === 200) {
-			Message.success('登录成功')
 			useToken.value = res.data.message
 			router.push('/course/list')
-			useGetUserInfo()
+			await useGetUserInfo()
+			Message.success(`欢迎回来 ${useUserInfo.value.schoolUser.studentName}`)
 		} else if (res.status === 400) {
 			Message.error('账号或者密码错误')
 		}

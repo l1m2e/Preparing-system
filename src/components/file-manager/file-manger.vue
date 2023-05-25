@@ -38,7 +38,7 @@ const fileListUi = computed(() =>
 
 const shareColor = {
 	1: 'text-white',
-	2: 'text-cyan'
+	2: 'text-red'
 }
 
 const fileOperation = [
@@ -50,13 +50,20 @@ const fileOperation = [
 	{ icon: 'i-ri-download-line', text: '下载', onClick: (file: File) => emit('download', file) }
 ]
 
-const filterFileOperation = computed(
+// 根据组件权限筛选按钮
+const filterFileBtnByPermission = computed(
 	() =>
 		fileOperation
 			.filter((item) => !props.disabledFileOperation || item.text === '下载') // 是否禁用 用户操作
 			.filter((item) => props.share || !['分享', '取消分享'].includes(item.text)) //是否显示分享
 			.filter((item) => props.download || item.text !== '下载') // 是否显示下载
 )
+
+const filterFileBtnByState = (file: File) =>
+	filterFileBtnByPermission.value
+		.filter((item) => !(file.shareType === 0 && item.text === '取消分享')) // 未分享取隐藏消分享按钮
+		.filter((item) => !(file.shareType !== 0 && item.text === '分享')) // 已分享隐藏分享按钮
+		.filter((item) => !(file.type === 0 && item.text === '下载')) // 文件夹隐藏下载按钮
 </script>
 
 <template>
@@ -65,7 +72,6 @@ const filterFileOperation = computed(
 			<a-checkbox-group v-model="checkedIdList">
 				<div
 					v-for="item in fileListUi"
-					:key="item.id"
 					:class="`${item.checked ? 'checkbox-card-checked' : 'checkbox-card'}`"
 					:data-file-id="item.id"
 					@dblclick="$emit('open', item)"
@@ -81,10 +87,12 @@ const filterFileOperation = computed(
 					</a-checkbox>
 
 					<a-tooltip :content="item.shareType === 1 ? '已共享至拥有该科目的老师' : '已共享至全校的老师'" position="top" mini>
-						<div
-							v-if="props.share && item.shareType"
-							class="absolute bottom-70px z-1 right-40px i-ri-links-line"
-							:class="`${item.shareType && shareColor[item.shareType]} ${item.type === 0 && 'right-25px!'}`"></div>
+						<Transition enter-active-class="animated-zoom-in" leave-active-class="animated-zoom-out" class="animated animated-faster">
+							<div
+								v-if="props.share && item.shareType"
+								class="absolute bottom-70px z-1 right-40px i-ri-links-line"
+								:class="`${item.shareType && shareColor[item.shareType]} ${item.type === 0 && 'right-25px!'}`"></div>
+						</Transition>
 					</a-tooltip>
 
 					<img :src="folderSvg" v-if="item.type === 0" class="w-120px h-120px mt-10px" />
@@ -102,16 +110,12 @@ const filterFileOperation = computed(
 							@click.stop=""
 							class="absolute right-5px top-5px i-ri-more-line text-[var(--color-border-3)] hover:text-[rgb(var(--primary-6))] text-20px operation"></div>
 						<template #content>
-							<template v-for="v in filterFileOperation">
-								<a-doption
-									@click="v.onClick(item)"
-									v-if="v.text === '分享' ? item.shareType === 0 : v.text === '取消分享' ? item.shareType !== 0 : true">
-									<div class="flex items-center">
-										<div :class="v.icon"></div>
-										<div class="ml-10px">{{ v.text }}</div>
-									</div>
-								</a-doption>
-							</template>
+							<a-doption v-for="v in filterFileBtnByState(item)" @click="v.onClick(item)">
+								<div class="flex items-center">
+									<div :class="v.icon"></div>
+									<div class="ml-10px">{{ v.text }}</div>
+								</div>
+							</a-doption>
 						</template>
 					</a-dropdown>
 				</div>

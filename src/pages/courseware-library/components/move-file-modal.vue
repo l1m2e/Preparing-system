@@ -12,7 +12,10 @@ const emits = defineEmits<{
 
 const show = ref(false)
 
-const open = () => {
+// 有两种模式 move 从我的文件夹移动到另外一个文件夹 import 直接导入文件
+let model = 'move'
+const open = (openModel: 'import' | 'move' = 'move') => {
+	model = openModel
 	show.value = true
 	getCourse()
 }
@@ -80,11 +83,28 @@ const pullLoad = () => {}
 
 //保存
 const save = async () => {
+	model === 'move' ? moveFile() : importFile()
+}
+
+// 移动文件
+const moveFile = async () => {
 	const res = await api.courseware.moveCourseware({ ids: props.modelValue, fid: breadcrumbLastId.value, courseName: courseName.value })
-	if (res.status === 200) {
-		Message.success('移动成功')
+	movState(res.status, res.data.error)
+}
+
+// 导入文件
+const importFile = async () => {
+	const res = await api.courseware.copyShareCourseware({ ids: props.modelValue, fid: breadcrumbLastId.value, courseName: courseName.value })
+	movState(res.status, res.data.error)
+}
+
+const movState = (status: number, error?: string) => {
+	if (status === 200) {
+		Message.success('课件导入成功')
 		show.value = false
-		emits('ok')
+		model === 'move' && emits('ok')
+	} else {
+		Message.error(error || '操作失败')
 	}
 }
 

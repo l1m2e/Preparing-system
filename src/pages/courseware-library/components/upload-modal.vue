@@ -13,7 +13,7 @@ const params = {
 }
 
 const open = (courseName: string, fid: number) => {
-	params.fid = fid.toString()
+	params.fid = fid === -1002 ? '0' : fid.toString()
 	params.courseName = courseName
 	show.value = true
 }

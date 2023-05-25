@@ -1,6 +1,7 @@
 import { getUuid } from '~/utils'
 import { baseUrl } from '~/config/baseUrl'
 import { io } from '~/service'
+import router from '~/router'
 
 export const useToken = useStorage('token', '')
 export const useUserInfo = useStorage('userInfo', {
@@ -71,4 +72,11 @@ export const getWSUrl = async () => {
 export const useGetUserInfo = async () => {
 	const res = await api.login.userInfo()
 	useUserInfo.value.schoolUser = res.data
+}
+
+// 退出登录
+export const useLogout = () => {
+	useToken.value = ''
+	router.replace('/login')
+	Message.info(`您已退出登录 ${useUserInfo.value.schoolUser.studentName}`)
 }
