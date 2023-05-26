@@ -25,9 +25,8 @@ const ok = async () => {
 	const res = await api.prepare.addPreparing({ ...param, ...form, ...semesterStore.value })
 	if (res.status === 200) {
 		courseInfoStore.value.preparingFlag = true
-		courseInfoStore.value.id = parseInt(res.data.message!)
+		courseInfoStore.value.id = res.data.id
 		Message.success('开启备课成功')
-		console.log(courseInfoStore.value)
 		emits('change')
 		show.value = false
 		beforeCancel()

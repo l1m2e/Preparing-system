@@ -2,7 +2,7 @@
 import type { File } from '~/components/file-manager/interface'
 
 const emits = defineEmits<{
-	ok: []
+	ok: [{ id: number; shareType: number }]
 }>()
 
 const show = ref(false)
@@ -11,7 +11,6 @@ let fileId: number | undefined = undefined
 
 const open = (file: File) => {
 	show.value = true
-	console.log(file)
 	fileId = file.id
 }
 
@@ -25,7 +24,7 @@ const save = async (shareType: number) => {
 	})
 	if (res.status === 200) {
 		Message.success('修改成功')
-		emits('ok')
+		emits('ok', { id: fileId, shareType })
 		show.value = false
 	} else {
 		Message.error('共享失败')

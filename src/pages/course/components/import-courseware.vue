@@ -2,10 +2,7 @@
 import folderSvg from '~/assets/svg/folder.svg'
 import fileSvg from '~/assets/svg/file.svg'
 import { setReactive } from '~/utils'
-
-const props = defineProps<{
-	modelValue: Array<number>
-}>()
+import { courseInfoStore } from '~/store/courseStore'
 
 const emits = defineEmits<{
 	ok: []
@@ -13,10 +10,7 @@ const emits = defineEmits<{
 
 const show = ref(false)
 
-// 有两种模式 move 从我的文件夹移动到另外一个文件夹 import 直接导入文件
-let model = 'move'
-const open = (openModel: 'import' | 'move' = 'move') => {
-	model = openModel
+const open = () => {
 	show.value = true
 	getCourse()
 }
@@ -83,14 +77,23 @@ const getFileList = async (id: number) => {
 	}
 }
 
+const selectFile = reactive<Array<number>>([])
+
 // 单击文件夹
 const clickFolder = (item: File) => {
-	resetPagination()
 	const { fileName, id, folderFlag } = item
-	fileList.value.length = 0
 	if (folderFlag) {
+		resetPagination()
+		fileList.value.length = 0
 		breadcrumbList.push({ title: fileName, id })
 		getFileList(id)
+	} else {
+		selectFile.includes(id)
+			? selectFile.splice(
+					selectFile.findIndex((item) => item === id),
+					1
+			  )
+			: selectFile.push(id)
 	}
 }
 
@@ -103,28 +106,13 @@ const pullLoad = () => {
 
 //保存
 const save = async () => {
-	model === 'move' ? moveFile() : importFile()
-}
-
-// 移动文件
-const moveFile = async () => {
-	const res = await api.courseware.moveCourseware({ ids: props.modelValue, fid: breadcrumbLastId.value, courseName: courseName.value })
-	movState(res.status, res.data.error)
-}
-
-// 导入文件
-const importFile = async () => {
-	const res = await api.courseware.copyShareCourseware({ ids: props.modelValue, fid: breadcrumbLastId.value, courseName: courseName.value })
-	movState(res.status, res.data.error)
-}
-
-const movState = (status: number, error?: string) => {
-	if (status === 200) {
-		Message.success('课件导入成功')
+	const res = await api.courseware.bindCourseware({ pid: courseInfoStore.value.id, cidList: selectFile })
+	if (res.status === 200) {
+		Message.success('导入课件成功')
 		show.value = false
-		model === 'move' && emits('ok')
+		emits('ok')
 	} else {
-		Message.error(error || '操作失败')
+		Message.error(`导入失败 ${res.data.error}`)
 	}
 }
 
@@ -165,7 +153,8 @@ const clear = () => {
 			<a-row
 				v-for="item in fileList"
 				@click="clickFolder(item)"
-				class="py-10px mx-10px box-border rounded hover:bg-[var(--color-fill-2)] cursor-pointer !items-center first:mt-10px transition mb-10px">
+				class="py-10px mx-10px box-border rounded hover:bg-[var(--color-fill-2)] cursor-pointer !items-center first:mt-10px transition mb-10px"
+				:class="selectFile.includes(item.id) && 'bg-blue-1 hover:bg-blue-1 dark:bg-blue-5 dark:hover:bg-blue-5'">
 				<a-col :span="3" class="center"><img :src="item.folderFlag ? folderSvg : fileSvg" class="w-30px h-30px" /></a-col>
 				<a-col :span="21" class="truncate">{{ item.fileName }}</a-col>
 			</a-row>
@@ -174,8 +163,8 @@ const clear = () => {
 			<div></div>
 			<div>
 				<a-button @click="show = false">取消</a-button>
-				<a-badge :count="props.modelValue.length" :dotStyle="{ background: '#3b82f6' }">
-					<a-button type="primary" class="ml-10px" @click="save" :disabled="isHome">移动到此处</a-button>
+				<a-badge :count="selectFile.length" :dotStyle="{ background: '#3b82f6' }">
+					<a-button type="primary" class="ml-10px" @click="save" :disabled="isHome">导入到课件</a-button>
 				</a-badge>
 			</div>
 		</footer>

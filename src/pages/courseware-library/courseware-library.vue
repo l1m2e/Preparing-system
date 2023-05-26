@@ -7,6 +7,7 @@ import { baseUrl } from '~/config/baseUrl'
 import { useUserInfo } from '~/composables'
 import MoveFileModal from './components/move-file-modal.vue'
 import ShareSelect from './components/share-select.vue'
+import { setReactive } from '~/utils'
 
 const fileList = ref<Array<Type课件返回类>>([]) // 文件列表原始数据
 const fileListFormat = ref<Array<File>>([]) // 文件列表格式化
@@ -32,8 +33,8 @@ const breadcrumbLastId = computed(() => breadcrumbList.slice().pop()?.id || 0)
 const isHome = computed(() => (isMe.value ? breadcrumbList.length === 1 : breadcrumbList.length <= 2))
 
 const clickBreadcrumb = (id: number | string) => {
-	selectFile.value.length = 0
-	fileListFormat.value.length = 0
+	clearFileList()
+	resetPagination()
 	const index = breadcrumbList.findIndex((item) => item.id === id)
 
 	if (index !== -1) breadcrumbList.splice(index + 1)
@@ -59,6 +60,9 @@ const pagination = reactive({
 	size: 40,
 	pages: 1
 })
+
+const resetPagination = () => setReactive(pagination, { current: 1, size: 40, pages: 1 })
+
 // 根据课程名称获取文件列表
 const getFileList = async () => {
 	const teacherId = isMe.value ? '' : breadcrumbList[2] && (breadcrumbList[2].id as string)
@@ -81,8 +85,9 @@ const getFileList = async () => {
 	})
 
 	if (res.status === 200) {
-		fileList.value = res.data.records
-		fileListFormat.value = res.data.records.map((item) => formatFile(item))
+		// fileList.value = res.data.records
+		res.data.records.forEach((item) => fileList.value.push(item))
+		res.data.records.map((item) => formatFile(item)).forEach((item) => fileListFormat.value.push(item))
 		pagination.pages = res.data.pages || 1
 	}
 
@@ -92,9 +97,17 @@ const getFileList = async () => {
 // 下拉到底部加载更多
 const scrollTobottomLoad = () => {
 	/** 如果当前页大于总页数,则直接返回不请求 */
+	pagination.current++
 	if (pagination.current > pagination.pages) return
-	Message.success('下拉到底部了')
-	if (isMe.value && breadcrumbLastId.value !== -1002) {
+
+	console.log(pagination)
+
+	if (isMe.value && breadcrumbLastId.value !== -1001) {
+		getFileList()
+	}
+
+	if (!isMe.value && breadcrumbLastId.value !== -1001 && breadcrumbLastId.value !== -1002) {
+		getFileList()
 	}
 }
 
@@ -131,6 +144,9 @@ const formatFile = (data: Type课件返回类) => {
 
 // 打开文件夹
 const open = async (data: File) => {
+	console.log(breadcrumbLastId.value)
+	clearFileList()
+	resetPagination()
 	if (data.type === 0) {
 		isMe.value ? openMeFolder(data) : openShareFolder(data)
 	} else {
@@ -151,6 +167,13 @@ const openShareFolder = async (file: File) => {
 	breadcrumbList.push({ title: file.fileName, id: file.id })
 	if (breadcrumbList.length === 2) await getTeacher()
 	if (breadcrumbList.length >= 3) await getFileList()
+}
+
+// 清空文件列表
+const clearFileList = () => {
+	fileList.value.length = 0
+	fileListFormat.value.length = 0
+	selectFile.value.length = 0
 }
 
 // 打开文件
@@ -215,7 +238,7 @@ const deleteFile = async (data: number | Array<number>) => {
 
 //刷新数据
 const update = () => {
-	selectFile.value.length = 0
+	clearFileList()
 	if (isHome.value) {
 		getCourse()
 	} else {
@@ -262,7 +285,16 @@ const shareSelectRef = ref()
 const shareFile = async (file: File) => {
 	if (file.shareType !== 0) {
 		const res = await api.courseware.shareBatch({ ids: [file.id as number], shareType: 0 })
-		return res.status === 200 ? (update(), Message.success('取消共享成功')) : Message.error('取消共享失败')
+		if (res.status === 200) {
+			const item = fileListFormat.value.find((item) => item.id === file.id)
+			if (item) {
+				item.shareType = 0
+			}
+			Message.success('取消共享成功')
+		} else {
+			Message.error('取消共享失败')
+		}
+		return
 	}
 
 	shareSelectRef.value.open(file)
@@ -300,6 +332,14 @@ const fileIconTextList = [
 	{ text: 'svg', icon: 'i-ri-image-line' },
 	{ text: 'mp4', icon: 'i-ri-video-line' }
 ]
+
+const shareSuccess = (data: { id: number; shareType: number }) => {
+	const item = fileListFormat.value.find((item) => item.id === data.id)
+
+	if (item) {
+		item.shareType = data.shareType
+	}
+}
 </script>
 
 <template>
@@ -372,6 +412,6 @@ const fileIconTextList = [
 		<InputModel title="重命名文件夹" v-model="resetFolderNameShow" @ok="resetFolderName" placeholder="请输入新建文件夹名称"></InputModel>
 		<a-image-preview :src="imagePreviewSrc" v-model:visible="imagePreview" />
 		<MoveFileModal ref="moveFileModalRef" v-model="selectFile" @ok="update"></MoveFileModal>
-		<ShareSelect ref="shareSelectRef" @ok="update"></ShareSelect>
+		<ShareSelect ref="shareSelectRef" @ok="shareSuccess"></ShareSelect>
 	</div>
 </template>

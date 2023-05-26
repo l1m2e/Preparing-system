@@ -412,6 +412,87 @@ export interface PreparingParam {
 	classDevicePosition: string
 }
 
+/** 测验信息 */
+export type ExaminationVo = {
+	/**
+	 * id
+	 * @format int64
+	 */
+	id: number
+	/** 标题 */
+	title: string
+	/** 标识 */
+	keyword?: string
+	/**
+	 * 创建时间
+	 * @format int64
+	 */
+	createdTimestamp: number
+	/**
+	 * 总分
+	 * @format int32
+	 */
+	totalScores: number
+	/**
+	 * 问题列表总数
+	 * @format int32
+	 */
+	totalQuestion: number
+} | null
+
+/** 备课详细信息 */
+export interface PreparingVo {
+	/**
+	 * id
+	 * @format int64
+	 */
+	id: number
+	/** 主题名 */
+	title: string
+	/** 课程名 */
+	courseName: string
+	/**
+	 * 课时
+	 * @format int32
+	 */
+	courseHour: number
+	/**
+	 * 问题信息数组
+	 * @uniqueItems true
+	 */
+	questionVos?: QuestionVo[] | null
+	/**
+	 * 测验id数组
+	 * @uniqueItems true
+	 */
+	examinationList?: ExaminationVo[] | null
+	/**
+	 * 课件信息数组
+	 * @uniqueItems true
+	 */
+	coursewareVos?: Type课件返回类[] | null
+	/** 班级名称 */
+	className: string
+	/** 老师工号 */
+	jobNum: string
+	/** 教室名称 */
+	classDeviceName: string
+	/** 教室mac */
+	classRoomMac: string
+	/** 老师名称 */
+	teacherName: string
+	/**
+	 * 修改时间戳
+	 * @format int64
+	 */
+	updateTimestamp: number
+	/**
+	 * 创建时间戳
+	 * @format int64
+	 */
+	createdTimestamp: number
+}
+
 /** 题库id和对应分数数组 */
 export interface QuestionExa {
 	/** @format int64 */
@@ -673,87 +754,6 @@ export interface Preparing {
 	classRoomMac: string
 	teacherName: string
 	classDevicePosition?: string
-}
-
-/** 测验信息 */
-export type ExaminationVo = {
-	/**
-	 * id
-	 * @format int64
-	 */
-	id: number
-	/** 标题 */
-	title: string
-	/** 标识 */
-	keyword?: string
-	/**
-	 * 创建时间
-	 * @format int64
-	 */
-	createdTimestamp: number
-	/**
-	 * 总分
-	 * @format int32
-	 */
-	totalScores: number
-	/**
-	 * 问题列表总数
-	 * @format int32
-	 */
-	totalQuestion: number
-} | null
-
-/** 备课详细信息 */
-export interface PreparingVo {
-	/**
-	 * id
-	 * @format int64
-	 */
-	id: number
-	/** 主题名 */
-	title: string
-	/** 课程名 */
-	courseName: string
-	/**
-	 * 课时
-	 * @format int32
-	 */
-	courseHour: number
-	/**
-	 * 问题信息数组
-	 * @uniqueItems true
-	 */
-	questionVos?: QuestionVo[] | null
-	/**
-	 * 测验id数组
-	 * @uniqueItems true
-	 */
-	examinationList?: ExaminationVo[] | null
-	/**
-	 * 课件信息数组
-	 * @uniqueItems true
-	 */
-	coursewareVos?: Type课件返回类[] | null
-	/** 班级名称 */
-	className: string
-	/** 老师工号 */
-	jobNum: string
-	/** 教室名称 */
-	classDeviceName: string
-	/** 教室mac */
-	classRoomMac: string
-	/** 老师名称 */
-	teacherName: string
-	/**
-	 * 修改时间戳
-	 * @format int64
-	 */
-	updateTimestamp: number
-	/**
-	 * 创建时间戳
-	 * @format int64
-	 */
-	createdTimestamp: number
 }
 
 /** 测验任务列表简略信息类 */
@@ -2472,6 +2472,36 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 		 * No description
 		 *
 		 * @tags 83-课件模块
+		 * @name UploadCoursewareByPid
+		 * @summary 15-上传课件到备课
+		 * @request POST:/teacherWeb/courseware/uploadByPid
+		 */
+		uploadCoursewareByPid: (
+			query: {
+				/**
+				 * 备课id
+				 * @format int64
+				 */
+				pid: number
+			},
+			data: {
+				files: File[]
+			},
+			params: RequestParams = {}
+		) =>
+			this.request<Type课件返回类[], any>({
+				path: `/teacherWeb/courseware/uploadByPid`,
+				method: 'POST',
+				query: query,
+				body: data,
+				type: ContentType.Json,
+				...params
+			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags 83-课件模块
 		 * @name BindCourseware
 		 * @summary 4-绑定课件到备课
 		 * @request POST:/teacherWeb/courseware/bindCourseware
@@ -2532,7 +2562,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 				 */
 				size?: number
 				/** 课件名 模糊搜索 */
-				coursewareName: string
+				coursewareName?: string
 			},
 			params: RequestParams = {}
 		) =>
@@ -2580,7 +2610,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 				/** 老师工号 */
 				jobNum: string
 				/**
-				 * 类型 0我的 1科目共享和全部共享 2全部共享
+				 * 类型 0我的 1共享
 				 * @format int32
 				 * @default 0
 				 */
@@ -2702,7 +2732,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 		 * @request POST:/teacherWeb/preparing/add
 		 */
 		addPreparing: (data: PreparingParam, params: RequestParams = {}) =>
-			this.request<Message, any>({
+			this.request<PreparingVo, any>({
 				path: `/teacherWeb/preparing/add`,
 				method: 'POST',
 				body: data,

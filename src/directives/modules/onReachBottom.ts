@@ -5,7 +5,8 @@ export const onReachBottom: Directive = {
 		const { cb, className } = binding.value
 		el.style.overflowY = 'auto' //设置元素y轴滚动
 		const newDiv = document.createElement('div') // 创建div
-		newDiv.style.cssText = 'width: 100%; height: 1px; background-color: red;' // 给div设置样式
+		// newDiv.style.cssText = 'width: 100%; height: 1px; background-color: red;' // 给div设置样式
+		newDiv.style.cssText = 'width: 100%; height: 1px;' // 给div设置样式
 
 		if (className) {
 			el.querySelector(`.${className}`)?.appendChild(newDiv) // 添加到指定区域

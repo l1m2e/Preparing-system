@@ -4,17 +4,11 @@ import { useToken } from '~/composables'
 import type { FileSrcVo } from '~/api/api'
 import type { FileItem } from '@arco-design/web-vue'
 import { Modal } from '@arco-design/web-vue'
+import { courseInfoStore } from '~/store/courseStore'
 
 const show = ref(false)
 
-const params = {
-	courseName: '',
-	fid: '0'
-}
-
-const open = (courseName: string, fid: number) => {
-	params.fid = fid === -1002 ? '0' : fid.toString()
-	params.courseName = courseName
+const open = () => {
 	show.value = true
 }
 defineExpose({ open })
@@ -81,9 +75,9 @@ const beforeRemove = (file: FileItem): Promise<boolean> => {
 	<a-modal :visible="show" title="上传文件" :width="700" :esc-to-close="false" :footer="false" @cancel="close" @before-close="emit('ok')">
 		<a-upload
 			v-model:file-list="filelist"
-			:action="`${baseUrl.httpUrl}/teacherWeb/courseware/upload`"
+			:action="`${baseUrl.httpUrl}/teacherWeb/courseware/uploadByPid`"
 			:headers="{ token: useToken }"
-			:data="{ ...params }"
+			:data="{ pid: courseInfoStore.id.toString() }"
 			@before-remove="beforeRemove"
 			@success="uploadSuccess"
 			@error="uploadError"

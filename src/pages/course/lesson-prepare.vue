@@ -4,6 +4,7 @@ import classRoomJpg from '~/assets/img/classroom.png'
 import weekCourse from './components/week-course.vue'
 import prepareLessonsModal from './components/prepare-lessons-modal.vue'
 import courseIssue from './components/course-issue.vue'
+import courseware from './components/courseware.vue'
 import { changeTextToCN, pick, setReactive } from '~/utils'
 import { courseInfoStore, semesterStore } from '~/store/courseStore'
 
@@ -29,6 +30,7 @@ queryLessonPrepare()
 // 课时改变重新查询是否备课
 const courseHourChange = () => {
 	queryLessonPrepare()
+	tabsaActiveKey.value = '1'
 }
 // 开启备课
 const prepareLessonsModalRef = ref()
@@ -59,6 +61,8 @@ const classChange: any = async (className: string) => {
 	setReactive(courseInfoStore.value, res.data!)
 	console.log(res.data)
 }
+
+const tabsaActiveKey = ref('1')
 </script>
 
 <template>
@@ -122,12 +126,14 @@ const classChange: any = async (className: string) => {
 		</a-card>
 		<!-- 内容展示 -->
 		<a-card :bordered="false" class="mt-30px" v-if="courseInfoStore.preparingFlag">
-			<a-tabs default-active-key="1">
+			<a-tabs default-active-key="1" v-model:active-key="tabsaActiveKey">
 				<a-tab-pane key="1" title="课堂问题">
-					<courseIssue></courseIssue>
+					<courseIssue v-if="tabsaActiveKey === '1'"></courseIssue>
 				</a-tab-pane>
-				<a-tab-pane key="2" title="课堂测验">Content of Tab Panel 2</a-tab-pane>
-				<a-tab-pane key="3" title="课件"></a-tab-pane>
+				<!-- <a-tab-pane key="2" title="课堂测验">Content of Tab Panel 2</a-tab-pane> -->
+				<a-tab-pane key="2" title="课件">
+					<courseware v-if="tabsaActiveKey === '2'"></courseware>
+				</a-tab-pane>
 			</a-tabs>
 		</a-card>
 		<!-- 未开启备课遮罩层 -->
