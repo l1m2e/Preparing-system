@@ -31,7 +31,7 @@ const pullLoad = () => pagination.current++
 const clickFile = async (item: any) => {
 	if (item.type !== 0) return
 	//如果是文件夹
-	breadcrumbList.push({ title: item.keyword, fid: item.id })
+	breadcrumbList.push({ title: item.title, fid: item.id })
 	fileList.length = 0
 	getFileList()
 }
@@ -41,7 +41,7 @@ const createdFolderRef = ref()
 
 //创建文件夹
 const createdFolderSuccess = (res: any) => {
-	breadcrumbList.push({ title: res.keyword, fid: res.id })
+	breadcrumbList.push({ title: res.title, fid: res.id })
 }
 
 //保存
@@ -84,7 +84,7 @@ const save = async () => {
 				:class="selectedList.includes(item.id) && 'bg-blue-1 hover:bg-blue-1 dark:bg-blue-5 dark:hover:bg-blue-5'">
 				<a-col :span="3" class="center"><img :src="item.type ? fileSvg : folderSvg" class="w-30px h-30px" /></a-col>
 				<a-col :span="21" v-if="item.type" class="truncate">{{ richTextFilterText(item.title) }}</a-col>
-				<a-col :span="21" v-else class="truncate">{{ item.keyword }}</a-col>
+				<a-col :span="21" v-else class="truncate">{{ item.title }}</a-col>
 			</a-row>
 		</main>
 		<footer class="w-100% flex items-center justify-between mt-15px p-15px">

@@ -14,6 +14,7 @@
 		"@types/lodash-es": "^4.17.7",
 		"@types/uuid": "^8.3.4",
 		"@vueuse/core": "^9.13.0",
+		"@vueuse/math": "^10.1.2",
 		"@wangeditor/editor": "^5.1.23",
 		"@wangeditor/editor-for-vue": "^5.1.12",
 		"axios": "^0.27.2",

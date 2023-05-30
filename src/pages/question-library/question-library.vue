@@ -2,24 +2,24 @@
 import type { File } from '~/components/file-manager/interface.d'
 import type { AxiosResponse } from 'axios'
 import { isArray } from 'lodash-es'
-import { richTextFilterText } from '~/utils'
 import MoveFileModal from './components/move-file-modal.vue'
 
-const { pagination, fileList, breadcrumbList, breadcrumbLastId, clickBreadcrumb, getFileList, paginationReset } = useFilePagination()
+const isMe = ref<boolean>(false)
+const selectFile = ref<Array<number>>([]) // 被选中的列表
+const {
+	fileList,
+	breadcrumbList,
+	breadcrumbLastId,
+	isHome,
+	courseName,
+	clickBreadcrumb,
+	refreshFileList,
+	resetFlieState,
+	request: getFileList
+} = useFilePagination(isMe)
 
-// 打开组件获取文件列表
+//获取文件列表
 getFileList()
-
-// 格式化成组件需要的格式
-const formatFileList = computed(() =>
-	fileList.map((item) => {
-		const { keyword, id, fid, createdTimestamp, type, title } = item
-		return { fileName: keyword || richTextFilterText(title), fid: fid!, id, createdTimestamp, type }
-	})
-)
-
-// 被选中的列表
-const selectFile = ref<Array<number>>([])
 
 // 新建文件夹
 const createdFolderShow = ref(false)
@@ -27,13 +27,14 @@ const createdFolderShow = ref(false)
 const createdFolderOk = async (name: string) => {
 	if (name === '') return Message.error('文件夹昵称不能为空')
 
-	const res = await api.issueBank.addKeyword({ keyword: name, fid: breadcrumbLastId.value })
+	const res = await api.issueBank.addKeyword({ title: name, fid: breadcrumbLastId.value, courseName: courseName.value })
 
 	if (res.status !== 200) return Message.error('添加文件夹失败')
 
 	createdFolderShow.value = false
 	Message.success('添加文件夹成功')
-	fileList.unshift(res.data)
+	const { title, type, id, fid, createdTimestamp } = res.data
+	fileList.unshift({ fileName: title, type, id, fid: fid!, createdTimestamp })
 }
 
 // 新建题目
@@ -98,7 +99,7 @@ const restFolderName = async (name: string) => {
 	const folder = fileList.find((item) => item.id === folderId)
 
 	if (folder) {
-		folder.keyword = name
+		folder.fileName = name
 		Message.success('重命名文件夹成功')
 		resetFolderNameShow.value = false
 	}
@@ -111,14 +112,6 @@ const move = (data: number | Array<number>) => {
 	moveFileModalRef.value.open(isArray(data) ? data : [data])
 }
 
-// 刷新
-const updateFileList = () => {
-	paginationReset()
-	fileList.length = 0
-	selectFile.value.length = 0
-	getFileList()
-}
-
 // 打开文件
 const topicModalRef = ref()
 
@@ -126,11 +119,10 @@ const open = (data: File) => {
 	selectFile.value.length = 0
 	if (data.type === 0) {
 		//打开文件夹
-		paginationReset()
 		fileList.length = 0
 		breadcrumbList.push({ title: data.fileName, fid: data.id as number })
+		resetFlieState()
 		getFileList()
-		console.log(breadcrumbList)
 	} else {
 		//打卡文件
 		topicModalRef.value.toggleModal(['单选题', '填空题', '简答题', '判断题', '多选题'][data.type - 1], {
@@ -144,9 +136,9 @@ const open = (data: File) => {
 // 滑动到底部加载
 const scrollTobottomLoad = () => {
 	Message.success('滑动到底部了')
-	if (pagination.current < pagination.pages) {
-		pagination.current++
-	}
+	// if (pagination.current < pagination.pages) {
+	// 	pagination.current++
+	// }
 }
 
 //题目icon样式
@@ -174,7 +166,11 @@ const createdBtnMenu = [
 	<div class="p-10px box-border rounded mt-10px bg-[var(--color-bg-2)] select-none">
 		<div class="mb-10px">
 			<a-dropdown trigger="hover">
-				<div class="btn p-y-10px rounded-xl bg-blue-5 hover:bg-blue-4">新建</div>
+				<div
+					class="btn p-y-10px rounded-xl bg-blue-5 hover:bg-blue-4"
+					:class="(isHome || !isMe) && ' cursor-not-allowed bg-gray1 text-gray hover:bg-gray1! dark:(bg-dark1 hover:bg-dark1!)'">
+					新建
+				</div>
 				<template #content>
 					<a-doption v-for="item in createdBtnMenu" @click="item.click">
 						<div class="center">
@@ -192,13 +188,14 @@ const createdBtnMenu = [
 		<div class="h-80vh box-border overflow-y-auto scroll-bar" v-on-reach-bottom="{ cb: scrollTobottomLoad }">
 			<FileManger
 				v-model="selectFile"
-				:file-list="formatFileList"
+				:file-list="fileList"
+				:disabled="isHome"
 				@open="open"
 				@delete="deleteFile"
 				@move="move"
 				@created="createdFolderShow = true"
 				@reset-folder-name="resetFolderNameButton"
-				@refresh="updateFileList">
+				@refresh="refreshFileList">
 				<!-- 图标样式 -->
 				<template #fileIcon="{ type }">
 					<div :class="`w-20px h-20px absolute left-[calc(50%-10px)] top-40% text-white ${fileIconTextList[type].icon}`"></div>
@@ -207,9 +204,9 @@ const createdBtnMenu = [
 			</FileManger>
 		</div>
 
-		<InputModel title="重命名文件夹" v-model="resetFolderNameShow" @ok="restFolderName"></InputModel>
-		<InputModel title="新建文件夹" v-model="createdFolderShow" @ok="createdFolderOk"></InputModel>
-		<MoveFileModal ref="moveFileModalRef" @ok="updateFileList"></MoveFileModal>
-		<TopicModal @change="updateFileList" ref="topicModalRef"></TopicModal>
+		<InputModel placeholder="请输入文件夹名称" title="重命名文件夹" v-model="resetFolderNameShow" @ok="restFolderName"></InputModel>
+		<InputModel placeholder="请输入文件夹名称" title="新建文件夹" v-model="createdFolderShow" @ok="createdFolderOk"></InputModel>
+		<MoveFileModal ref="moveFileModalRef" @ok="refreshFileList"></MoveFileModal>
+		<TopicModal @change="refreshFileList" ref="topicModalRef" :course-name="courseName"></TopicModal>
 	</div>
 </template>

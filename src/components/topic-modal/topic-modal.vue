@@ -6,6 +6,10 @@ import { courseInfoStore } from '~/store/courseStore'
 
 import { getRichTextImageIds } from '~/utils'
 
+const props = defineProps<{
+	courseName?: string
+}>()
+
 const show = ref(false)
 const topicType = ref<string>('')
 
@@ -158,7 +162,7 @@ const saveTopic = async () => {
 	let res
 
 	if (openParam.fid !== -1 && openParam.id === 0) {
-		res = await api.issueBank.addQuestionBank({ ...params, fid: openParam.fid })
+		res = await api.issueBank.addQuestionBank({ ...params, fid: openParam.fid, courseName: props.courseName || '' })
 		loading.value = false
 		return res.status === 200
 	}
@@ -166,7 +170,7 @@ const saveTopic = async () => {
 	//如果问题id为0 则为添加 否则 为修改
 	if (openParam.id) {
 		res = openParam.isBank
-			? await api.issueBank.updateQuestionBankById(openParam.id, { ...params, fid: openParam.fid })
+			? await api.issueBank.updateQuestionBankById(openParam.id, { ...params, fid: openParam.fid, courseName: props.courseName || '' })
 			: await api.issue.updateQuestionById(openParam.id, params)
 	} else {
 		res = await api.issue.addQuestion(courseInfoStore.value.id, params)

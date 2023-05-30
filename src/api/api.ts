@@ -51,6 +51,8 @@ export interface QuestionBankParam {
 	 * @example ["A"]
 	 */
 	answer?: string[]
+	/** 所属科目 */
+	courseName?: string
 	/** 答案解析 */
 	analysis?: string
 	/**
@@ -58,8 +60,11 @@ export interface QuestionBankParam {
 	 * @format int32
 	 */
 	type: number
-	/** 是否共享 */
-	share_flag?: boolean
+	/**
+	 * 0不共享  1科目共享 2全部共享
+	 * @format int32
+	 */
+	share?: number
 	/**
 	 * 父id -1为不添加题库 其余为添加
 	 * @format int64
@@ -341,12 +346,14 @@ export interface TeacherUserParam {
 /** 题库文件夹类 */
 export interface QuestionBankKeyword {
 	/** 文件夹名 */
-	keyword: string
+	title: string
 	/**
 	 * 父id
 	 * @format int64
 	 */
 	fid?: number
+	/** 科目名 */
+	courseName?: string
 }
 
 /**
@@ -610,6 +617,36 @@ export interface MyPageQuestionVo {
 export interface OrderItem {
 	column?: string
 	asc?: boolean
+}
+
+/** 分页对象 */
+export interface MyPageSchoolUserVo {
+	/** 数据 */
+	records: SchoolUserVo[]
+	/**
+	 * 总数
+	 * @format int64
+	 */
+	total: number
+	/**
+	 * 每页总长度
+	 * @format int64
+	 */
+	size: number
+	/**
+	 * 当前页数
+	 * @format int64
+	 */
+	current: number
+	/** 排序字段信息 */
+	orders?: OrderItem[]
+	/** 是否查询总数 */
+	searchCount: boolean
+	/**
+	 * 总页数
+	 * @format int64
+	 */
+	pages: number
 }
 
 /** 问题任务列表简略信息类 */
@@ -1006,36 +1043,6 @@ export interface ExaminationLogInfoVo {
 export interface MyPage课件返回类 {
 	/** 数据 */
 	records: Type课件返回类[]
-	/**
-	 * 总数
-	 * @format int64
-	 */
-	total: number
-	/**
-	 * 每页总长度
-	 * @format int64
-	 */
-	size: number
-	/**
-	 * 当前页数
-	 * @format int64
-	 */
-	current: number
-	/** 排序字段信息 */
-	orders?: OrderItem[]
-	/** 是否查询总数 */
-	searchCount: boolean
-	/**
-	 * 总页数
-	 * @format int64
-	 */
-	pages: number
-}
-
-/** 分页对象 */
-export interface MyPageSchoolUserVo {
-	/** 数据 */
-	records: SchoolUserVo[]
 	/**
 	 * 总数
 	 * @format int64
@@ -1569,7 +1576,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 		 * @request GET:/teacherWeb/questionBank/query
 		 */
 		queryQuestionBank: (
-			query?: {
+			query: {
 				/**
 				 * 第几页
 				 * @format int32
@@ -1598,8 +1605,16 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 				 * @format int32
 				 */
 				type?: number
-				/** 是否查询共享题库 0假 1真 默认全部 */
-				shareFlag?: boolean
+				/**
+				 * 共享类型 0我的 1共享
+				 * @format int32
+				 * @default 0
+				 */
+				share?: number
+				/** 科目名 */
+				courseName: string
+				/** 老师工号 */
+				jobNum?: string
 				/**
 				 * 创建时间开始时
 				 * @format int64
@@ -1629,7 +1644,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 		 * @request GET:/teacherWeb/questionBank/querySim
 		 */
 		queryQuestionBankSim: (
-			query?: {
+			query: {
 				/**
 				 * 第几页
 				 * @format int32
@@ -1658,8 +1673,16 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 				 * @format int32
 				 */
 				type?: number
-				/** 是否查询共享题库 0假 1真 默认全部 */
-				shareFlag?: boolean
+				/**
+				 * 共享类型 0我的 1共享
+				 * @format int32
+				 * @default 0
+				 */
+				share?: number
+				/** 科目名 */
+				courseName: string
+				/** 老师工号 */
+				jobNum?: string
 				/**
 				 * 创建时间开始时
 				 * @format int64
@@ -1675,6 +1698,52 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 		) =>
 			this.request<MyPageQuestionVo, any>({
 				path: `/teacherWeb/questionBank/querySim`,
+				method: 'GET',
+				query: query,
+				...params
+			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags 82-问题题库模块
+		 * @name GetShareQuestionBank
+		 * @summary 11-查询分享的问题科目
+		 * @request GET:/teacherWeb/questionBank/getShareCourseName
+		 */
+		getShareQuestionBank: (params: RequestParams = {}) =>
+			this.request<string[], any>({
+				path: `/teacherWeb/questionBank/getShareCourseName`,
+				method: 'GET',
+				...params
+			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags 82-问题题库模块
+		 * @name GetJobNameByQuestionBank
+		 * @summary 12-查询分享问题科目下的分享老师
+		 * @request GET:/teacherWeb/questionBank/getJobNameByCourseName
+		 */
+		getJobNameByQuestionBank: (
+			query: {
+				/**
+				 * @format int64
+				 * @default 1
+				 */
+				current?: number
+				/**
+				 * @format int64
+				 * @default 5
+				 */
+				size?: number
+				courseName: string
+			},
+			params: RequestParams = {}
+		) =>
+			this.request<MyPageSchoolUserVo, any>({
+				path: `/teacherWeb/questionBank/getJobNameByCourseName`,
 				method: 'GET',
 				query: query,
 				...params

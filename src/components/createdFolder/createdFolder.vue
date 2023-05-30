@@ -4,17 +4,17 @@ const props = defineProps<{
 }>()
 
 const params = reactive({
-	keyword: ''
+	title: ''
 })
 
 const emits = defineEmits(['ok'])
 
 const addFolder = async () => {
-	if (params.keyword === '') return Message.error('文件夹昵称不能为空')
+	if (params.title === '') return Message.error('文件夹昵称不能为空')
 	const res = await api.issueBank.addKeyword({ ...params, fid: props.fid })
 	if (res.status === 200) {
 		show.value = false
-		params.keyword = ''
+		params.title = ''
 		emits('ok', res.data)
 		Message.success('添加文件夹成功')
 	} else {
@@ -32,7 +32,7 @@ const open = async () => {
 defineExpose({ open })
 
 const close = () => {
-	params.keyword = ''
+	params.title = ''
 	show.value = false
 	window.removeEventListener('keydown', watchEnter)
 }
@@ -47,7 +47,7 @@ const watchEnter = (event: KeyboardEvent) => {
 
 <template>
 	<a-modal :visible="show" title="新建文件夹" :width="500" :closable="false" :mask-closable="false" :esc-to-close="false" :footer="false">
-		<a-input placeholder="请输入文件夹名称" v-model="params.keyword"></a-input>
+		<a-input placeholder="请输入文件夹名称" v-model="params.title"></a-input>
 		<div class="center justify-end mt-30px">
 			<div>
 				<a-button class="mr-10px" @click="close">取消</a-button>

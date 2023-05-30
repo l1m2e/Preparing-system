@@ -41,8 +41,7 @@ export default defineConfig({
 			dirs: ['src/components'],
 			deep: true,
 			extensions: ['vue'],
-			// 用于转换目标的过滤器
-			include: [/.vue$/, /.vue?vue/],
+			include: [/.vue$/, /.vue\?vue/],
 			exclude: [/[\/]node_modules[\/]/, /[\/].git[\/]/, /[\/].nuxt[\/]/],
 			resolvers: [
 				ArcoResolver({

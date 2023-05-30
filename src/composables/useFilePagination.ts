@@ -1,87 +1,128 @@
-import { setReactive } from '~/utils'
-import type { QuestionVo } from '~/api/api'
+import dayjs from 'dayjs'
+import type { MaybeRef } from 'vue'
+import { toValue } from 'vue'
+import { File } from '~/components/file-manager/interface'
 
 /** 使用文件分页 */
-export const useFilePagination = () => {
-	/** 面包屑数组 */
-	const breadcrumbList = reactive([{ title: '全部', fid: 0 }])
-	/** 面包屑最后一个id */
+export const useFilePagination = (isMe: MaybeRef<boolean>) => {
+	//
+	const breadcrumbList = reactive([{ title: '全部', fid: -1001 }]) // 文件夹目录写死的层级 不参与请求 层级 -1001 全部 -1002 课程
 	const breadcrumbLastId = computed(() => breadcrumbList.slice().pop()?.fid || 0)
-	/** 分页配置 */
-	const pagination = reactive({
-		current: 1,
-		pages: 1,
-		size: 50
-	})
+	const isHome = computed(() => (toValue(isMe) ? breadcrumbList.length === 1 : breadcrumbList.length <= 2))
+	const courseName = computed(() => breadcrumbList[1]?.title ?? '')
+	const teacherId = computed(() => (toValue(isMe) ? '' : breadcrumbList[2]?.fid ?? ''))
 
-	// 分页重置
-	const paginationReset = () => setReactive(pagination, { current: 1, pages: 1, size: 50 })
-
-	/** 文件列表 */
-	const fileList = reactive<Array<QuestionVo>>([])
-
-	/** 获取文件列表 */
-	const getFileList = async () => {
-		/** 如果当前页大于总页数,则直接返回不请求 */
-		if (pagination.current > pagination.pages) return
-
-		const { pages, ...parms } = pagination
-
-		const res = await api.issueBank.queryQuestionBankSim({ ...parms, fid: breadcrumbLastId.value })
-
-		if (res.status === 200) {
-			res.data.records.forEach((item) => fileList.push(item))
-			pagination.pages = res.data.pages || 1
-		}
-	}
-
-	/**
-	 * 点击面包屑
-	 * @param id 点击的面包屑的id
-	 */
+	//点击面包屑
 	const clickBreadcrumb = (id: number) => {
 		const index = breadcrumbList.findIndex((item) => item.fid === id)
 		if (index !== -1) breadcrumbList.splice(index + 1)
-		fileList.length = 0
-		pagination.pages = pagination.current = 1
+		resetFlieState()
+		request()
+	}
+
+	//请求模块
+	const fileList = reactive<Array<File>>([])
+
+	//获取老师列表
+	const useTeacherFolder = async () => {
+		const res = await api.courseware.getJobNameByCourseName({ courseName: courseName.value })
+		if (res.status === 200) {
+			const formatData = res.data.records
+				.filter((item) => item.jobNum !== useUserInfo.value.schoolUser.studentId) //过滤掉自己共享的文件夹
+				.map((item) => ({
+					fileName: item.teachName!,
+					id: item.jobNum as any,
+					fid: -1002,
+					createdTimestamp: dayjs().valueOf(),
+					type: 0
+				}))
+			setFileList(formatData)
+		}
+	}
+
+	//获取课程列表
+	const getCourseFolder = async () => {
+		const query = toValue(isMe) ? api.courseTable.getCourseNameBySemester : api.courseware.getShareCourseName
+		const res = await query()
+		if (res.status === 200) {
+			const formatData = res.data.map((item) => ({ fileName: item, id: 0, fid: 0, createdTimestamp: dayjs().valueOf(), type: 0 }))
+			setFileList(formatData)
+		}
+	}
+
+	// 获取文件列表
+	const total = ref(Infinity)
+
+	const getFileList = async () => {
+		if (isLastPage.value) return
+
+		const res = await api.issueBank.queryQuestionBankSim({
+			current: currentPage.value,
+			size: currentPageSize.value,
+			fid: breadcrumbList.length === 3 ? 0 : breadcrumbLastId.value,
+			courseName: courseName.value,
+			jobNum: teacherId.value as any
+		})
+
+		if (res.status === 200) {
+			total.value = res.data.total
+			const formatData = res.data.records.map(({ title, id, fid, createdTimestamp, type }) => ({
+				fileName: title,
+				id,
+				fid: fid!,
+				createdTimestamp,
+				type
+			}))
+			setFileList(formatData)
+		}
+	}
+
+	//根据状态发起请求
+	const request = () => {
+		if (isHome.value) {
+			if (toValue(isMe)) {
+				getCourseFolder()
+			} else {
+				breadcrumbList.length === 1 ? getCourseFolder() : useTeacherFolder()
+			}
+			return
+		}
 		getFileList()
 	}
 
-	/** 监听分页 如果分页发生了变化则请求 但是不包括分页被重置为1的时候 */
-	watch(
-		() => pagination.current,
-		() => {
-			if (pagination.current === 1) return
-			getFileList()
-		}
-	)
+	//分页配置
+	const { currentPage, currentPageSize, isLastPage } = useOffsetPagination({
+		total,
+		pageSize: 50
+	})
 
-	/** 重置状态 */
-	const resetFlieState = () => {
-		paginationReset()
-		fileList.length = 0
-		breadcrumbList.length = 1
-	}
-
-	/** 给fileList重新赋值 */
-	const setFileList = (arr: Array<any>) => {
+	const setFileList = (arr: File[]) => {
 		fileList.length = 0
 		fileList.push(...arr)
 	}
 
-	onUnmounted(() => {
+	const resetFlieState = () => {
+		currentPage.value = 1
+		fileList.length = 0
+		total.value = Infinity
+	}
+
+	const refreshFileList = () => {
 		resetFlieState()
-	})
+		request()
+	}
 
 	return {
-		/** 分页配置 */
-		pagination,
+		/** 是否为首页 */
+		isHome,
 		/** 文件列表 */
 		fileList,
 		/** 面包屑数组 */
 		breadcrumbList,
 		/** 面包屑最后一个id */
 		breadcrumbLastId,
+		/** 课程名 */
+		courseName,
 		/** 点击面包屑 */
 		clickBreadcrumb,
 		/** 重置状态 */
@@ -90,7 +131,9 @@ export const useFilePagination = () => {
 		getFileList,
 		/** 设置文件列表 */
 		setFileList,
-		/** 分页重置 */
-		paginationReset
+		/** 刷新文件列表 */
+		refreshFileList,
+		/** 根据状态发起请求 */
+		request
 	}
 }
