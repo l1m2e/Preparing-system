@@ -13,7 +13,7 @@ defineExpose({ open })
 
 const isMe = ref(true)
 
-const { fileList, breadcrumbList, breadcrumbLastId, clickBreadcrumb, resetFlieState, next, request: getFileList } = useFilePagination(isMe)
+const { fileList, breadcrumbList, clickBreadcrumb, resetFileList, resetFlieState, next, request: getFileList } = useFilePagination(isMe)
 
 //滚动到底部刷新
 const pullLoad = () => {
@@ -42,14 +42,6 @@ const clickFile = async (item: any) => {
 	}
 }
 
-// 创建文件夹 ref
-const createdFolderRef = ref()
-
-//创建文件夹
-const createdFolderSuccess = (res: any) => {
-	breadcrumbList.push({ title: res.title, fid: res.id })
-}
-
 const emit = defineEmits(['ok'])
 
 //保存
@@ -76,12 +68,18 @@ const beforClose = () => {
 		:footer="false"
 		:body-style="{ padding: 0 }"
 		@before-close="beforClose">
-		<header>
+		<header class="flex justify-between items-center w-100%">
 			<a-breadcrumb separator=">" :max-count="3" class="ml-10px my-10px">
 				<a-breadcrumb-item v-for="item in breadcrumbList" @click="clickBreadcrumb(item.fid)" class="max-w-120px truncate">
 					{{ item.title }}
 				</a-breadcrumb-item>
 			</a-breadcrumb>
+			<div class="mr-10px">
+				<a-radio-group type="button" size="small" v-model="isMe" @change="resetFileList">
+					<a-radio :value="true">我的课件库</a-radio>
+					<a-radio :value="false">共享课件库</a-radio>
+				</a-radio-group>
+			</div>
 		</header>
 		<main class="w-100% h-500px overflow-y-auto scroll-bar overflow-x-hidden" v-on-reach-bottom="{ cb: pullLoad }">
 			<a-row
@@ -101,6 +99,5 @@ const beforClose = () => {
 				</a-badge>
 			</div>
 		</footer>
-		<CreatedFolder ref="createdFolderRef" :fid="breadcrumbLastId" @ok="createdFolderSuccess"></CreatedFolder>
 	</a-modal>
 </template>

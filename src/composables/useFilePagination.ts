@@ -79,6 +79,7 @@ export const useFilePagination = (isMe: MaybeRef<boolean>) => {
 
 	//根据状态发起请求
 	const request = () => {
+		// console.log('isHome', isHome.value)
 		if (isHome.value) {
 			if (toValue(isMe)) {
 				getCourseFolder()
@@ -114,9 +115,9 @@ export const useFilePagination = (isMe: MaybeRef<boolean>) => {
 	}
 
 	const resetFileList = () => {
+		breadcrumbList.length = 1
 		resetFlieState()
 		request()
-		breadcrumbList.length = 1
 	}
 
 	return {
