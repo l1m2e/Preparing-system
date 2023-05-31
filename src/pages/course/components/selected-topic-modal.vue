@@ -11,11 +11,13 @@ const open = () => {
 }
 defineExpose({ open })
 
-const { pagination, fileList, breadcrumbList, breadcrumbLastId, clickBreadcrumb, resetFlieState, getFileList } = useFilePagination()
+const isMe = ref(true)
+
+const { fileList, breadcrumbList, breadcrumbLastId, clickBreadcrumb, resetFlieState, next, request: getFileList } = useFilePagination(isMe)
 
 //滚动到底部刷新
 const pullLoad = () => {
-	pagination.current++
+	next()
 	Message.success('下拉加载更多被触发')
 }
 
@@ -26,7 +28,7 @@ const selectedList = ref<Array<any>>([])
 const clickFile = async (item: any) => {
 	//如果是文件夹
 	if (item.type === 0) {
-		breadcrumbList.push({ title: item.title, fid: item.id })
+		breadcrumbList.push({ title: item.fileName, fid: item.id })
 		fileList.length = 0
 		getFileList()
 		return
@@ -88,8 +90,7 @@ const beforClose = () => {
 				class="py-10px mx-10px box-border rounded hover:bg-[var(--color-fill-2)] cursor-pointer !items-center first:mt-10px transition mb-10px"
 				:class="selectedList.includes(item.id) && 'bg-blue-1 hover:bg-blue-1 dark:bg-blue-5 dark:hover:bg-blue-5'">
 				<a-col :span="3" class="center"><img :src="item.type ? fileSvg : folderSvg" class="w-30px h-30px" /></a-col>
-				<a-col :span="21" v-if="item.type" class="truncate">{{ richTextFilterText(item.title) }}</a-col>
-				<a-col :span="21" v-else class="truncate">{{ item.title }}</a-col>
+				<a-col :span="21" class="truncate">{{ richTextFilterText(item.fileName) }}</a-col>
 			</a-row>
 		</main>
 		<footer class="w-100% flex items-center justify-end mt-15px p-15px">

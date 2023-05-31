@@ -284,7 +284,7 @@ const shareSelectRef = ref()
 //共享操作
 const shareFile = async (file: File) => {
 	if (file.shareType !== 0) {
-		const res = await api.courseware.shareBatch({ ids: [file.id as number], shareType: 0 })
+		const res = await api.courseware.shareBatchCourseware({ ids: [file.id as number], shareType: 0 })
 		if (res.status === 200) {
 			const item = fileListFormat.value.find((item) => item.id === file.id)
 			if (item) {

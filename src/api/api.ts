@@ -27,6 +27,20 @@ export interface Message {
 	error?: string
 }
 
+/** 批量分享问题模型 */
+export interface QuestionBankShareParam {
+	/**
+	 * 问题id
+	 * @uniqueItems true
+	 */
+	ids: number[]
+	/**
+	 * 分享类型 0不分享 1科目分享 2全局分享，默认0
+	 * @format int32
+	 */
+	share: number
+}
+
 /**
  * 选项数组
  * @example [{"unique":"A","text":"选项"}]
@@ -60,11 +74,6 @@ export interface QuestionBankParam {
 	 * @format int32
 	 */
 	type: number
-	/**
-	 * 0不共享  1科目共享 2全部共享
-	 * @format int32
-	 */
-	share?: number
 	/**
 	 * 父id -1为不添加题库 其余为添加
 	 * @format int64
@@ -104,10 +113,11 @@ export interface QuestionVo {
 	 * @format int32
 	 */
 	type: number
-	/** 类型 标识 */
-	keyword?: string
-	/** 是否为题库 0假 1真 */
-	shareFlag: boolean
+	/**
+	 * 共享类型 0我的 1科目共享 2全校共享
+	 * @format int32
+	 */
+	share: number
 	/**
 	 * 难易度
 	 * @format int32
@@ -137,6 +147,8 @@ export interface QuestionMoveParam {
 	 * @format int64
 	 */
 	fid: number
+	/** 科目名(导入分享课件专用) */
+	courseName?: string
 }
 
 /** 批改问题类 */
@@ -1465,6 +1477,23 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 		 * No description
 		 *
 		 * @tags 82-问题题库模块
+		 * @name ShareBatchQuestion
+		 * @summary 13-批量分享
+		 * @request PUT:/teacherWeb/questionBank/shareBatch
+		 */
+		shareBatchQuestion: (data: QuestionBankShareParam, params: RequestParams = {}) =>
+			this.request<Message, any>({
+				path: `/teacherWeb/questionBank/shareBatch`,
+				method: 'PUT',
+				body: data,
+				type: ContentType.Json,
+				...params
+			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags 82-问题题库模块
 		 * @name UpdateQuestionBankById
 		 * @summary 7-修改问题
 		 * @request PUT:/teacherWeb/questionBank/putQuestion/{id}
@@ -2440,11 +2469,11 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 		 * No description
 		 *
 		 * @tags 83-课件模块
-		 * @name ShareBatch
+		 * @name ShareBatchCourseware
 		 * @summary 13-批量分享
 		 * @request PUT:/teacherWeb/courseware/shareBatch
 		 */
-		shareBatch: (data: CoursewareShareParam, params: RequestParams = {}) =>
+		shareBatchCourseware: (data: CoursewareShareParam, params: RequestParams = {}) =>
 			this.request<Message, any>({
 				path: `/teacherWeb/courseware/shareBatch`,
 				method: 'PUT',

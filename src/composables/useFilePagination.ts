@@ -54,26 +54,26 @@ export const useFilePagination = (isMe: MaybeRef<boolean>) => {
 	const total = ref(Infinity)
 
 	const getFileList = async () => {
-		if (isLastPage.value) return
-
+		console.log('请求文件列表', currentPage.value, currentPageSize.value, isLastPage.value)
 		const res = await api.issueBank.queryQuestionBankSim({
 			current: currentPage.value,
 			size: currentPageSize.value,
-			fid: breadcrumbList.length === 3 ? 0 : breadcrumbLastId.value,
+			fid: toValue(isMe) ? breadcrumbLastId.value : breadcrumbList.length === 3 ? 0 : breadcrumbLastId.value,
 			courseName: courseName.value,
 			jobNum: teacherId.value as any
 		})
 
 		if (res.status === 200) {
 			total.value = res.data.total
-			const formatData = res.data.records.map(({ title, id, fid, createdTimestamp, type }) => ({
+			const formatData = res.data.records.map(({ title, id, fid, createdTimestamp, type, share }) => ({
 				fileName: title,
 				id,
 				fid: fid!,
 				createdTimestamp,
-				type
+				type,
+				shareType: share
 			}))
-			setFileList(formatData)
+			fileList.push(...formatData)
 		}
 	}
 
@@ -91,9 +91,10 @@ export const useFilePagination = (isMe: MaybeRef<boolean>) => {
 	}
 
 	//分页配置
-	const { currentPage, currentPageSize, isLastPage } = useOffsetPagination({
+	const { currentPage, currentPageSize, isLastPage, next } = useOffsetPagination({
 		total,
-		pageSize: 50
+		pageSize: 50,
+		onPageChange: getFileList
 	})
 
 	const setFileList = (arr: File[]) => {
@@ -110,6 +111,12 @@ export const useFilePagination = (isMe: MaybeRef<boolean>) => {
 	const refreshFileList = () => {
 		resetFlieState()
 		request()
+	}
+
+	const resetFileList = () => {
+		resetFlieState()
+		request()
+		breadcrumbList.length = 1
 	}
 
 	return {
@@ -134,6 +141,10 @@ export const useFilePagination = (isMe: MaybeRef<boolean>) => {
 		/** 刷新文件列表 */
 		refreshFileList,
 		/** 根据状态发起请求 */
-		request
+		request,
+		/** 重置所有状态 */
+		resetFileList,
+		/** 下一页 */
+		next
 	}
 }

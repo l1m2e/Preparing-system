@@ -10,28 +10,25 @@ const emit = defineEmits<{
 
 const show = ref(false)
 const selectedList = ref<Array<any>>([])
+const isMe = ref(true)
 
 const open = (openSelectedList: Array<number>) => {
 	//进入页面前清空页面数据
-	resetFlieState()
+	resetFileList()
 	getFileList()
 	show.value = true
-	console.log(openSelectedList)
 	selectedList.value = openSelectedList
 }
 defineExpose({ open })
 
-const { pagination, fileList, breadcrumbList, breadcrumbLastId, clickBreadcrumb, resetFlieState, getFileList } = useFilePagination()
+const { fileList, breadcrumbList, breadcrumbLastId, clickBreadcrumb, request: getFileList, next, resetFileList, courseName } = useFilePagination(isMe)
 const fileListUi = computed(() => fileList.filter((item) => !selectedList.value.includes(item.id)))
-
-//滚动到底部刷新
-const pullLoad = () => pagination.current++
 
 //点击文件夹
 const clickFile = async (item: any) => {
 	if (item.type !== 0) return
 	//如果是文件夹
-	breadcrumbList.push({ title: item.title, fid: item.id })
+	breadcrumbList.push({ title: item.fileName, fid: item.id })
 	fileList.length = 0
 	getFileList()
 }
@@ -46,7 +43,7 @@ const createdFolderSuccess = (res: any) => {
 
 //保存
 const save = async () => {
-	const res = await api.issueBank.moveQuestionBank({ fid: breadcrumbLastId.value, ids: selectedList.value })
+	const res = await api.issueBank.moveQuestionBank({ fid: breadcrumbLastId.value, ids: selectedList.value, courseName: courseName.value })
 	if (res.status === 200) {
 		fileList.length = 0
 		getFileList()
@@ -76,15 +73,13 @@ const save = async () => {
 				</a-breadcrumb-item>
 			</a-breadcrumb>
 		</header>
-		<main class="w-100% h-500px overflow-y-auto scroll-bar overflow-x-hidden" v-on-reach-bottom="{ cb: pullLoad }">
+		<main class="w-100% h-500px overflow-y-auto scroll-bar overflow-x-hidden" v-on-reach-bottom="{ cb: next }">
 			<a-row
 				v-for="item in fileListUi"
 				@click="clickFile(item)"
-				class="py-10px mx-10px box-border rounded hover:bg-[var(--color-fill-2)] cursor-pointer !items-center first:mt-10px transition mb-10px"
-				:class="selectedList.includes(item.id) && 'bg-blue-1 hover:bg-blue-1 dark:bg-blue-5 dark:hover:bg-blue-5'">
+				class="py-10px mx-10px box-border rounded hover:bg-[var(--color-fill-2)] cursor-pointer !items-center first:mt-10px transition mb-10px">
 				<a-col :span="3" class="center"><img :src="item.type ? fileSvg : folderSvg" class="w-30px h-30px" /></a-col>
-				<a-col :span="21" v-if="item.type" class="truncate">{{ richTextFilterText(item.title) }}</a-col>
-				<a-col :span="21" v-else class="truncate">{{ item.title }}</a-col>
+				<a-col :span="21" class="truncate">{{ richTextFilterText(item.fileName) }}</a-col>
 			</a-row>
 		</main>
 		<footer class="w-100% flex items-center justify-between mt-15px p-15px">

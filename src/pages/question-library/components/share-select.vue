@@ -2,7 +2,7 @@
 import type { File } from '~/components/file-manager/interface'
 
 const emits = defineEmits<{
-	ok: [{ id: number; shareType: number }]
+	ok: [{ id: number; share: number }]
 }>()
 
 const show = ref(false)
@@ -16,15 +16,15 @@ const open = (file: File) => {
 
 defineExpose({ open })
 
-const save = async (shareType: number) => {
+const save = async (share: number) => {
 	if (!fileId) return Message.error('没有选中文件,请尝试重新打开')
-	const res = await api.courseware.shareBatchCourseware({
+	const res = await api.issueBank.shareBatchQuestion({
 		ids: [fileId],
-		shareType
+		share
 	})
 	if (res.status === 200) {
 		Message.success('修改成功')
-		emits('ok', { id: fileId, shareType })
+		emits('ok', { id: fileId, share })
 		show.value = false
 	} else {
 		Message.error('共享失败')

@@ -2,9 +2,15 @@
 import type { File } from '~/components/file-manager/interface.d'
 import type { AxiosResponse } from 'axios'
 import { isArray } from 'lodash-es'
+import ShareSelect from './components/share-select.vue'
 import MoveFileModal from './components/move-file-modal.vue'
 
-const isMe = ref<boolean>(false)
+const isMe = ref<boolean>(true)
+//切换课件库
+const switchingLibrary = () => {
+	resetFileList()
+}
+
 const selectFile = ref<Array<number>>([]) // 被选中的列表
 const {
 	fileList,
@@ -15,6 +21,8 @@ const {
 	clickBreadcrumb,
 	refreshFileList,
 	resetFlieState,
+	resetFileList,
+	next,
 	request: getFileList
 } = useFilePagination(isMe)
 
@@ -120,7 +128,8 @@ const open = (data: File) => {
 	if (data.type === 0) {
 		//打开文件夹
 		fileList.length = 0
-		breadcrumbList.push({ title: data.fileName, fid: data.id as number })
+		breadcrumbList.push({ title: data.fileName, fid: data.id })
+		console.log(breadcrumbList)
 		resetFlieState()
 		getFileList()
 	} else {
@@ -136,9 +145,35 @@ const open = (data: File) => {
 // 滑动到底部加载
 const scrollTobottomLoad = () => {
 	Message.success('滑动到底部了')
-	// if (pagination.current < pagination.pages) {
-	// 	pagination.current++
-	// }
+	next()
+}
+
+// 分享文件
+const shareFile = async (file: File) => {
+	//取消共享
+	if (file.shareType !== 0) {
+		const res = await api.issueBank.shareBatchQuestion({ ids: [file.id as number], share: 0 })
+		if (res.status === 200) {
+			const item = fileList.find((item) => item.id === file.id)
+			if (item) {
+				item.shareType = 0
+			}
+			Message.success('取消共享成功')
+		} else {
+			Message.error('取消共享失败')
+		}
+		return
+	}
+
+	shareSelectRef.value.open(file)
+}
+
+const shareSelectRef = ref()
+const shareSuccess = (data: { id: number; share: number }) => {
+	const item = fileList.find((item) => item.id === data.id)
+	if (item) {
+		item.shareType = data.share
+	}
 }
 
 //题目icon样式
@@ -164,25 +199,34 @@ const createdBtnMenu = [
 
 <template>
 	<div class="p-10px box-border rounded mt-10px bg-[var(--color-bg-2)] select-none">
-		<div class="mb-10px">
-			<a-dropdown trigger="hover">
-				<div
-					class="btn p-y-10px rounded-xl bg-blue-5 hover:bg-blue-4"
-					:class="(isHome || !isMe) && ' cursor-not-allowed bg-gray1 text-gray hover:bg-gray1! dark:(bg-dark1 hover:bg-dark1!)'">
-					新建
-				</div>
-				<template #content>
-					<a-doption v-for="item in createdBtnMenu" @click="item.click">
-						<div class="center">
-							<div class="mr-10px" :class="item.icon"></div>
-							<span>{{ item.name }}</span>
-						</div>
-					</a-doption>
-				</template>
-			</a-dropdown>
-			<a-breadcrumb separator=">" :max-count="4" class="ml-10px">
-				<a-breadcrumb-item v-for="item in breadcrumbList" @click="clickBreadcrumb(item.fid)">{{ item.title }}</a-breadcrumb-item>
-			</a-breadcrumb>
+		<div class="mb-10px flex justify-between">
+			<div>
+				<a-dropdown trigger="hover" :disabled="isHome">
+					<div
+						class="btn p-y-10px rounded-xl bg-blue-5 hover:bg-blue-4"
+						:class="(isHome || !isMe) && ' cursor-not-allowed bg-gray1 text-gray hover:bg-gray1! dark:(bg-dark1 hover:bg-dark1!)'">
+						新建
+					</div>
+					<template #content>
+						<a-doption v-for="item in createdBtnMenu" @click="item.click">
+							<div class="center">
+								<div class="mr-10px" :class="item.icon"></div>
+								<span>{{ item.name }}</span>
+							</div>
+						</a-doption>
+					</template>
+				</a-dropdown>
+				<a-breadcrumb separator=">" :max-count="4" class="ml-10px">
+					<a-breadcrumb-item v-for="item in breadcrumbList" @click="clickBreadcrumb(item.fid)">{{ item.title }}</a-breadcrumb-item>
+				</a-breadcrumb>
+			</div>
+
+			<div>
+				<a-radio-group type="button" size="large" v-model="isMe" @change="switchingLibrary">
+					<a-radio :value="true">我的课件库</a-radio>
+					<a-radio :value="false">共享课件库</a-radio>
+				</a-radio-group>
+			</div>
 		</div>
 
 		<div class="h-80vh box-border overflow-y-auto scroll-bar" v-on-reach-bottom="{ cb: scrollTobottomLoad }">
@@ -190,9 +234,11 @@ const createdBtnMenu = [
 				v-model="selectFile"
 				:file-list="fileList"
 				:disabled="isHome"
+				:share="isMe"
 				@open="open"
 				@delete="deleteFile"
 				@move="move"
+				@onShare="shareFile"
 				@created="createdFolderShow = true"
 				@reset-folder-name="resetFolderNameButton"
 				@refresh="refreshFileList">
@@ -208,5 +254,6 @@ const createdBtnMenu = [
 		<InputModel placeholder="请输入文件夹名称" title="新建文件夹" v-model="createdFolderShow" @ok="createdFolderOk"></InputModel>
 		<MoveFileModal ref="moveFileModalRef" @ok="refreshFileList"></MoveFileModal>
 		<TopicModal @change="refreshFileList" ref="topicModalRef" :course-name="courseName"></TopicModal>
+		<ShareSelect ref="shareSelectRef" @ok="shareSuccess"></ShareSelect>
 	</div>
 </template>
