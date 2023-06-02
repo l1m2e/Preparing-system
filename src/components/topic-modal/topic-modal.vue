@@ -8,6 +8,7 @@ import { getRichTextImageIds } from '~/utils'
 
 const props = defineProps<{
 	courseName?: string
+	readonly?: boolean
 }>()
 
 const show = ref(false)
@@ -239,12 +240,17 @@ const message = (msg: string) => {
 		<multiple-choice-question v-if="topicType === '多选题'" type="多选题"></multiple-choice-question>
 		<short-answer-question v-if="topicType === '简答题'"></short-answer-question>
 		<div class="center justify-between mt-30px">
-			<a-tooltip content="清空入的内容" position="right" mini>
+			<a-tooltip content="清空入的内容" position="right" mini v-if="!props.readonly">
 				<a-button @click="resetTopicStore">重置</a-button>
 			</a-tooltip>
-			<div>
+			<div v-else></div>
+
+			<div v-if="!props.readonly">
 				<a-button class="mr-10px" @click="close">取消</a-button>
 				<a-button :loading="loading" @click="save" type="primary">保存</a-button>
+			</div>
+			<div v-else>
+				<a-button @click="show = false" type="primary">关闭预览</a-button>
 			</div>
 		</div>
 	</a-modal>

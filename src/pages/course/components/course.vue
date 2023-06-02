@@ -98,7 +98,7 @@ const goLessonPrepare = (info: any) => {
 										<a-button type="primary" @click="goLessonPrepare(child)">去备课</a-button>
 									</div>
 									<a-progress class="mt-20px" :animation="true" :percent="parseFloat((child.courseHour / child.courseHourAll).toFixed(2))">
-										<template v-slot:text="scope">{{ scope.percent * 100 }}% {{ child.courseHourAll }} /{{ child.courseHour }}</template>
+										<template v-slot:text="scope">{{ (scope.percent * 100).toFixed(0) }}% {{ child.courseHourAll }} /{{ child.courseHour }}</template>
 									</a-progress>
 								</div>
 							</div>

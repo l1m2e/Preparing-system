@@ -100,7 +100,8 @@ watch(
 const imagePreviewGroupShow = ref(false)
 const imagePreviewGroupcurrent = ref(0)
 const imageList = ref<Array<string>>([])
-const openImagePreviewGroup = (idList: Array<number>) => {
+const openImagePreviewGroup = (idList: Array<string>) => {
+	console.log(idList)
 	imageList.value = idList.map((item) => `${baseUrl.httpUrl}/file/download/image/teacher/${item}`)
 	imagePreviewGroupShow.value = true
 }
@@ -250,7 +251,9 @@ const moveFileModalSave = async (arr: number[]) => {
 				<template #title="{ record }">
 					<div class="flex items-center">
 						<a-tooltip :content="richTextFilterText(record.title)">
-							<div class="max-w-70% truncate mr-10px">{{ richTextFilterText(record.title) }}</div>
+							<div class="max-w-70% truncate mr-10px">
+								{{ richTextFilterText(record.title).substring(0, 35) }} {{ richTextFilterText(record.title).length > 35 && '...' }}
+							</div>
 						</a-tooltip>
 						<a-tooltip content="点击查看图片">
 							<a-tag

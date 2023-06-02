@@ -144,10 +144,9 @@ const formatFile = (data: Type课件返回类) => {
 
 // 打开文件夹
 const open = async (data: File) => {
-	console.log(breadcrumbLastId.value)
-	clearFileList()
-	resetPagination()
 	if (data.type === 0) {
+		clearFileList()
+		resetPagination()
 		isMe.value ? openMeFolder(data) : openShareFolder(data)
 	} else {
 		openFile(data)
@@ -274,8 +273,11 @@ const resetFolderName = async (coursewareName: string) => {
 const moveFileModalRef = ref()
 
 const singleMove = (id: number | Array<number>) => {
+	console.log(id)
 	if (!Array.isArray(id)) {
 		selectFile.value = [id]
+	} else {
+		selectFile.value = [...id]
 	}
 	moveFileModalRef.value.open()
 }

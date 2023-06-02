@@ -9,7 +9,7 @@ const emit = defineEmits<{
 }>()
 
 const show = ref(false)
-const selectedList = ref<Array<any>>([])
+const selectedList = ref<Array<number>>([])
 const isMe = ref(true)
 
 const open = (openSelectedList: Array<number>) => {
@@ -21,8 +21,19 @@ const open = (openSelectedList: Array<number>) => {
 }
 defineExpose({ open })
 
-const { fileList, breadcrumbList, breadcrumbLastId, clickBreadcrumb, request: getFileList, next, resetFileList, courseName } = useFilePagination(isMe)
+const {
+	fileList,
+	breadcrumbList,
+	breadcrumbLastId,
+	clickBreadcrumb,
+	request: getFileList,
+	next,
+	resetFileList,
+	courseName
+} = useFilePagination({ isMe, filterFile: true })
+
 const fileListUi = computed(() => fileList.filter((item) => !selectedList.value.includes(item.id)))
+
 
 //点击文件夹
 const clickFile = async (item: any) => {
@@ -84,7 +95,7 @@ const save = async () => {
 		</main>
 		<footer class="w-100% flex items-center justify-between mt-15px p-15px">
 			<div>
-				<a-button type="text" @click="createdFolderRef.open()">新建文件夹</a-button>
+				<!-- <a-button type="text" @click="createdFolderRef.open()">新建文件夹</a-button> -->
 			</div>
 			<div>
 				<a-button @click="show = false">取消</a-button>

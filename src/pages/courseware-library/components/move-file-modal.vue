@@ -46,6 +46,7 @@ interface File {
 }
 
 const fileList = ref<Array<File>>([])
+const fileListUi = computed(() => fileList.value.filter((item) => !props.modelValue.includes(item.id)))
 
 // 获取本学期科目列表
 const getCourse = async () => {
@@ -69,7 +70,8 @@ const getFileList = async (id: number) => {
 		id,
 		jobNum: '',
 		current: pagination.current,
-		size: pagination.size
+		size: pagination.size,
+		folderFlag: true
 	})
 
 	if (res.status === 200) {
@@ -163,7 +165,7 @@ const clear = () => {
 		</header>
 		<main class="w-100% h-500px overflow-y-auto scroll-bar overflow-x-hidden" v-on-reach-bottom="{ cb: pullLoad }">
 			<a-row
-				v-for="item in fileList"
+				v-for="item in fileListUi"
 				@click="clickFolder(item)"
 				class="py-10px mx-10px box-border rounded hover:bg-[var(--color-fill-2)] cursor-pointer !items-center first:mt-10px transition mb-10px">
 				<a-col :span="3" class="center"><img :src="item.folderFlag ? folderSvg : fileSvg" class="w-30px h-30px" /></a-col>

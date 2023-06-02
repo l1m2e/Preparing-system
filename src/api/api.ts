@@ -365,7 +365,7 @@ export interface QuestionBankKeyword {
 	 */
 	fid?: number
 	/** 科目名 */
-	courseName?: string
+	courseName: string
 }
 
 /**
@@ -1630,7 +1630,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 				/** 标题 模糊搜索 */
 				title?: string
 				/**
-				 * 题目类型 1选择 2填空 3简答 4判断 默认全部
+				 * 题目类型 0文件夹 1选择 2填空 3简答 4判断 默认全部
 				 * @format int32
 				 */
 				type?: number
@@ -1698,7 +1698,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 				/** 标题 模糊搜索 */
 				title?: string
 				/**
-				 * 题目类型 1选择 2填空 3简答 4判断 默认全部
+				 * 题目类型 0文件夹 1选择 2填空 3简答 4判断 默认全部
 				 * @format int32
 				 */
 				type?: number
@@ -2703,6 +2703,8 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 				id?: number
 				/** 课件名 模糊搜索 */
 				coursewareName?: string
+				/** 是否文件夹，不填则全部 */
+				folderFlag?: boolean
 				/** 科目名 */
 				courseName: string
 				/** 老师工号 */
@@ -3066,7 +3068,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 		 * @summary 7-保存临时图片
 		 * @request POST:/file/saveImage
 		 */
-		saveImage: (data: Array, params: RequestParams = {}) =>
+		saveImage: (data: string[], params: RequestParams = {}) =>
 			this.request<Message, any>({
 				path: `/file/saveImage`,
 				method: 'POST',
@@ -3098,7 +3100,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 		 * @summary 5-删除文件
 		 * @request DELETE:/file/delete
 		 */
-		deleteFile: (data: Array, params: RequestParams = {}) =>
+		deleteFile: (data: string[], params: RequestParams = {}) =>
 			this.request<Message, any>({
 				path: `/file/delete`,
 				method: 'DELETE',

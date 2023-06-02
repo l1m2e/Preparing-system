@@ -4,8 +4,15 @@ import { toValue } from 'vue'
 import { File } from '~/components/file-manager/interface'
 
 /** 使用文件分页 */
-export const useFilePagination = (isMe: MaybeRef<boolean>) => {
+interface Options {
+	/** 是否是我的文件夹 */
+	isMe: MaybeRef<boolean>
+	/** 是否筛选掉所有文件 */
+	filterFile?: boolean
+}
+export const useFilePagination = (data: Options) => {
 	//
+	const { isMe, filterFile } = data
 	const breadcrumbList = reactive([{ title: '全部', fid: -1001 }]) // 文件夹目录写死的层级 不参与请求 层级 -1001 全部 -1002 课程
 	const breadcrumbLastId = computed(() => breadcrumbList.slice().pop()?.fid || 0)
 	const isHome = computed(() => (toValue(isMe) ? breadcrumbList.length === 1 : breadcrumbList.length <= 2))
@@ -25,7 +32,7 @@ export const useFilePagination = (isMe: MaybeRef<boolean>) => {
 
 	//获取老师列表
 	const useTeacherFolder = async () => {
-		const res = await api.courseware.getJobNameByCourseName({ courseName: courseName.value })
+		const res = await api.issueBank.getJobNameByQuestionBank({ courseName: courseName.value })
 		if (res.status === 200) {
 			const formatData = res.data.records
 				.filter((item) => item.jobNum !== useUserInfo.value.schoolUser.studentId) //过滤掉自己共享的文件夹
@@ -42,7 +49,7 @@ export const useFilePagination = (isMe: MaybeRef<boolean>) => {
 
 	//获取课程列表
 	const getCourseFolder = async () => {
-		const query = toValue(isMe) ? api.courseTable.getCourseNameBySemester : api.courseware.getShareCourseName
+		const query = toValue(isMe) ? api.courseTable.getCourseNameBySemester : api.issueBank.getShareQuestionBank
 		const res = await query()
 		if (res.status === 200) {
 			const formatData = res.data.map((item) => ({ fileName: item, id: 0, fid: 0, createdTimestamp: dayjs().valueOf(), type: 0 }))
@@ -55,12 +62,15 @@ export const useFilePagination = (isMe: MaybeRef<boolean>) => {
 
 	const getFileList = async () => {
 		console.log('请求文件列表', currentPage.value, currentPageSize.value, isLastPage.value)
+		const type = filterFile ? 0 : undefined
 		const res = await api.issueBank.queryQuestionBankSim({
 			current: currentPage.value,
 			size: currentPageSize.value,
 			fid: toValue(isMe) ? breadcrumbLastId.value : breadcrumbList.length === 3 ? 0 : breadcrumbLastId.value,
 			courseName: courseName.value,
-			jobNum: teacherId.value as any
+			jobNum: teacherId.value as any,
+			share: toValue(isMe) ? 0 : 1,
+			type
 		})
 
 		if (res.status === 200) {

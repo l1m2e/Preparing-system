@@ -24,7 +24,7 @@ const {
 	resetFileList,
 	next,
 	request: getFileList
-} = useFilePagination(isMe)
+} = useFilePagination({isMe})
 
 //获取文件列表
 getFileList()
@@ -42,7 +42,7 @@ const createdFolderOk = async (name: string) => {
 	createdFolderShow.value = false
 	Message.success('添加文件夹成功')
 	const { title, type, id, fid, createdTimestamp } = res.data
-	fileList.unshift({ fileName: title, type, id, fid: fid!, createdTimestamp })
+	fileList.unshift({ fileName: title, type, id, fid: fid!, createdTimestamp, shareType: 0 })
 }
 
 // 新建题目
@@ -201,7 +201,7 @@ const createdBtnMenu = [
 	<div class="p-10px box-border rounded mt-10px bg-[var(--color-bg-2)] select-none">
 		<div class="mb-10px flex justify-between">
 			<div>
-				<a-dropdown trigger="hover" :disabled="isHome">
+				<a-dropdown trigger="hover" :disabled="isHome || !isMe">
 					<div
 						class="btn p-y-10px rounded-xl bg-blue-5 hover:bg-blue-4"
 						:class="(isHome || !isMe) && ' cursor-not-allowed bg-gray1 text-gray hover:bg-gray1! dark:(bg-dark1 hover:bg-dark1!)'">
@@ -223,8 +223,8 @@ const createdBtnMenu = [
 
 			<div>
 				<a-radio-group type="button" size="large" v-model="isMe" @change="switchingLibrary">
-					<a-radio :value="true">我的课件库</a-radio>
-					<a-radio :value="false">共享课件库</a-radio>
+					<a-radio :value="true">我的问题库</a-radio>
+					<a-radio :value="false">共享问题库</a-radio>
 				</a-radio-group>
 			</div>
 		</div>
@@ -233,8 +233,9 @@ const createdBtnMenu = [
 			<FileManger
 				v-model="selectFile"
 				:file-list="fileList"
-				:disabled="isHome"
+				:disabled="isHome || !isMe"
 				:share="isMe"
+				:disabledCreated="isHome || !isMe"
 				@open="open"
 				@delete="deleteFile"
 				@move="move"
@@ -253,7 +254,7 @@ const createdBtnMenu = [
 		<InputModel placeholder="请输入文件夹名称" title="重命名文件夹" v-model="resetFolderNameShow" @ok="restFolderName"></InputModel>
 		<InputModel placeholder="请输入文件夹名称" title="新建文件夹" v-model="createdFolderShow" @ok="createdFolderOk"></InputModel>
 		<MoveFileModal ref="moveFileModalRef" @ok="refreshFileList"></MoveFileModal>
-		<TopicModal @change="refreshFileList" ref="topicModalRef" :course-name="courseName"></TopicModal>
+		<TopicModal @change="refreshFileList" ref="topicModalRef" :readonly="!isMe" :course-name="courseName"></TopicModal>
 		<ShareSelect ref="shareSelectRef" @ok="shareSuccess"></ShareSelect>
 	</div>
 </template>

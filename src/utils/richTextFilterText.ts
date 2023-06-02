@@ -23,5 +23,5 @@ export const getRichTextImageIds = (richText: string) => {
 	// 搜索图片url
 	const imageUrlList = Array.from(parsedHtml.querySelectorAll('img')).map((item) => item.getAttribute('src'))
 	// 获取图片id 数组
-	return imageUrlList.map((url) => url?.split('/').pop() || '').map((item) => parseInt(item))
+	return imageUrlList.map((url) => url?.split('/').pop() || '').map((item) => item)
 }

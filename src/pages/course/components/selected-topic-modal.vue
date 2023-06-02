@@ -13,7 +13,7 @@ defineExpose({ open })
 
 const isMe = ref(true)
 
-const { fileList, breadcrumbList, clickBreadcrumb, resetFileList, resetFlieState, next, request: getFileList } = useFilePagination(isMe)
+const { fileList, breadcrumbList, clickBreadcrumb, resetFileList, resetFlieState, next, request: getFileList } = useFilePagination({isMe})
 
 //滚动到底部刷新
 const pullLoad = () => {
