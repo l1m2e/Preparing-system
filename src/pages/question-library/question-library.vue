@@ -9,6 +9,7 @@ const isMe = ref<boolean>(true)
 //切换课件库
 const switchingLibrary = () => {
 	resetFileList()
+	selectFile.value.length = 0
 }
 
 const selectFile = ref<Array<number>>([]) // 被选中的列表
@@ -24,7 +25,12 @@ const {
 	resetFileList,
 	next,
 	request: getFileList
-} = useFilePagination({isMe})
+} = useFilePagination({ isMe })
+
+watch(breadcrumbLastId, () => {
+	console.log('11')
+	selectFile.value.length = 0
+})
 
 //获取文件列表
 getFileList()
@@ -251,9 +257,16 @@ const createdBtnMenu = [
 			</FileManger>
 		</div>
 
-		<InputModel placeholder="请输入文件夹名称" title="重命名文件夹" v-model="resetFolderNameShow" @ok="restFolderName"></InputModel>
+		<InputModel placeholder="请输入重命名的名称" title="重命名" v-model="resetFolderNameShow" @ok="restFolderName"></InputModel>
 		<InputModel placeholder="请输入文件夹名称" title="新建文件夹" v-model="createdFolderShow" @ok="createdFolderOk"></InputModel>
-		<MoveFileModal ref="moveFileModalRef" @ok="refreshFileList"></MoveFileModal>
+		<MoveFileModal
+			ref="moveFileModalRef"
+			@ok="
+				() => {
+					selectFile.length = 0
+					refreshFileList()
+				}
+			"></MoveFileModal>
 		<TopicModal @change="refreshFileList" ref="topicModalRef" :readonly="!isMe" :course-name="courseName"></TopicModal>
 		<ShareSelect ref="shareSelectRef" @ok="shareSuccess"></ShareSelect>
 	</div>

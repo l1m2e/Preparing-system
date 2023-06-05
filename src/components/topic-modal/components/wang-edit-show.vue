@@ -1,16 +1,11 @@
 <script lang="ts" setup>
 const props = defineProps<{
 	placeholder: string
-	modelValue: string
 	minHeight?: string
 }>()
-const emit = defineEmits(['update:modelValue'])
-const valueHtml = computed({
-	get: () => props.modelValue,
-	set: (value) => {
-		emit('update:modelValue', value)
-	}
-})
+
+const modelValue = defineModel<string>()
+
 const flag = ref(false)
 
 const onClick = () => {
@@ -24,12 +19,12 @@ const editBlur = () => {
 
 <template>
 	<div>
-		<wang-edit v-if="flag" v-model="valueHtml" :placeholder="props.placeholder" :onOnEditBlur="editBlur" :minHeight="props.minHeight"></wang-edit>
+		<wang-edit v-if="flag" v-model="modelValue" :placeholder="props.placeholder" :onOnEditBlur="editBlur" :minHeight="props.minHeight"></wang-edit>
 		<div
-			v-else-if="valueHtml && valueHtml !== '<p><br></p>'"
+			v-else-if="modelValue && modelValue !== '<p><br></p>'"
 			@click="onClick"
 			class="cursor-pointer p-10px bg-[var(--color-fill-1)] w-100% h-42px overflow-y-auto scroll-bar rounded-5px"
-			v-html="valueHtml"></div>
+			v-html="modelValue"></div>
 		<div
 			@click="onClick"
 			v-else

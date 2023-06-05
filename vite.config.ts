@@ -17,7 +17,8 @@ export default defineConfig({
 	plugins: [
 		Vue({
 			script: {
-				propsDestructure: true
+				propsDestructure: true,
+				defineModel: true
 			}
 		}),
 		requireTransform({ fileRegex: /.ts$|.tsx$|.vue$/ }),

@@ -7,25 +7,21 @@ import { useToken } from '~/composables'
 
 interface Props {
 	placeholder: string
-	modelValue: string
 	minHeight?: string
 }
 const props = withDefaults(defineProps<Props>(), {
 	minHeight: '80'
 })
-const emit = defineEmits(['update:modelValue', 'onEditBlur'])
+
+const modelValue = defineModel<string>()
+
+const emit = defineEmits(['onEditBlur'])
 
 const minHeight = computed(() => props.minHeight + 'px')
 
 // 编辑器实例，必须用 shallowRef
 const editorRef = shallowRef()
-// 内容 HTML
-const valueHtml = computed({
-	get: () => props.modelValue,
-	set: (value) => {
-		emit('update:modelValue', value)
-	}
-})
+
 const editorConfig: Partial<IEditorConfig> = { placeholder: props.placeholder, MENU_CONF: {} }
 
 // 组件销毁时，也及时销毁编辑器
@@ -76,9 +72,7 @@ const onBlur = async () => {
 	console.log('失去焦点')
 }
 const borderColor = computed(() => (isFocus.value ? ' 1px solid rgb(var(--primary-6))' : ' 1px solid var(--color-border-2)'))
-watch(borderColor, (n) => {
-	console.log(n)
-})
+
 //上传图片
 if (editorConfig.MENU_CONF) {
 	editorConfig.MENU_CONF['uploadImage'] = {
@@ -89,7 +83,6 @@ if (editorConfig.MENU_CONF) {
 		//上传成功
 		onSuccess(file: File, res: any) {
 			console.log(`${file.name} 上传成功`, res)
-			// fileList.push(res.data.url)
 		},
 		// 上传失败
 		onFailed(file: File, res: any) {
@@ -110,7 +103,7 @@ if (editorConfig.MENU_CONF) {
 		<Toolbar class="richText-toolbar" :editor="editorRef" :defaultConfig="toolbarConfig" mode="simple" />
 		<Editor
 			class="richText-edit"
-			v-model="valueHtml"
+			v-model="modelValue"
 			:defaultConfig="editorConfig"
 			mode="simple"
 			@onCreated="handleCreated"

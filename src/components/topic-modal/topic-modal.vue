@@ -37,11 +37,13 @@ const toggleModal = async (topic: string, param: { id?: number; fid?: number; is
 	}
 
 	show.value = true
+	console.log(topicStore)
 }
 
 /** 获取题目信息 */
 const getTopic = async (id: number) => {
 	const res = openParam.isBank ? await api.issueBank.getQuestionBankInfoById(id) : await api.issue.getQuestionInfoById(id)
+
 	if (res.status === 200) {
 		const obj = pick(res.data, ['analysis', 'title', 'difficulty'])
 		setReactive(topicStore, obj)
@@ -157,8 +159,6 @@ const saveTopic = async () => {
 		...(['单选题', '多选题'].includes(topicType.value) && { choices })
 	}
 
-	if (!courseInfoStore.value.id) return message('没有获得课程id')
-
 	loading.value = true
 	let res
 
@@ -174,6 +174,7 @@ const saveTopic = async () => {
 			? await api.issueBank.updateQuestionBankById(openParam.id, { ...params, fid: openParam.fid, courseName: props.courseName || '' })
 			: await api.issue.updateQuestionById(openParam.id, params)
 	} else {
+		if (!courseInfoStore.value.id) return message('没有获得课程id')
 		res = await api.issue.addQuestion(courseInfoStore.value.id, params)
 	}
 	loading.value = false
@@ -225,15 +226,7 @@ const message = (msg: string) => {
 </script>
 
 <template>
-	<a-modal
-		:visible="show"
-		:title="topicType"
-		:width="1200"
-		:closable="false"
-		:mask-closable="false"
-		:esc-to-close="false"
-		:footer="false"
-		@before-close="resetTopicStore">
+	<a-modal :visible="show" :title="topicType" :width="1200" :closable="false" :mask-closable="false" :esc-to-close="false" :footer="false">
 		<cloze-questions v-if="topicType === '填空题'"></cloze-questions>
 		<judgement-questions v-if="topicType === '判断题'"></judgement-questions>
 		<multiple-choice-question v-if="topicType === '单选题'" type="单选题"></multiple-choice-question>

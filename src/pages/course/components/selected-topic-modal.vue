@@ -13,7 +13,7 @@ defineExpose({ open })
 
 const isMe = ref(true)
 
-const { fileList, breadcrumbList, clickBreadcrumb, resetFileList, resetFlieState, next, request: getFileList } = useFilePagination({isMe})
+const { fileList, breadcrumbList, isHome, clickBreadcrumb, resetFileList, resetFlieState, next, request: getFileList } = useFilePagination({ isMe })
 
 //滚动到底部刷新
 const pullLoad = () => {
@@ -76,8 +76,8 @@ const beforClose = () => {
 			</a-breadcrumb>
 			<div class="mr-10px">
 				<a-radio-group type="button" size="small" v-model="isMe" @change="resetFileList">
-					<a-radio :value="true">我的课件库</a-radio>
-					<a-radio :value="false">共享课件库</a-radio>
+					<a-radio :value="true">我的问题库</a-radio>
+					<a-radio :value="false">共享问题库</a-radio>
 				</a-radio-group>
 			</div>
 		</header>
@@ -95,7 +95,7 @@ const beforClose = () => {
 			<div>
 				<a-button @click="show = false">取消</a-button>
 				<a-badge :count="selectedList.length" :dotStyle="{ background: '#3b82f6' }">
-					<a-button type="primary" class="ml-10px" @click="save">添加到备课</a-button>
+					<a-button type="primary" class="ml-10px" @click="save" :disabled="isHome || selectedList.length === 0">添加到备课</a-button>
 				</a-badge>
 			</div>
 		</footer>

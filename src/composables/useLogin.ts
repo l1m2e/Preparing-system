@@ -53,10 +53,10 @@ const reconnection = async (uuid: string) => {
 
 const onLogin = (res: any) => {
 	if (res.type === 'success') {
-		useToken.value = res.message
+		useToken.value = res.data
 		useGetUserInfo() // 获取token成功则获取用户信息
 		useloginIo.disconnect() // 登录成功断开 ws
-		console.log('断开')
+		router.replace('/course/list')
 	}
 }
 

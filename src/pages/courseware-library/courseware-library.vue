@@ -139,7 +139,7 @@ const createdFolderOk = async (name: string) => {
 
 const formatFile = (data: Type课件返回类) => {
 	const { updateTimestamp: createdTimestamp, coursewareName: fileName, id, fid, shareType, folderFlag } = data
-	return { createdTimestamp, fileName, id, fid, shareType, type: folderFlag ? 0 : 1 }
+	return { createdTimestamp, fileName, id, fid, shareType, type: folderFlag ? 0 : 10 }
 }
 
 // 打开文件夹
@@ -308,8 +308,15 @@ const donwloadFile = async (file: File) => {
 	window.location.href = `${baseUrl.httpUrl}/file/download/courseware/teacher/${item.srcId}`
 }
 
-//文件icon样式
-const fileIconTextList = [
+const shareSuccess = (data: { id: number; shareType: number }) => {
+	const item = fileListFormat.value.find((item) => item.id === data.id)
+
+	if (item) {
+		item.shareType = data.shareType
+	}
+}
+
+const fileIconsMap = [
 	{ text: 'doc', icon: 'i-ri-file-word-2-line' },
 	{ text: 'docx', icon: 'i-ri-file-word-2-line' },
 	{ text: 'docm', icon: 'i-ri-file-word-2-line' },
@@ -334,14 +341,6 @@ const fileIconTextList = [
 	{ text: 'svg', icon: 'i-ri-image-line' },
 	{ text: 'mp4', icon: 'i-ri-video-line' }
 ]
-
-const shareSuccess = (data: { id: number; shareType: number }) => {
-	const item = fileListFormat.value.find((item) => item.id === data.id)
-
-	if (item) {
-		item.shareType = data.shareType
-	}
-}
 </script>
 
 <template>
@@ -397,9 +396,9 @@ const shareSuccess = (data: { id: number; shareType: number }) => {
 					<template #fileIcon="{ file }">
 						<div
 							class="w-30px h-30px absolute left-[calc(50%-15px)] top-40% text-white"
-							:class="fileIconTextList.find((item) => item.text === file.fileName.split('.').pop())?.icon || 'i-ri-apps-2-fill'"></div>
+							:class="fileIconsMap.find((item) => item.text === file.fileName.split('.').pop())?.icon || 'i-ri-apps-2-fill'"></div>
 						<div :class="`absolute w-30px  text-center left-[calc(50%-15px)] top-65% text-white `">
-							{{ fileIconTextList.find((item) => item.text === file.fileName.split('.').pop())?.text || '未知' }}
+							{{ fileIconsMap.find((item) => item.text === file.fileName.split('.').pop())?.text || '未知' }}
 						</div>
 					</template>
 					<template #footerPopup v-if="!isMe">
@@ -411,7 +410,7 @@ const shareSuccess = (data: { id: number; shareType: number }) => {
 		</div>
 		<UploadModal ref="uploadModalRef" @ok="update" />
 		<InputModel title="新建文件夹" v-model="createdFolderShow" @ok="createdFolderOk" placeholder="请输入新建文件夹名称"></InputModel>
-		<InputModel title="重命名文件夹" v-model="resetFolderNameShow" @ok="resetFolderName" placeholder="请输入新建文件夹名称"></InputModel>
+		<InputModel title="重命名" v-model="resetFolderNameShow" @ok="resetFolderName" placeholder="请输入重命名的名称"></InputModel>
 		<a-image-preview :src="imagePreviewSrc" v-model:visible="imagePreview" />
 		<MoveFileModal ref="moveFileModalRef" v-model="selectFile" @ok="update"></MoveFileModal>
 		<ShareSelect ref="shareSelectRef" @ok="shareSuccess"></ShareSelect>

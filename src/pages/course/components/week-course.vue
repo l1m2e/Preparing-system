@@ -7,11 +7,11 @@ let selectionTime: number | string = courseInfoStore.value.startTime
 const weekCourseList = ref()
 
 // 获取周课表
-const getWeekCourseList = async () => {
+const getWeekCourseList = async (first = false) => {
 	const res = await api.courseTable.getCourseSimplify({
 		className: courseInfoStore.value.className,
 		courseName: courseInfoStore.value.courseName,
-		time: dayjs(selectionTime).format('YYYY-MM-DD')
+		time: first ? dayjs().format('YYYY-MM-DD') : dayjs(selectionTime).format('YYYY-MM-DD')
 	})
 	if (res.status !== 200) return Message.error('获取课程列表失败')
 	setReactive(semesterStore.value, res.data)
@@ -52,7 +52,9 @@ const weekNumCN = computed(() => `第${changeTextToCN(weekInfo.weekNum)}周`)
 
 // 获取周开始的时间
 const getWeekStartTime = async (first = false) => {
-	const res = await api.courseTable.timeCourse({ weekNum: weekInfo.weekNum.toString() })
+	const params = first ? {} : { weekNum: weekInfo.weekNum.toString() }
+
+	const res = await api.courseTable.timeCourse(params)
 
 	if (res.status !== 200) return Message.error('获取周时间失败')
 
@@ -62,10 +64,9 @@ const getWeekStartTime = async (first = false) => {
 		selectionTime = courseInfoStore.value.startTime
 	} else {
 		selectionTime = weekInfo.startDate
-		console.log(weekInfo.startDate)
 	}
 
-	getWeekCourseList()
+	getWeekCourseList(first)
 
 	//每次获取周开始时间重新计算 当前周日期列表
 	getSelectedWeekList(weekInfo.startDate)
@@ -108,6 +109,7 @@ const electedCourseHour = (info: any) => {
 
 	info.selected = true
 }
+
 // 开启备课的时候重新查询周课表
 defineExpose({ getWeekCourseList })
 </script>

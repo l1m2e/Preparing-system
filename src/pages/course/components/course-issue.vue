@@ -252,7 +252,7 @@ const moveFileModalSave = async (arr: number[]) => {
 					<div class="flex items-center">
 						<a-tooltip :content="richTextFilterText(record.title)">
 							<div class="max-w-70% truncate mr-10px">
-								{{ richTextFilterText(record.title).substring(0, 35) }} {{ richTextFilterText(record.title).length > 35 && '...' }}
+								{{ richTextFilterText(record.title).substring(0, 35) }} {{ richTextFilterText(record.title).length > 35 ? '...' : '' }}
 							</div>
 						</a-tooltip>
 						<a-tooltip content="点击查看图片">

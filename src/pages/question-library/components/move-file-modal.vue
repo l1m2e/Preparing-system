@@ -23,6 +23,7 @@ defineExpose({ open })
 
 const {
 	fileList,
+	isHome,
 	breadcrumbList,
 	breadcrumbLastId,
 	clickBreadcrumb,
@@ -33,7 +34,6 @@ const {
 } = useFilePagination({ isMe, filterFile: true })
 
 const fileListUi = computed(() => fileList.filter((item) => !selectedList.value.includes(item.id)))
-
 
 //点击文件夹
 const clickFile = async (item: any) => {
@@ -59,6 +59,7 @@ const save = async () => {
 		fileList.length = 0
 		getFileList()
 		emit('ok')
+		Message.success('移动成功')
 	}
 	if (res.status === 400) {
 		res.data.error && Message.error(res.data.error)
@@ -100,7 +101,7 @@ const save = async () => {
 			<div>
 				<a-button @click="show = false">取消</a-button>
 				<a-badge :count="selectedList.length" :dotStyle="{ background: '#3b82f6' }">
-					<a-button type="primary" class="ml-10px" @click="save">移动到此处</a-button>
+					<a-button type="primary" class="ml-10px" @click="save" :disabled="isHome || selectedList.length === 0">移动到此处</a-button>
 				</a-badge>
 			</div>
 		</footer>

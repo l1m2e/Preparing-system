@@ -13,6 +13,7 @@ const cancel = () => {
 
 //确定
 const ok = () => {
+	if (name.value === '') return Message.info('不能为空')
 	emit('ok', name.value)
 }
 </script>

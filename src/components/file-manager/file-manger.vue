@@ -8,12 +8,12 @@ import { richTextFilterText } from '~/utils'
 
 const props = defineProps<Props>()
 const emit = defineEmits<Emit>()
+const modelValue = defineModel<number[]>() //被选中的文件列表
 
 onMounted(() => {
 	useRegion(fileContentRef.value, 'data-file-id', (data) => {
 		if (props.disabled) return
-		checkedIdList.value = data
-		emit('update:modelValue', data)
+		modelValue.value = data
 	})
 })
 
@@ -28,12 +28,10 @@ watch(
 	() => useAutoChangGridLayout(fileContentRef, 160, props.fileList.length, '.arco-checkbox-group')
 )
 
-//被选中的文件列表
-const checkedIdList = ref<Array<number>>([])
 const fileListUi = computed(() =>
 	//标记选中状态
 	props.fileList.map((item) => {
-		return checkedIdList.value.includes(item.id as number) ? { ...item, checked: true } : { ...item, checked: false }
+		return modelValue.value?.includes(item.id as number) ? { ...item, checked: true } : { ...item, checked: false }
 	})
 )
 
@@ -65,12 +63,13 @@ const filterFileBtnByState = (file: File) =>
 		.filter((item) => !(file.shareType === 0 && item.text === '取消分享')) // 未分享取隐藏消分享按钮
 		.filter((item) => !(file.shareType !== 0 && item.text === '分享')) // 已分享隐藏分享按钮
 		.filter((item) => !(file.type === 0 && item.text === '下载')) // 文件夹隐藏下载按钮
+		.filter((item) => !([1, 2, 3, 4].includes(file.type) && item.text === '重命名')) // 如果是问题隐藏重命名按钮
 </script>
 
 <template>
 	<a-dropdown trigger="contextMenu" alignPoint class="block">
 		<div class="w-100% min-h-99% select-none relative flex flex-col justify-between" ref="fileContentRef">
-			<a-checkbox-group v-model="checkedIdList">
+			<a-checkbox-group v-model="modelValue">
 				<div
 					v-for="item in fileListUi"
 					:class="`${item.checked ? 'checkbox-card-checked' : 'checkbox-card'}`"
@@ -124,17 +123,17 @@ const filterFileBtnByState = (file: File) =>
 
 			<div class="flex w-100% h-100px sticky bottom-0 left-0 right-0 center overflow-hidden" @mousedown.stop="">
 				<Transition enter-active-class="animated-fade-in-up" leave-active-class="animated-fade-out-down" class="animated animated-faster">
-					<slot name="footerPopup" v-if="checkedIdList.length !== 0">
+					<slot name="footerPopup" v-if="modelValue.length !== 0">
 						<div
 							class="py-10px px-20px border border-1px border-[var(--color-border-1)] bg-[var(--color-bg-1)] shadow-lg rounded-xl center overflow-hidden">
 							<a-tooltip content="删除" position="top" mini>
-								<div class="action-bar" @click="$emit('delete', checkedIdList)"><div class="i-ri-delete-bin-6-line"></div></div>
+								<div class="action-bar" @click="$emit('delete', modelValue)"><div class="i-ri-delete-bin-6-line"></div></div>
 							</a-tooltip>
-							<a-tooltip content="移动" position="top" mini @click="$emit('move', checkedIdList)">
+							<a-tooltip content="移动" position="top" mini @click="$emit('move', modelValue)">
 								<div class="action-bar"><div class="i-ri-share-forward-line"></div></div>
 							</a-tooltip>
 							<a-tooltip content="取消选中" position="top" mini>
-								<div class="action-bar"><div class="i-ri-close-circle-line" @click="checkedIdList.length = 0"></div></div>
+								<div class="action-bar"><div class="i-ri-close-circle-line" @click="modelValue.length = 0"></div></div>
 							</a-tooltip>
 						</div>
 					</slot>

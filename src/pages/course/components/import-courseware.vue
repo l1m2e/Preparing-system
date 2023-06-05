@@ -164,7 +164,7 @@ const clear = () => {
 			<div>
 				<a-button @click="show = false">取消</a-button>
 				<a-badge :count="selectFile.length" :dotStyle="{ background: '#3b82f6' }">
-					<a-button type="primary" class="ml-10px" @click="save" :disabled="isHome">导入到课件</a-button>
+					<a-button type="primary" class="ml-10px" @click="save" :disabled="isHome || selectFile.length === 0">导入到课件</a-button>
 				</a-badge>
 			</div>
 		</footer>
