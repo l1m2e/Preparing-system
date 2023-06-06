@@ -3,6 +3,7 @@ import ToggleDarkSwitch from './components/toggle-dark-switch.vue'
 import courseSvg from '~/assets/svg/course.svg'
 import router from '~/router'
 import { useUserInfo, useLogout } from '~/composables'
+import resetPassword from './components/reset-password.vue'
 
 //菜单折叠
 const collapsed = ref(false)
@@ -25,6 +26,8 @@ const onClickMenuItem = (key: string) => {
 	router.push(key)
 	console.log(route.path)
 }
+
+const resetPasswordRef = ref()
 </script>
 
 <template>
@@ -38,14 +41,28 @@ const onClickMenuItem = (key: string) => {
 			<ToggleDarkSwitch></ToggleDarkSwitch>
 			<!-- 退出按钮 -->
 
-			<a-tooltip content="退出登录">
-				<div @click="useLogout" class="flex items-center mr-40px cursor-pointer select-none">
+			<a-dropdown trigger="hover">
+				<div @click="" class="flex items-center mr-40px cursor-pointer select-none">
 					<div class="w-35px h-35px center bg-gray-1 hover:bg-gray-2 dark:(bg-dark-1 hover:bg-dark-2) rounded-full mr-10px">
-						<div class="i-ri-login-box-line"></div>
+						<div class="i-ri-user-line"></div>
 					</div>
 					<div>{{ useUserInfo.schoolUser.studentName }}</div>
 				</div>
-			</a-tooltip>
+				<template #content>
+					<a-doption @click="resetPasswordRef.open()">
+						<template #icon>
+							<div i-ri-edit-line></div>
+						</template>
+						<template #default>修改密码</template>
+					</a-doption>
+					<a-doption @click="useLogout">
+						<template #icon>
+							<div i-ri-logout-box-line></div>
+						</template>
+						<template #default>退出登陆</template>
+					</a-doption>
+				</template>
+			</a-dropdown>
 		</div>
 	</div>
 	<!-- 侧边 -->
@@ -71,6 +88,8 @@ const onClickMenuItem = (key: string) => {
 			</Transition>
 		</router-view>
 	</div>
+
+	<resetPassword ref="resetPasswordRef"></resetPassword>
 </template>
 <style scoped>
 .side {

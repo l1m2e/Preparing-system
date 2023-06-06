@@ -68,6 +68,5 @@ const ok = () => {}
 				</a-badge>
 			</div>
 		</footer>
-		<!-- <CreatedFolder ref="createdFolderRef" :fid="breadcrumbLastId" @ok="createdFolderSuccess"></CreatedFolder> -->
 	</a-modal>
 </template>

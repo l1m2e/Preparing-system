@@ -44,14 +44,6 @@ const clickFile = async (item: any) => {
 	getFileList()
 }
 
-// 创建文件夹 ref
-const createdFolderRef = ref()
-
-//创建文件夹
-const createdFolderSuccess = (res: any) => {
-	breadcrumbList.push({ title: res.title, fid: res.id })
-}
-
 //保存
 const save = async () => {
 	const res = await api.issueBank.moveQuestionBank({ fid: breadcrumbLastId.value, ids: selectedList.value, courseName: courseName.value })
@@ -95,9 +87,7 @@ const save = async () => {
 			</a-row>
 		</main>
 		<footer class="w-100% flex items-center justify-between mt-15px p-15px">
-			<div>
-				<!-- <a-button type="text" @click="createdFolderRef.open()">新建文件夹</a-button> -->
-			</div>
+			<div></div>
 			<div>
 				<a-button @click="show = false">取消</a-button>
 				<a-badge :count="selectedList.length" :dotStyle="{ background: '#3b82f6' }">
@@ -105,6 +95,5 @@ const save = async () => {
 				</a-badge>
 			</div>
 		</footer>
-		<CreatedFolder ref="createdFolderRef" :fid="breadcrumbLastId" @ok="createdFolderSuccess"></CreatedFolder>
 	</a-modal>
 </template>

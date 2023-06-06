@@ -47,7 +47,7 @@ declare module '@vue/runtime-core' {
     ATooltip: typeof import('@arco-design/web-vue')['Tooltip']
     AUpload: typeof import('@arco-design/web-vue')['Upload']
     ClozeQuestions: typeof import('./../components/topic-modal/components/cloze-questions.vue')['default']
-    CreatedFolder: typeof import('./../components/createdFolder/createdFolder.vue')['default']
+    CreatedFolder: typeof import('./../components/created-folder/created-folder.vue')['default']
     Difficulty: typeof import('./../components/topic-modal/components/difficulty.vue')['default']
     FileManger: typeof import('./../components/file-manager/file-manger.vue')['default']
     InputModel: typeof import('./../components/input-model/input-model.vue')['default']
