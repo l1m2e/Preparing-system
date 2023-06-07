@@ -7,7 +7,7 @@
 		"typecheck": "vue-tsc --noEmit",
 		"preview": "vite preview",
 		"up": "taze major -I",
-		"api": "swagger-typescript-api -p http://192.168.88.123:8081/v3/api-docs/teacherWeb -o ./src/api -n api --axios --module-name-first-tag"
+		"api": "swagger-typescript-api -p http://192.168.88.239:8086/v3/api-docs/teacherWeb -o ./src/api -n api --axios --module-name-first-tag"
 	},
 	"dependencies": {
 		"@iconify-json/ri": "^1.1.8",

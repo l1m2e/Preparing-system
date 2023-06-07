@@ -4,6 +4,7 @@ import { io } from '~/service'
 import router from '~/router'
 
 export const useToken = useStorage('token', '')
+
 export const useUserInfo = useStorage('userInfo', {
 	/** 用户id */
 	userId: 0,

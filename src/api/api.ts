@@ -11,11 +11,13 @@
 
 /** 老师端修改账号密码 */
 export interface TeacherUserChangeParam {
-	/** 工号 */
-	jobNum: string
 	/** 原密码 */
 	oldPassword: string
-	/** 新密码 */
+	/**
+	 * 新密码
+	 * @minLength 6
+	 * @maxLength 16
+	 */
 	password: string
 }
 
@@ -242,7 +244,8 @@ export interface CoursewarePutParam {
 	shareType?: number
 }
 
-export interface Type课件返回类 {
+/** 课件返回类 */
+export interface CoursewareVo {
 	/** @format int64 */
 	id: number
 	/** @format int64 */
@@ -255,6 +258,8 @@ export interface Type课件返回类 {
 	srcId?: string
 	/** 是否文件夹 */
 	folderFlag?: boolean
+	/** 类型 1为课前 2为老师课堂使用 4为课后 */
+	type?: number[]
 	/**
 	 * 分享类型 0不分享 1科目分享 2全局分享
 	 * @format int32
@@ -265,6 +270,22 @@ export interface Type课件返回类 {
 	 * @format int64
 	 */
 	updateTimestamp: number
+}
+
+/** 修改备课课件模型 */
+export interface CoursewareCopyPutParam {
+	/**
+	 * id
+	 * @format int64
+	 */
+	id: number
+	/** 课件名/文件夹名 */
+	coursewareName?: string
+	/**
+	 * 类型 1为课前 2为老师课堂使用 4为课后
+	 * @uniqueItems true
+	 */
+	type?: number[]
 }
 
 /** 批量分享课件模型 */
@@ -323,7 +344,11 @@ export interface SchoolTeaUserParam {
 	studentName: string
 	/** 学号 */
 	studentId: string
-	/** 密码 */
+	/**
+	 * 密码
+	 * @minLength 6
+	 * @maxLength 16
+	 */
 	password: string
 }
 
@@ -343,6 +368,8 @@ export interface SchoolUserVo {
 	type: string
 	/** 性别 */
 	gender: string
+	/** 是否默认密码 */
+	defaultPwd?: boolean
 	jobNum?: string
 	teachName?: string
 }
@@ -489,7 +516,7 @@ export interface PreparingVo {
 	 * 课件信息数组
 	 * @uniqueItems true
 	 */
-	coursewareVos?: Type课件返回类[] | null
+	coursewareVos?: CoursewareVo[] | null
 	/** 班级名称 */
 	className: string
 	/** 老师工号 */
@@ -570,6 +597,11 @@ export interface CoursewareBind {
 	 * @uniqueItems true
 	 */
 	cidList: number[]
+	/**
+	 * 类型 1为课前 2为老师课堂使用 4为课后
+	 * @uniqueItems true
+	 */
+	type?: number[]
 }
 
 export interface LinkedMap {
@@ -1052,9 +1084,9 @@ export interface ExaminationLogInfoVo {
 }
 
 /** 分页对象 */
-export interface MyPage课件返回类 {
+export interface MyPageCoursewareVo {
 	/** 数据 */
-	records: Type课件返回类[]
+	records: CoursewareVo[]
 	/**
 	 * 总数
 	 * @format int64
@@ -1294,7 +1326,7 @@ export class HttpClient<SecurityDataType = unknown> {
 	private format?: ResponseType
 
 	constructor({ securityWorker, secure, format, ...axiosConfig }: ApiConfig<SecurityDataType> = {}) {
-		this.instance = axios.create({ ...axiosConfig, baseURL: axiosConfig.baseURL || 'http://192.168.88.123:8081' })
+		this.instance = axios.create({ ...axiosConfig, baseURL: axiosConfig.baseURL || 'http://192.168.88.239:8086' })
 		this.secure = secure
 		this.format = format
 		this.securityWorker = securityWorker
@@ -1380,7 +1412,7 @@ export class HttpClient<SecurityDataType = unknown> {
 /**
  * @title OpenAPI definition
  * @version v0
- * @baseUrl http://192.168.88.123:8081
+ * @baseUrl http://192.168.88.239:8086
  */
 export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDataType> {
 	v80登录模块 = {
@@ -2457,8 +2489,25 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 		 * @request PUT:/teacherWeb/courseware/update
 		 */
 		updateCourseware: (data: CoursewarePutParam, params: RequestParams = {}) =>
-			this.request<Type课件返回类, any>({
+			this.request<CoursewareVo, any>({
 				path: `/teacherWeb/courseware/update`,
+				method: 'PUT',
+				body: data,
+				type: ContentType.Json,
+				...params
+			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags 83-课件模块
+		 * @name UpdateCoursewareCopy
+		 * @summary 16-修改备课课件信息
+		 * @request PUT:/teacherWeb/courseware/updateCopy
+		 */
+		updateCoursewareCopy: (data: CoursewareCopyPutParam, params: RequestParams = {}) =>
+			this.request<Message, any>({
+				path: `/teacherWeb/courseware/updateCopy`,
 				method: 'PUT',
 				body: data,
 				type: ContentType.Json,
@@ -2520,12 +2569,12 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 		 * No description
 		 *
 		 * @tags 83-课件模块
-		 * @name AddFileH
+		 * @name AddFolder
 		 * @summary 14-添加文件夹
 		 * @request PUT:/teacherWeb/courseware/addFolder
 		 */
-		addFileH: (data: CoursewareParam, params: RequestParams = {}) =>
-			this.request<Type课件返回类, any>({
+		addFolder: (data: CoursewareParam, params: RequestParams = {}) =>
+			this.request<CoursewareVo, any>({
 				path: `/teacherWeb/courseware/addFolder`,
 				method: 'PUT',
 				body: data,
@@ -2557,7 +2606,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 			},
 			params: RequestParams = {}
 		) =>
-			this.request<Type课件返回类[], any>({
+			this.request<CoursewareVo[], any>({
 				path: `/teacherWeb/courseware/upload`,
 				method: 'POST',
 				query: query,
@@ -2587,7 +2636,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 			},
 			params: RequestParams = {}
 		) =>
-			this.request<Type课件返回类[], any>({
+			this.request<CoursewareVo[], any>({
 				path: `/teacherWeb/courseware/uploadByPid`,
 				method: 'POST',
 				query: query,
@@ -2659,12 +2708,17 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 				 * @example 5
 				 */
 				size?: number
+				/**
+				 * 类型 1为课前 2为老师课堂使用 4为课后 默认全部
+				 * @format int32
+				 */
+				type: number
 				/** 课件名 模糊搜索 */
 				coursewareName?: string
 			},
 			params: RequestParams = {}
 		) =>
-			this.request<MyPage课件返回类, any>({
+			this.request<MyPageCoursewareVo, any>({
 				path: `/teacherWeb/courseware/queryCoursewareByPid`,
 				method: 'GET',
 				query: query,
@@ -2718,7 +2772,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 			},
 			params: RequestParams = {}
 		) =>
-			this.request<MyPage课件返回类, any>({
+			this.request<MyPageCoursewareVo, any>({
 				path: `/teacherWeb/courseware/list`,
 				method: 'GET',
 				query: query,
@@ -3085,10 +3139,19 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 		 * @summary 2-下载文件
 		 * @request GET:/file/download/{type}/{user}/{id}
 		 */
-		fileChunkDownload: (type: string, user: string, id: string, params: RequestParams = {}) =>
+		fileChunkDownload: (
+			type: string,
+			user: string,
+			id: string,
+			query?: {
+				fileName?: string
+			},
+			params: RequestParams = {}
+		) =>
 			this.request<void, any>({
 				path: `/file/download/${type}/${user}/${id}`,
 				method: 'GET',
+				query: query,
 				...params
 			}),
 

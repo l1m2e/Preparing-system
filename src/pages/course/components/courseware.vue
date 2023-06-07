@@ -1,18 +1,27 @@
 <script lang="ts" setup>
-import type { Type课件返回类 } from '~/api/api'
+import type { CoursewareVo } from '~/api/api'
 import type { TableColumnData } from '@arco-design/web-vue'
 import { courseInfoStore } from '~/store/courseStore'
 import { baseUrl } from '~/config/baseUrl'
 import ImportCourseware from './import-courseware.vue'
 import UploadCourseware from './upload-courseware.vue'
+import dayjs from 'dayjs'
 
 const paginationConfig = reactive({ pageSize: 8, total: 0, current: 1 })
 
-const data = ref<Type课件返回类[]>([])
+const data = ref<CoursewareVo[]>([])
 const columns: TableColumnData[] = [
 	{
 		title: '课件名称',
 		dataIndex: 'coursewareName'
+	},
+	{
+		title: '创建时间',
+		slotName: 'updateTimestamp'
+	},
+	{
+		title: '课件类型',
+		slotName: 'type'
 	},
 	{
 		title: '操作',
@@ -45,9 +54,9 @@ const pageChange = (index: number) => {
 	getCoursewareList()
 }
 
-const download = (file: Type课件返回类) => (window.location.href = `${baseUrl.httpUrl}/file/download/courseware/teacher/${file.srcId}`)
+const download = (file: CoursewareVo) => (window.location.href = `${baseUrl.httpUrl}/file/download/courseware/teacher/${file.srcId}`)
 
-const deleteFile = async (file: Type课件返回类) => {
+const deleteFile = async (file: CoursewareVo) => {
 	const res = await api.courseware.unBindCourseware({ pid: courseInfoStore.value.id, cidList: [file.id] })
 	if (res.status === 200) {
 		getCoursewareList()
@@ -57,6 +66,14 @@ const deleteFile = async (file: Type课件返回类) => {
 
 const importCoursewarRef = ref()
 const uploadCoursewareRef = ref()
+
+const coursewareTypeChange = async (val: CoursewareVo) => {
+	const res = await api.courseware.updateCoursewareCopy({ id: val.id, type: val.type })
+	if (res.status !== 200) {
+		getCoursewareList()
+		return Message.error('修改失败')
+	}
+}
 </script>
 
 <template>
@@ -91,6 +108,12 @@ const uploadCoursewareRef = ref()
 					<template #icon><icon-delete></icon-delete></template>
 				</a-button>
 			</div>
+		</template>
+		<template #updateTimestamp="{ record }">
+			{{ dayjs(record.updateTimestamp).format('YYYY-MM-DD HH:mm') }}
+		</template>
+		<template #type="{ record }">
+			<CoursewareTypeSelect v-model="record.type" @change="coursewareTypeChange(record)"></CoursewareTypeSelect>
 		</template>
 	</a-table>
 	<ImportCourseware ref="importCoursewarRef" @ok="getCoursewareList"></ImportCourseware>

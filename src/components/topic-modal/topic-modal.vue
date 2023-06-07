@@ -87,7 +87,7 @@ const close = () => {
 		content: '题目暂未保存，确定取消保存？',
 		hideCancel: false,
 		onOk: () => {
-			show.value = false
+			;(show.value = false), resetTopicStore()
 		}
 	})
 }
@@ -99,6 +99,7 @@ const loading = ref(false)
 //保存
 const save = async () => {
 	const isImageSaved = await saveImage()
+
 	if (!isImageSaved) return Message.error('图片保存失败')
 
 	const isTopicSaved = await saveTopic()
@@ -106,7 +107,11 @@ const save = async () => {
 	if (!isTopicSaved) return Message.error('保存题目失败')
 
 	emit('change')
+
 	show.value = false
+
+	if (openParam.id === 0) resetTopicStore()
+
 	Message.success('保存成功')
 }
 

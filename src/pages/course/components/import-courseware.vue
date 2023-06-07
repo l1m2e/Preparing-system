@@ -104,9 +104,10 @@ const pullLoad = () => {
 	getFileList(breadcrumbLastId.value)
 }
 
+const coursewareType = ref<Array<number>>([1])
 //保存
 const save = async () => {
-	const res = await api.courseware.bindCourseware({ pid: courseInfoStore.value.id, cidList: selectFile })
+	const res = await api.courseware.bindCourseware({ pid: courseInfoStore.value.id, cidList: selectFile, type: coursewareType.value })
 	if (res.status === 200) {
 		Message.success('导入课件成功')
 		show.value = false
@@ -128,12 +129,13 @@ const update = () => {
 const clear = () => {
 	breadcrumbList.length = 1
 	fileList.value.length = 0
+	selectFile.length = 0
 }
 </script>
 
 <template>
 	<a-modal
-		title="移动到"
+		title="请选择您需要导入的课件"
 		@before-close="clear"
 		:visible="show"
 		:width="500"
@@ -160,7 +162,9 @@ const clear = () => {
 			</a-row>
 		</main>
 		<footer class="w-100% flex items-center justify-between mt-15px p-15px">
-			<div></div>
+			<div>
+				<CoursewareTypeSelect v-model="coursewareType" :width="290" :max-tag-count="2"></CoursewareTypeSelect>
+			</div>
 			<div>
 				<a-button @click="show = false">取消</a-button>
 				<a-badge :count="selectFile.length" :dotStyle="{ background: '#3b82f6' }">

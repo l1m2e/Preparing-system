@@ -30,7 +30,7 @@ const uploadError = (fileItem: FileItem) => {
 const emit = defineEmits(['ok'])
 
 const close = () => {
-	const isDone = filelist.value.every((item) => item.status === 'done')
+	const isDone = filelist.value.every((item) => item.status === 'done' || 'error')
 	if (isDone) return cleaFile()
 	Modal.warning({
 		title: '警告',
